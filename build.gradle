@@ -1,0 +1,97 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.2.7' // Spring Boot 호환 버전
+    id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'one.dfy.bily'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.4'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-cache' /*토큰 캐싱 - 선택 사항*/
+/*    implementation 'org.springframework.boot:spring-boot-starter-security'*/
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.4'
+    implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    runtimeOnly 'com.mysql:mysql-connector-j'
+    implementation 'com.nimbusds:nimbus-jose-jwt:9.6' // nimbus-jose-jwt 라이브러리 추가
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+    implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
+    implementation 'io.jsonwebtoken:jjwt-gson:0.11.5'
+    implementation 'org.glassfish.jaxb:jaxb-runtime:2.3.1' // JAXB Runtime
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    implementation 'com.amazonaws:aws-java-sdk-s3:1.12.691'
+    implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'// AWS S3 연동
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'// websocket 의존성 주입
+    implementation 'org.springframework.boot:spring-boot-starter-mail' // SMTP 구현
+    implementation 'com.sun.mail:jakarta.mail:2.0.1' // 최신 SMTP 지원 라이브러리
+    implementation 'mysql:mysql-connector-java:8.0.29'  // Use the latest version available
+    implementation 'org.bgee.log4jdbc-log4j2:log4jdbc-log4j2-jdbc4.1:1.16'  /* Log4JDBC */
+    // Springdoc OpenAPI
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0' // 존재하는 최신 버전
+
+    implementation 'io.swagger.core.v3:swagger-core:2.2.14'
+    implementation 'io.swagger.core.v3:swagger-annotations:2.2.14'
+
+
+
+
+}
+
+tasks.withType(JavaCompile) {
+    options.compilerArgs << "-Xlint:deprecation"
+}
+
+
+tasks.register('buildReactApp') {
+    doLast {
+        exec {
+            workingDir "${projectDir}/admin-frontend" // React 앱의 디렉토리 경로
+            commandLine 'npm', 'run', 'build'
+            standardOutput = new ByteArrayOutputStream()
+            errorOutput = new ByteArrayOutputStream()
+            ignoreExitValue = true // 오류 발생 시에도 계속 진행
+            doLast {
+                println "Output: ${standardOutput.toString()}"
+                println "Error: ${errorOutput.toString()}"
+            }
+        }
+
+        // 기존 build 디렉토리를 삭제하고 복사
+        def staticDir = "${projectDir}/src/main/resources/static"
+        def buildDir = "${projectDir}/admin-frontend/build"
+
+        // 기존 디렉토리 삭제
+        delete fileTree(staticDir) {
+            include '**'
+        }
+
+        // 빌드 결과물 복사
+        copy {
+            from buildDir
+            into staticDir
+        }
+    }
+}

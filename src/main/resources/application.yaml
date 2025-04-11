@@ -1,0 +1,108 @@
+server:
+  port: 8081
+  ssl:
+    enabled: false
+  tomcat:
+    max-http-form-post-size: 100MB
+
+jwt:
+  secret: DjktOBVHAu0VxgLpj5HQFprityt4WamJQBeh21lA+N8=
+  expiration: 86400 # 1일 (초 단위)
+
+jasypt:
+  encryptor:
+    password: dfybybily!@#$%  # 암호화에 사용한 비밀번호
+
+spring:
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 50MB  # 개별 파일 최대 크기 (요구사항에 따라 조정 가능)
+      max-request-size: 100MB  # 요청 전체 크기 (여러 파일 포함)
+      file-size-threshold: 2MB  # 임계값, 2MB 초과 시 디스크에 임시 저장
+
+  jackson:
+    serialization:
+      write-date-keys-as-timestamps: false
+    config:
+      import: optional:file:.env[.properties]
+    profiles:
+      active: dev
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
+    application:
+      name: one-dfy-bily-api
+    h2:
+      console:
+        enabled: true
+    web:
+      resources:
+        static-locations: classpath:/static/
+    mybatis:
+      mapper-locations: classpath:mapper/*.xml
+  mail:
+    host: smtp.naver.com
+    port: 587
+    username: kfgreen@naver.com
+    password: "@!kim0242"
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+  datasource:
+    url: jdbc:mysql://15.165.245.177:3306/bliydatabase
+    username: bliy
+    password: Admin2025!
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
+
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  # 로그 레벨 설정
+logging:
+  pattern:
+    console: "%clr(%d{yyyy-MM-dd HH:mm:ss}){green} [%thread] %clr(%-5level){cyan} %clr([%logger{36}]){blue} - %msg%n"
+  level:
+    org.springframework.web.multipart: DEBUG
+    root: INFO          # 기본 로그 레벨
+    org:
+      springframework:
+        web: DEBUG       # Spring Web 로깅
+        orm: DEBUG       # ORM 관련 로깅
+      hibernate:
+        SQL: DEBUG       # Hibernate 실행 SQL
+        type:
+          descriptor: TRACE  # SQL 바인딩 파라미터
+      apache:
+        ibatis: TRACE    # MyBatis 관련 메서드 및 쿼리문 디버깅
+        mybatis: TRACE      # MyBatis SQL 실행 및 결과 디버깅
+    jdbc:
+      connection: DEBUG   # JDBC 연결 관련 로그
+      result: DEBUG       # JDBC 결과 로그
+      statement: DEBUG    # JDBC Statement 관련 로그
+
+cloud:
+  aws:
+    s3:
+      bucket: ${AWS_S3_BUCKET}
+    credentials:
+      access-key: ${AWS_ACCESS_KEY}
+      secret-key: ${AWS_SECRET_KEY}
+    region:
+      static: ${AWS_REGION}
+      auto: false
+    stack:
+      auto: false
+
+springdoc:
+  api-docs:
+    path: /api-docs # API 문서 경로 설정
+  swagger-ui:
+    path: /swagger-ui.html # Swagger UI 경로 설정
+    enabled: true # Swagger UI 활성화 여부

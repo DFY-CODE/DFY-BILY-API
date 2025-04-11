@@ -1,0 +1,109 @@
+server:
+  port: 443
+  ssl:
+    enabled: true
+    key-store: classpath:keystore.p12
+    key-store-password: dfydfy
+    key-store-type: PKCS12
+    key-alias: tomcat
+
+jwt:
+  secret: DjktOBVHAu0VxgLpj5HQFprityt4WamJQBeh21lA+N8=
+  expiration: 86400 # 1일 (초 단위)
+
+jasypt:
+  encryptor:
+    password: dfybybily!@#$%  # 암호화에 사용한 비밀번호
+
+spring:
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 50MB  # 개별 파일 최대 크기 (요구사항에 따라 조정 가능)
+      max-request-size: 100MB  # 요청 전체 크기 (여러 파일 포함)
+      file-size-threshold: 2MB  # 임계값, 2MB 초과 시 디스크에 임시 저장
+
+  jackson:
+    serialization:
+      write-date-keys-as-timestamps: false
+    config:
+      import: optional:file:.env.prod[.properties]
+    profiles:
+      active: prod
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
+    application:
+      name: one-dfy-bily-api
+    h2:
+      console:
+        enabled: true
+    web:
+      resources:
+        static-locations: classpath:/static/
+  mail:
+    host: smtp.naver.com
+    port: 587
+    username: kfgreen@naver.com
+    password: "@!kim0242"
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+  datasource:
+    url: jdbc:mysql://15.165.245.177:3306/bliydatabase
+    username: bliy
+    password: Admin2025!
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
+
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+
+# 로그 레벨 설정
+logging:
+  pattern:
+    console: "%clr(%d{yyyy-MM-dd HH:mm:ss}){green} [%thread] %clr(%-5level){cyan} %clr([%logger{36}]){blue} - %msg%n"
+  level:
+    root: INFO                                    # 기본 로그 레벨을 INFO로 설정
+    org:
+      apache:
+        ibatis: WARN                              # MyBatis 관련 로그를 INFO -> WARN으로 변경
+      hibernate: WARN                             # Hibernate 주요 로그들 WARN으로 설정
+      jdbc:
+        sql: WARN                                 # SQL 쿼리 로그를 WARN으로 축소
+        result: OFF                               # 결과 로그는 비활성화
+        connection: WARN                          # JDBC 연결 이벤트 로그를 WARN으로 축소
+    springframework:
+      web:
+        socket: WARN                              # WebSocket 로그를 WARN으로 축소
+      messaging: WARN                             # 메시징 로그를 WARN으로 축소
+
+
+
+cloud:
+  aws:
+    s3:
+      bucket: ${AWS_S3_BUCKET}
+    credentials:
+      access-key: ${AWS_ACCESS_KEY}
+      secret-key: ${AWS_SECRET_KEY}
+    region:
+      static: ${AWS_REGION}
+      auto: false
+    stack:
+      auto: false
+
+springdoc:
+  api-docs:
+    path: /api-docs # API 문서 경로 설정
+  swagger-ui:
+    path: /swagger-ui.html # Swagger UI 경로 설정
+    enabled: true # Swagger UI 활성화 여부
+
+

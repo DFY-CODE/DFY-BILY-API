@@ -1,0 +1,25 @@
+package one.dfy.bily.api.common.dto;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.Data;
+
+
+import java.time.LocalDateTime;
+
+@Data
+public class ChatMessage {
+    private Long id;
+    private Long chatRoomId; // 공간 ID
+    private Long senderId;
+    private Long receiverId;
+    private String messageContent;
+    private Boolean isRead;
+    private String senderName; // 🔹 보낸 사람 이름
+    private String receiverName; // 🔹 받는 사람 이름
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime sentAt;
+}
+
+
+
