@@ -39,7 +39,8 @@ public class WebConfig implements WebMvcConfigurer {
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         // 빌드된 React 앱의 리소스를 제공
         registry.addResourceHandler("/**") // 모든 요청에 대해
-                .addResourceLocations("classpath:/static/"); // 실제 리소스 위치
+                .addResourceLocations("file:src/main/webapp/frontend/","file:src/main/webapp/backend/"); // 새 리소스 위치
+
     }
 
 }

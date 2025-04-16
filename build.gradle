@@ -54,7 +54,7 @@ dependencies {
 
     implementation 'io.swagger.core.v3:swagger-core:2.2.14'
     implementation 'io.swagger.core.v3:swagger-annotations:2.2.14'
-
+    implementation 'io.github.cdimascio:java-dotenv:5.2.2' // 최신 버전 확인 후 사용
 
 
 

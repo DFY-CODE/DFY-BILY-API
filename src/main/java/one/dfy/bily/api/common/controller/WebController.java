@@ -16,7 +16,18 @@ public class WebController {
             "/space-modify/**",
             "/scheduling" // React 라우트 패턴
     })
-    public String forwardToIndex() {
-        return "forward:/index.html";
+    public String forwardToReact() {
+        return "forward:/backend/index.html";
     }
+
+    // Next.js 정적 리소스 포워딩 (frontend 디렉토리)
+    @GetMapping(value = {
+            "/",
+            "/spaces",
+            "/admin/**" // Next.js 라우트 패턴
+    })
+    public String forwardToNext() {
+        return "forward:/frontend/index.html";
+    }
+
 }
