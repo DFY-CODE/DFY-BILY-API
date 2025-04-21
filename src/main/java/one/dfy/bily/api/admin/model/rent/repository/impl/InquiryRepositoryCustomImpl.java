@@ -16,6 +16,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -31,6 +32,8 @@ public class InquiryRepositoryCustomImpl implements InquiryRepositoryCustom {
             String companyName,
             String contactPerson,
             String spaceIdKeyword,
+            LocalDateTime startAt,
+            LocalDateTime endAt,
             Pageable pageable
     ) {
         QInquiry inquiry = QInquiry.inquiry;
@@ -44,7 +47,9 @@ public class InquiryRepositoryCustomImpl implements InquiryRepositoryCustom {
                 .where(
                         companyName != null ? inquiry.companyName.contains(companyName) : null,
                         contactPerson != null ? inquiry.contactPerson.contains(contactPerson) : null,
-                        spaceIdKeyword != null ? space.spaceId.contains(spaceIdKeyword) : null
+                        spaceIdKeyword != null ? space.spaceId.contains(spaceIdKeyword) : null,
+                        startAt != null ? inquiry.createdAt.goe(startAt) : null,
+                        endAt != null ? inquiry.createdAt.loe(endAt) : null
                 )
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -85,7 +90,9 @@ public class InquiryRepositoryCustomImpl implements InquiryRepositoryCustom {
                 .where(
                         companyName != null ? inquiry.companyName.eq(companyName) : null,
                         contactPerson != null ? inquiry.contactPerson.eq(contactPerson) : null,
-                        spaceIdKeyword != null ? space.spaceId.containsIgnoreCase(spaceIdKeyword) : null
+                        spaceIdKeyword != null ? space.spaceId.containsIgnoreCase(spaceIdKeyword) : null,
+                        startAt != null ? inquiry.createdAt.goe(startAt) : null,
+                        endAt != null ? inquiry.createdAt.loe(endAt) : null
                 )
                 .fetchOne();
 

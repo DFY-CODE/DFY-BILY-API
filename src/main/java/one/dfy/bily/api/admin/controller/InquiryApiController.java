@@ -18,6 +18,7 @@ import one.dfy.bily.api.admin.service.InquiryService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -39,17 +40,19 @@ public class InquiryApiController {
                     schema = @Schema(implementation = Map.class),
                     examples = @ExampleObject(
                             name = "성공 응답 예시",
-                            externalValue = "/swagger/json/inquiry/findInquiryListByKeyword.json"
+                            externalValue = "/swagger/json/inquiry/findInquiryListByKeywordAndDate.json"
                     )
             ))
     })
-    public ResponseEntity<List<InquiryResponse>> findInquiryListByKeyword(
+    public ResponseEntity<List<InquiryResponse>> findInquiryListByKeywordAndDate(
             @Parameter(description = "문의 검색 타입", required = false) @RequestParam(value = "type", required = false) InquirySearchType type,
             @Parameter(description = "문의 검색 단어", required = false) @RequestParam(value = "keyword", required = false)String keyword,
+            @Parameter(description = "문의 검색 날짜", required = false) @RequestParam(value = "start-date", required = false) LocalDateTime startAt,
+            @Parameter(description = "문의 검색 날짜", required = false) @RequestParam(value = "end-date", required = false) LocalDateTime endAt,
             @Parameter(description = "문의 검색 페이지", required = false) @RequestParam(defaultValue = "1") int page,
             @Parameter(description = "문의 검색 페이지 사이즈", required = false) @RequestParam(defaultValue = "20") int pageSize
     ) {
-        return ResponseEntity.ok(inquiryService.findInquiryListByKeyword(type, keyword, page, pageSize));
+        return ResponseEntity.ok(inquiryService.findInquiryListByKeywordAndDate(type, keyword, startAt, endAt, page, pageSize));
     }
 
     @GetMapping("/inquiry/{inquiry-id}")

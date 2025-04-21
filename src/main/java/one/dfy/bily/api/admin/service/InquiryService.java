@@ -16,6 +16,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -26,14 +27,16 @@ public class InquiryService {
     private final InquiryFileInfoRepository inquiryFileInfoRepository;
 
     @Transactional(readOnly = true)
-    public List<InquiryResponse> findInquiryListByKeyword(InquirySearchType type, String keyword, int page, int pageSize) {
+    public List<InquiryResponse> findInquiryListByKeywordAndDate(InquirySearchType type, String keyword, LocalDateTime startAt, LocalDateTime endAt, int page, int pageSize) {
 
-        Pageable pageable = PageRequest.of(page, pageSize, Sort.by(Sort.Direction.DESC, "inquiryId"));
+        Pageable pageable = PageRequest.of(page-1, pageSize, Sort.by(Sort.Direction.DESC, "inquiryId"));
 
         return inquiryRepository.searchInquiries(
                 type == InquirySearchType.COMPANY_NAME ? keyword : null,
                 type == InquirySearchType.CONTACT_PERSON ? keyword : null,
                 type == InquirySearchType.SPACE ? keyword : null,
+                startAt,
+                endAt,
                 pageable
         ).getContent();
     }
