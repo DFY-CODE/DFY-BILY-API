@@ -11,7 +11,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import one.dfy.bily.api.common.dto.*;
 import one.dfy.bily.api.common.service.FileService;
-import one.dfy.bily.api.common.service.SpaceService;
+import one.dfy.bily.api.admin.service.SpaceService;
 import one.dfy.bily.api.common.service.UserService;
 import one.dfy.bily.api.util.S3Uploader;
 import org.springframework.beans.factory.annotation.Autowired;

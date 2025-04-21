@@ -28,6 +28,8 @@ spring:
       import: optional:file:.env[.properties]
     profiles:
       active: dev
+    property-naming-strategy: SNAKE_CASE
+
   autoconfigure:
     exclude: org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
     application:
@@ -40,6 +42,7 @@ spring:
         static-locations: classpath:/static/
     mybatis:
       mapper-locations: classpath:mapper/*.xml
+
   mail:
     host: smtp.naver.com
     port: 587
@@ -51,11 +54,16 @@ spring:
           auth: true
           starttls:
             enable: true
+
   datasource:
     url: jdbc:mysql://15.165.245.177:3306/bliydatabase
     username: bliy
     password: Admin2025!
     driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: none
 
 mybatis:
   configuration:

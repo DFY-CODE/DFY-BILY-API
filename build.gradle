@@ -56,7 +56,11 @@ dependencies {
     implementation 'io.swagger.core.v3:swagger-annotations:2.2.14'
     implementation 'io.github.cdimascio:java-dotenv:5.2.2' // 최신 버전 확인 후 사용
 
-
+// query dsl 추가
+    implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+    annotationProcessor 'com.querydsl:querydsl-apt:5.0.0:jakarta'
+    annotationProcessor 'jakarta.persistence:jakarta.persistence-api'
+    annotationProcessor 'jakarta.annotation:jakarta.annotation-api'
 
 }
 
@@ -94,4 +98,31 @@ tasks.register('buildReactApp') {
             into staticDir
         }
     }
+}
+
+
+springBoot {
+    mainClass = 'one.dfy.bily.api.OneDfyBilyApiApplication'
+}
+
+tasks.named('bootJar') {
+    mainClass = 'one.dfy.bily.api.OneDfyBilyApiApplication'
+}
+
+def querydslDir = layout.buildDirectory.dir("generated/sources/annotationProcessor/java/main")
+
+tasks.withType(JavaCompile).configureEach {
+    options.generatedSourceOutputDirectory.set(querydslDir)
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs += querydslDir
+        }
+    }
+}
+
+clean {
+    delete querydslDir
 }

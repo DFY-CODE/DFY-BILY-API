@@ -1,0 +1,31 @@
+{
+  "id": 49,
+  "contact_person": "오하늘",
+  "phone_number": "010-3242-4324",
+  "email": "zisun@dfy.co.kr",
+  "company_name": "배고파 주식회사",
+  "position": "햄버거",
+  "company_website": "",
+  "event_category": "전자",
+  "event_name": null,
+  "preferred_dates": [
+    {
+      "to": "2025-04-06T00:00:00Z",
+      "from": "2025-04-04T00:00:00Z"
+    }
+  ],
+  "content": "얼마면 되나요?",
+  "file_attachment": [
+    "IMG_9315.png",
+    "img_qr.jpg"
+  ],
+  "created_at": "2025-04-14T10:48:05.467567+00:00",
+  "status": "신규",
+  "author": "646355a1-7113-483f-a3f6-1b1ba2014259",
+  "host_company": "무한리필",
+  "space_id": 312,
+  "space_id_name": "강남구_논현동_70-10",
+  "spaces": {
+    "space_id": "강남구_논현동_70-10"
+  }
+}

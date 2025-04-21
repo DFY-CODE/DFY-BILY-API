@@ -41,7 +41,7 @@ public class S3Uploader {
 
         fileInfoEntity.setFileName(multipartFile.getOriginalFilename());
         String fileExtension = getFileExtension(fileName);
-        String newFileName = "images/space/" + dirName + UUID.randomUUID().toString() + fileExtension;
+        String newFileName = "images/" + dirName + UUID.randomUUID().toString() + fileExtension;
         String saveFileName = dirName + UUID.randomUUID().toString() + fileExtension;
 
         fileInfoEntity.setContentId(contentId);
