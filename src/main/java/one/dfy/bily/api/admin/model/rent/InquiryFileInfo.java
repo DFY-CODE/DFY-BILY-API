@@ -14,8 +14,7 @@ public class InquiryFileInfo {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ATTACH_FILE_ID")
-    private Long attachFileId;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "INQUIRY_ID", nullable = false)

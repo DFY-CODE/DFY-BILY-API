@@ -1,10 +1,10 @@
 package one.dfy.bily.api.admin.model.rent.repository.impl;
 
+import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import one.dfy.bily.api.admin.dto.InquiryFile;
 import one.dfy.bily.api.admin.dto.InquiryResponse;
-import one.dfy.bily.api.admin.dto.InquiryPreferredDate;
-import one.dfy.bily.api.admin.dto.InquerySpaces;
 import one.dfy.bily.api.admin.mapper.InquiryMapper;
 import one.dfy.bily.api.admin.model.rent.Inquiry;
 import one.dfy.bily.api.admin.model.rent.QInquiry;
@@ -48,23 +48,33 @@ public class InquiryRepositoryCustomImpl implements InquiryRepositoryCustom {
                 )
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
-                .orderBy(inquiry.inquiryId.desc())
+                .orderBy(inquiry.id.desc())
                 .fetch();
 
         // 2. ID 리스트 뽑기
-        List<Long> inquiryIds = inquiries.stream().map(Inquiry::getInquiryId).toList();
+        List<Long> inquiryIds = inquiries.stream().map(Inquiry::getId).toList();
 
         // 3. 파일 목록 조회 및 그룹핑
-        Map<Long, List<String>> filesByInquiryId = queryFactory
-                .select(file.inquiry.inquiryId, file.fileName)
+        Map<Long, List<InquiryFile>> filesById = queryFactory
+                .select(
+                        Projections.constructor(
+                                InquiryFile.class,
+                                file.id,
+                                file.fileName
+                        ),
+                        file.inquiry.id
+                )
                 .from(file)
-                .where(file.inquiry.inquiryId.in(inquiryIds))
+                .where(file.inquiry.id.in(inquiryIds))
                 .fetch()
                 .stream()
-                .filter(tuple -> tuple.get(file.inquiry.inquiryId) != null)
+                .filter(tuple -> tuple.get(1, Long.class) != null)
                 .collect(Collectors.groupingBy(
-                        tuple -> tuple.get(file.inquiry.inquiryId),
-                        Collectors.mapping(tuple -> tuple.get(file.fileName), Collectors.toList())
+                        tuple -> tuple.get(1, Long.class), // inquiry.id
+                        Collectors.mapping(
+                                tuple -> tuple.get(0, InquiryFile.class), // InquiryFile DTO
+                                Collectors.toList()
+                        )
                 ));
 
         // 4. 총 개수 조회
@@ -81,7 +91,7 @@ public class InquiryRepositoryCustomImpl implements InquiryRepositoryCustom {
 
         // 5. DTO 매핑
         List<InquiryResponse> content = inquiries.stream()
-                .map(i -> InquiryMapper.toInquiryResponse(i, filesByInquiryId))
+                .map(i -> InquiryMapper.toInquiryResponse(i, filesById))
                 .toList();
 
         return new PageImpl<>(content, pageable, total == null ? 0 : total);

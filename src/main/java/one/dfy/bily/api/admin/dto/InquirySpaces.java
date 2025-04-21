@@ -1,5 +1,5 @@
 package one.dfy.bily.api.admin.dto;
 
-public record InquerySpaces(
+public record InquirySpaces(
         String spaceId
 ) {}

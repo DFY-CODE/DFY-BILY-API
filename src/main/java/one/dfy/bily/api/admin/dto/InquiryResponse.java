@@ -15,12 +15,12 @@ public record InquiryResponse(
         String eventName,
         List<InquiryPreferredDate> preferredDates,
         String content,
-        List<String> fileAttachment,
+        List<InquiryFile> fileAttachment,
         LocalDateTime createdAt,
         String status,
         String author,
         Integer spaceId,
         String hostCompany,
         String spaceIdName,
-        InquerySpaces inquerySpaces
+        InquirySpaces inquirySpaces
 ) {}

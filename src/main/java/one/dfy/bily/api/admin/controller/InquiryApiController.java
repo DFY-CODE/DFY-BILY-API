@@ -31,7 +31,7 @@ public class InquiryApiController {
     private final InquiryService inquiryService;
     private final InquiryFacade inquiryFacade;
 
-    @GetMapping("/inquiry/list")
+    @GetMapping("/inquiry")
     @Operation(summary = "문의 리스트 조회", description = "검색 타입과 키워드를 통해 문의 리스트를 반환합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "성공", content = @Content(
@@ -68,8 +68,8 @@ public class InquiryApiController {
         return ResponseEntity.ok(inquiryService.findInquiryByInquiryId(inquiryId));
     }
 
-    @PostMapping("/inquiry/{inquiry-id}/modify")
-    @Operation(summary = "문의 상세 조회", description = "문의 아이디로 상세 데이터를 반환합니다.")
+    @PostMapping("/inquiry/{inquiry-id}")
+    @Operation(summary = "문의 수정", description = "문의 내용울 수정합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "성공", content = @Content(
                     mediaType = "application/json",

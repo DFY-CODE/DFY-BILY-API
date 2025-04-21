@@ -16,11 +16,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -45,7 +41,7 @@ public class InquiryService {
     @Transactional(readOnly = true)
     public InquiryResponse findInquiryByInquiryId(Long inquiryId){
 
-        return inquiryRepository.findByInquiryId(inquiryId)
+        return inquiryRepository.findById(inquiryId)
                 .map(inquiry -> {
                     List<InquiryFileInfo> files = inquiryFileInfoRepository.findByInquiry(inquiry);
 
@@ -58,7 +54,7 @@ public class InquiryService {
     @Transactional
     public InquiryResponse updateInquiry(Long inquiryId, InquiryUpdateRequest inquiryUpdateRequest, Space space){
 
-        Inquiry inquiryInfo = inquiryRepository.findByInquiryId(inquiryId)
+        Inquiry inquiryInfo = inquiryRepository.findById(inquiryId)
                 .map(inquiry -> {
                     inquiry.updateFrom(inquiryUpdateRequest, space);
                     return inquiry;

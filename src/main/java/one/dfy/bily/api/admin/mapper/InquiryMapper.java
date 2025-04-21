@@ -1,6 +1,7 @@
 package one.dfy.bily.api.admin.mapper;
 
-import one.dfy.bily.api.admin.dto.InquerySpaces;
+import one.dfy.bily.api.admin.dto.InquirySpaces;
+import one.dfy.bily.api.admin.dto.InquiryFile;
 import one.dfy.bily.api.admin.dto.InquiryPreferredDate;
 import one.dfy.bily.api.admin.dto.InquiryResponse;
 import one.dfy.bily.api.admin.model.rent.Inquiry;
@@ -11,21 +12,21 @@ import java.util.Map;
 
 public class InquiryMapper {
 
-    public static InquiryResponse toInquiryResponse(Inquiry inquiry, Map<Long, List<String>> filesByInquiryId) {
-        List<String> fileNames = filesByInquiryId.getOrDefault(inquiry.getInquiryId(), List.of());
-        return mapToResponse(inquiry, fileNames);
+    public static InquiryResponse toInquiryResponse(Inquiry inquiry, Map<Long, List<InquiryFile>> filesByInquiryId) {
+        List<InquiryFile> fileNames = filesByInquiryId.getOrDefault(inquiry.getId(), List.of());
+        return inquiryToResponse(inquiry, fileNames);
     }
 
     public static InquiryResponse toInquiryResponse(Inquiry inquiry, List<InquiryFileInfo> files) {
-        List<String> fileNames = files.stream()
-                .map(InquiryFileInfo::getFileName)
+        List<InquiryFile> inquiryFiles = files.stream()
+                .map(InquiryMapper::inquiryToResponse)
                 .toList();
-        return mapToResponse(inquiry, fileNames);
+        return inquiryToResponse(inquiry, inquiryFiles);
     }
 
-    private static InquiryResponse mapToResponse(Inquiry inquiry, List<String> fileNames) {
+    private static InquiryResponse inquiryToResponse(Inquiry inquiry, List<InquiryFile> inquiryFiles) {
         return new InquiryResponse(
-                inquiry.getInquiryId(),
+                inquiry.getId(),
                 inquiry.getContactPerson(),
                 inquiry.getPhoneNumber(),
                 inquiry.getEmail(),
@@ -39,14 +40,21 @@ public class InquiryMapper {
                         inquiry.getPreferredEndDate()
                 )),
                 inquiry.getContent(),
-                fileNames,
+                inquiryFiles,
                 inquiry.getCreatedAt(),
                 inquiry.getStatus(),
                 inquiry.getAuthor(),
                 inquiry.getSpace().getContentId(),
                 inquiry.getHostCompany(),
                 inquiry.getSpace().getSpaceId(),
-                new InquerySpaces(inquiry.getSpace().getSpaceId())
+                new InquirySpaces(inquiry.getSpace().getSpaceId())
+        );
+    }
+
+    private static InquiryFile inquiryToResponse(InquiryFileInfo file) {
+        return new InquiryFile(
+                file.getId(),
+                file.getFileName()
         );
     }
 }
