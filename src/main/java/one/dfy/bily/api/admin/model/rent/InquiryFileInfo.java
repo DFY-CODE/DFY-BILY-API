@@ -3,6 +3,7 @@ package one.dfy.bily.api.admin.model.rent;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import one.dfy.bily.api.common.model.BaseEntity;
 
 import java.time.LocalDateTime;
 
@@ -10,7 +11,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Entity
 @Table(name = "TBL_INQUIRY_FILE_INFO")
-public class InquiryFileInfo {
+public class InquiryFileInfo extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,14 +39,8 @@ public class InquiryFileInfo {
     @Column(name = "CREATOR", nullable = false, length = 50)
     private String creator;
 
-    @Column(name = "CREATE_DATE", nullable = false)
-    private LocalDateTime createDate;
-
     @Column(name = "UPDATER", length = 50)
     private String updater;
-
-    @Column(name = "UPDATE_DATE")
-    private LocalDateTime updateDate;
 
     @Column(name = "FILE_TYPE", nullable = false, length = 50)
     private String fileType;

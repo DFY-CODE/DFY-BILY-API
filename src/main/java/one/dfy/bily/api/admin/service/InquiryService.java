@@ -2,8 +2,9 @@ package one.dfy.bily.api.admin.service;
 
 import lombok.RequiredArgsConstructor;
 import one.dfy.bily.api.admin.constant.InquirySearchType;
-import one.dfy.bily.api.admin.dto.InquiryResponse;
-import one.dfy.bily.api.admin.dto.InquiryUpdateRequest;
+import one.dfy.bily.api.admin.dto.Inquiry.InquiryFile;
+import one.dfy.bily.api.admin.dto.Inquiry.InquiryResponse;
+import one.dfy.bily.api.admin.dto.Inquiry.InquiryUpdateRequest;
 import one.dfy.bily.api.admin.mapper.InquiryMapper;
 import one.dfy.bily.api.admin.model.rent.Inquiry;
 import one.dfy.bily.api.admin.model.rent.InquiryFileInfo;
@@ -29,7 +30,7 @@ public class InquiryService {
     @Transactional(readOnly = true)
     public List<InquiryResponse> findInquiryListByKeywordAndDate(InquirySearchType type, String keyword, LocalDateTime startAt, LocalDateTime endAt, int page, int pageSize) {
 
-        Pageable pageable = PageRequest.of(page-1, pageSize, Sort.by(Sort.Direction.DESC, "inquiryId"));
+        Pageable pageable = PageRequest.of(page-1, pageSize, Sort.by(Sort.Direction.DESC, "id"));
 
         return inquiryRepository.searchInquiries(
                 type == InquirySearchType.COMPANY_NAME ? keyword : null,
@@ -68,5 +69,12 @@ public class InquiryService {
 
         return InquiryMapper.toInquiryResponse(inquiryInfo, files);
 
+    }
+
+    @Transactional(readOnly = true)
+    public List<InquiryFile> findInquiryFileByInquiry(Inquiry inquiry){
+        return inquiryFileInfoRepository.findByInquiry(inquiry).stream()
+                .map(InquiryMapper::inquiryFileToResponse)
+                .toList();
     }
 }

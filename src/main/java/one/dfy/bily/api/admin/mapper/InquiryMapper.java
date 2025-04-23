@@ -1,9 +1,9 @@
 package one.dfy.bily.api.admin.mapper;
 
-import one.dfy.bily.api.admin.dto.InquirySpaces;
-import one.dfy.bily.api.admin.dto.InquiryFile;
-import one.dfy.bily.api.admin.dto.InquiryPreferredDate;
-import one.dfy.bily.api.admin.dto.InquiryResponse;
+import one.dfy.bily.api.admin.dto.space.SpaceId;
+import one.dfy.bily.api.admin.dto.Inquiry.InquiryFile;
+import one.dfy.bily.api.admin.dto.Inquiry.InquiryPreferredDate;
+import one.dfy.bily.api.admin.dto.Inquiry.InquiryResponse;
 import one.dfy.bily.api.admin.model.rent.Inquiry;
 import one.dfy.bily.api.admin.model.rent.InquiryFileInfo;
 
@@ -19,7 +19,7 @@ public class InquiryMapper {
 
     public static InquiryResponse toInquiryResponse(Inquiry inquiry, List<InquiryFileInfo> files) {
         List<InquiryFile> inquiryFiles = files.stream()
-                .map(InquiryMapper::inquiryToResponse)
+                .map(InquiryMapper::inquiryFileToResponse)
                 .toList();
         return inquiryToResponse(inquiry, inquiryFiles);
     }
@@ -47,11 +47,11 @@ public class InquiryMapper {
                 inquiry.getSpace().getContentId(),
                 inquiry.getHostCompany(),
                 inquiry.getSpace().getSpaceId(),
-                new InquirySpaces(inquiry.getSpace().getSpaceId())
+                new SpaceId(inquiry.getSpace().getSpaceId())
         );
     }
 
-    private static InquiryFile inquiryToResponse(InquiryFileInfo file) {
+    public static InquiryFile inquiryFileToResponse(InquiryFileInfo file) {
         return new InquiryFile(
                 file.getId(),
                 file.getFileName()

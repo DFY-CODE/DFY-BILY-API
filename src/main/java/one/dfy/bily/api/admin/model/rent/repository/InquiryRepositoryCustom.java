@@ -1,6 +1,6 @@
 package one.dfy.bily.api.admin.model.rent.repository;
 
-import one.dfy.bily.api.admin.dto.InquiryResponse;
+import one.dfy.bily.api.admin.dto.Inquiry.InquiryResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

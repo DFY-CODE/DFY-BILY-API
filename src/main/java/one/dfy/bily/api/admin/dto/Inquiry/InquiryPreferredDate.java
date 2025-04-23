@@ -1,4 +1,4 @@
-package one.dfy.bily.api.admin.dto;
+package one.dfy.bily.api.admin.dto.Inquiry;
 
 import java.time.LocalDateTime;
 

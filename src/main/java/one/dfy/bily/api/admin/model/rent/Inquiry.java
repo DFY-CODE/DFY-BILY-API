@@ -3,68 +3,66 @@ package one.dfy.bily.api.admin.model.rent;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import one.dfy.bily.api.admin.dto.InquiryPreferredDate;
-import one.dfy.bily.api.admin.dto.InquiryUpdateRequest;
+import one.dfy.bily.api.admin.dto.Inquiry.InquiryPreferredDate;
+import one.dfy.bily.api.admin.dto.Inquiry.InquiryUpdateRequest;
 import one.dfy.bily.api.admin.model.space.Space;
+import one.dfy.bily.api.common.model.BaseEntity;
 
 import java.time.LocalDateTime;
 
 @Getter
 @NoArgsConstructor
 @Entity
-@Table(name = "TBL_INQUIRIES")
-public class Inquiry {
+@Table(name = "TBL_INQUIRY")
+public class Inquiry extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "contact_person", nullable = false)
+    @Column(name = "CONTACT_PERSON", nullable = false)
     private String contactPerson;
 
-    @Column(name = "phone_number", nullable = false)
+    @Column(name = "PHONE_NUMBER", nullable = false)
     private String phoneNumber;
 
-    @Column(name = "email", nullable = false)
+    @Column(name = "EMAIL", nullable = false)
     private String email;
 
-    @Column(name = "company_name", nullable = false)
+    @Column(name = "COMPANY_NAME", nullable = false)
     private String companyName;
 
-    @Column(name = "position", nullable = false)
+    @Column(name = "POSITION", nullable = false)
     private String position;
 
-    @Column(name = "company_website", nullable = false)
+    @Column(name = "COMPANY_WEBSITE", nullable = false)
     private String companyWebsite;
 
-    @Column(name = "event_category")
+    @Column(name = "EVENT_CATEGORY")
     private String eventCategory;
 
-    @Column(name = "event_name", nullable = false)
+    @Column(name = "EVENT_NAME", nullable = false)
     private String eventName;
 
-    @Column(name = "preferred_start_date", nullable = false)
+    @Column(name = "PREFERRED_START_DATE", nullable = false)
     private LocalDateTime preferredStartDate;
 
-    @Column(name = "preferred_end_date", nullable = false)
+    @Column(name = "PREFERRED_END_DATE", nullable = false)
     private LocalDateTime preferredEndDate;
 
-    @Column(name = "content")
+    @Column(name = "CONTENT")
     private String content;
 
-    @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt;
-
-    @Column(name = "status", nullable = false)
+    @Column(name = "STATUS", nullable = false)
     private String status;
 
-    @Column(name = "author")
+    @Column(name = "AUTHOR")
     private String author;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "content_id", referencedColumnName = "CONTENT_ID", nullable = false)
+    @JoinColumn(name = "CONTENT_ID", referencedColumnName = "CONTENT_ID", nullable = false)
     private Space space;
 
-    @Column(name = "host_company", nullable = false)
+    @Column(name = "HOST_COMPANY", nullable = false)
     private String hostCompany;
 
     public void updateFrom(InquiryUpdateRequest request, Space space) {
@@ -82,6 +80,4 @@ public class Inquiry {
         this.preferredStartDate = preferred.from();
         this.preferredEndDate = preferred.to();
     }
-
-
 }
