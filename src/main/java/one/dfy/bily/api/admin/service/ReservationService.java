@@ -2,11 +2,15 @@ package one.dfy.bily.api.admin.service;
 
 import lombok.RequiredArgsConstructor;
 import one.dfy.bily.api.admin.constant.InquirySearchType;
+import one.dfy.bily.api.admin.constant.PaymentType;
 import one.dfy.bily.api.admin.dto.Inquiry.InquiryFile;
 import one.dfy.bily.api.admin.dto.reservation.ReservationDetailResponse;
 import one.dfy.bily.api.admin.dto.reservation.ReservationResponse;
+import one.dfy.bily.api.admin.dto.reservation.ReservationUpdateRequest;
 import one.dfy.bily.api.admin.mapper.ReservationMapper;
+import one.dfy.bily.api.admin.model.reservation.Payment;
 import one.dfy.bily.api.admin.model.reservation.Reservation;
+import one.dfy.bily.api.admin.model.reservation.repository.PaymentRepository;
 import one.dfy.bily.api.admin.model.reservation.repository.ReservationRepository;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -15,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -22,6 +27,7 @@ import java.util.List;
 public class ReservationService {
 
     private ReservationRepository reservationRepository;
+    private PaymentRepository paymentRepository;
 
     @Transactional(readOnly = true)
     public List<ReservationResponse> findReservationListByKeywordAndDate(InquirySearchType type, String keyword, LocalDateTime startAt, LocalDateTime endAt, int page, int pageSize) {
@@ -40,10 +46,38 @@ public class ReservationService {
 
     @Transactional(readOnly = true)
     public Reservation findReservationDetailById(Long id) {
-        return reservationRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("유효하지 않은 문의 정보입니다."));
+        return reservationRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("유효하지 않은 예약 정보입니다."));
     }
 
     public ReservationDetailResponse reservationMappingToReservationDetailResponse(Reservation reservation, List<InquiryFile> inquiryFilelist) {
         return ReservationMapper.toReservationDetailResponse(reservation, inquiryFilelist);
+    }
+
+    @Transactional
+    public ReservationUpdateRequest updateReservation(ReservationUpdateRequest request) {
+        Reservation reservation  = reservationRepository.findById(request.id()).orElseThrow(() -> new IllegalArgumentException("유효하지 않은 예약 정보입니다."));
+        List<Payment> paymentList = paymentRepository.findByReservation(reservation);
+
+        paymentList.forEach(payment -> {
+            if(payment.isEqualType(PaymentType.DEPOSIT)){
+                payment.updatePayment(request.deposit().date(),request.deposit().payment());
+            }
+            if(payment.isEqualType(PaymentType.INTERIM_PAYMENT1)){
+                payment.updatePayment(request.interimPayment1().date(),request.interimPayment1().payment());
+
+            }
+            if(payment.isEqualType(PaymentType.INTERIM_PAYMENT2)){
+                payment.updatePayment(request.interimPayment2().date(),request.interimPayment2().payment());
+
+            }
+            if(payment.isEqualType(PaymentType.FINAL_PAYMENT)){
+                payment.updatePayment(request.finalPayment().date(),request.finalPayment().payment());
+
+            }
+        });
+
+        reservation.updateReservation(request.status(), request.fixedDate().from(), request.fixedDate().to());
+
+        return request;
     }
 }

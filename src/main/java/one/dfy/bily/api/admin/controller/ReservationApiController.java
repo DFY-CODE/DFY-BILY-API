@@ -14,6 +14,7 @@ import one.dfy.bily.api.admin.constant.InquirySearchType;
 import one.dfy.bily.api.admin.dto.Inquiry.InquiryResponse;
 import one.dfy.bily.api.admin.dto.reservation.ReservationDetailResponse;
 import one.dfy.bily.api.admin.dto.reservation.ReservationResponse;
+import one.dfy.bily.api.admin.dto.reservation.ReservationUpdateRequest;
 import one.dfy.bily.api.admin.facade.ReservationFacade;
 import one.dfy.bily.api.admin.service.ReservationService;
 import org.springframework.http.ResponseEntity;
@@ -66,7 +67,7 @@ public class ReservationApiController {
     }
 
     @GetMapping("/{reservation-id}")
-    @Operation(summary = "예약 리스트 조회", description = "검색 타입과 키워드를 통해 예약 리스트를 반환합니다.")
+    @Operation(summary = "예약 상세 조회", description = "예약 상세정보를 반환합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "성공", content = @Content(
                     mediaType = "application/json",
@@ -79,6 +80,22 @@ public class ReservationApiController {
     })
     public ResponseEntity<ReservationDetailResponse> findReservationDetail(@PathVariable(name = "reservation-id") Long reservationId) {
         return ResponseEntity.ok(reservationFacade.findReservationDetail(reservationId));
+    }
+
+    @PatchMapping()
+    @Operation(summary = "예약 리스트 조회", description = "검색 타입과 키워드를 통해 예약 리스트를 반환합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = Map.class),
+                    examples = @ExampleObject(
+                            name = "성공 응답 예시",
+                            externalValue = "/swagger/json/inquiry/findInquiryListByKeywordAndDate.json"
+                    )
+            ))
+    })
+    public ResponseEntity<ReservationUpdateRequest> updateReservation(@RequestBody ReservationUpdateRequest reservationUpdateRequest) {
+        return ResponseEntity.ok(reservationService.updateReservation(reservationUpdateRequest));
     }
 
 }

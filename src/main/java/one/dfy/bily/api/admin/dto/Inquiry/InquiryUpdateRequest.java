@@ -1,16 +1,18 @@
 package one.dfy.bily.api.admin.dto.Inquiry;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.List;
 
 public record InquiryUpdateRequest(
-        String companyName,
-        String contactPerson,
-        String position,
-        String email,
-        String phoneNumber,
-        String hostCompany,
-        String eventCategory,
-        String content,
-        Long spaceId,
-        List<InquiryPreferredDate> preferredDates
+        @JsonProperty("company_name") String companyName,
+        @JsonProperty("contact_person") String contactPerson,
+        @JsonProperty("position") String position,
+        @JsonProperty("email") String email,
+        @JsonProperty("phone_number") String phoneNumber,
+        @JsonProperty("host_company") String hostCompany,
+        @JsonProperty("event_category") String eventCategory,
+        @JsonProperty("content") String content,
+        @JsonProperty("space_id") Long spaceId,
+        @JsonProperty("preferred_dates") List<InquiryPreferredDate> preferredDates
 ) { }
