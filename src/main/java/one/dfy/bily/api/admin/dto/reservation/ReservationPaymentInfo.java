@@ -1,10 +1,11 @@
 package one.dfy.bily.api.admin.dto.reservation;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import one.dfy.bily.api.admin.constant.ReservationStatus;
 
 import java.time.LocalDateTime;
 
-public record ReservationUpdateRequest(
+public record ReservationPaymentInfo(
         @JsonProperty("id") Long id,
         @JsonProperty("inquiry_id") Long inquiryId,
         @JsonProperty("deposit") PaymentUpdateRequest deposit,
@@ -12,6 +13,6 @@ public record ReservationUpdateRequest(
         @JsonProperty("interim_payment2") PaymentUpdateRequest interimPayment2,
         @JsonProperty("final_payment") PaymentUpdateRequest finalPayment,
         @JsonProperty("fixed_date") ReservationPreferredDate fixedDate,
-        @JsonProperty("status") String status,
+        @JsonProperty("status") ReservationStatus status,
         @JsonProperty("created_at") LocalDateTime createdAt
 ) { }

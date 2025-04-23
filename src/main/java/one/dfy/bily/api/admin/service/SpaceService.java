@@ -261,6 +261,9 @@ public class SpaceService {
     }
 
     public Space findById(Long contentId) {
+        if (contentId == null) {
+            return null;
+        }
         return spaceRepository.findById(contentId).orElseThrow(() -> new IllegalArgumentException("공간이 존재하지 않습니다."));
     }
 

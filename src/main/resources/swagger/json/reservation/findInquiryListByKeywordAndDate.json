@@ -1,0 +1,46 @@
+[
+  {
+    "id": 29,
+    "company_name": "진우 회사",
+    "host_company": "구찌",
+    "event_name": null,
+    "event_category": "F&B",
+    "contact_person": "오하늘",
+    "position": "대표이사",
+    "reservations": [
+      {
+        "status": "해약",
+        "fixed_date": {
+          "to": "2025-03-07T14:59:59.999Z",
+          "from": "2025-03-06T15:00:00.000Z"
+        },
+        "inquiry_id": 29
+      }
+    ],
+    "spaces": {
+      "space_id": "강남구_강남대로140길9"
+    }
+  },
+  {
+    "id": 36,
+    "company_name": "dfz-dev",
+    "host_company": "DFZ",
+    "event_name": null,
+    "event_category": "전자",
+    "contact_person": "오하늘",
+    "position": "선임",
+    "reservations": [
+      {
+        "status": "계약완료",
+        "fixed_date": {
+          "to": "2025-04-30T14:59:59.999Z",
+          "from": "2025-04-28T15:00:00.000Z"
+        },
+        "inquiry_id": 36
+      }
+    ],
+    "spaces": {
+      "space_id": "강남구_강남대로140길9"
+    }
+  }
+]

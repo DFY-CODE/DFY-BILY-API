@@ -1,0 +1,26 @@
+{
+  "id": 13,
+  "inquiry_id": 36,
+  "deposit": {
+    "date": "2025-05-02T00:00:00Z",
+    "payment": 6
+  },
+  "interim_payment1": {
+    "date": "2025-05-09T00:00:00Z",
+    "payment": 1
+  },
+  "interim_payment2": {
+    "date": "2025-05-23T00:00:00Z",
+    "payment": 3
+  },
+  "final_payment": {
+    "date": "2025-05-30T00:00:00Z",
+    "payment": 40
+  },
+  "status": "계약완료",
+  "created_at": "2025-03-17T10:17:43.755537+00:00",
+  "fixed_date": {
+    "to": "2025-04-30T14:59:59.999Z",
+    "from": "2025-04-28T15:00:00.000Z"
+  }
+}

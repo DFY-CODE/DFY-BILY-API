@@ -13,8 +13,8 @@ import java.util.List;
 @Facade
 @RequiredArgsConstructor
 public class ReservationFacade {
-    private ReservationService reservationService;
-    private InquiryService inquiryService;
+    private final ReservationService reservationService;
+    private final InquiryService inquiryService;
 
     public ReservationDetailResponse findReservationDetail(Long id){
         Reservation reservation = reservationService.findReservationDetailById(id);

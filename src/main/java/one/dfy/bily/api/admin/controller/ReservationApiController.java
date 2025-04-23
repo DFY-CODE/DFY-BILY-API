@@ -2,6 +2,7 @@ package one.dfy.bily.api.admin.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -11,10 +12,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import one.dfy.bily.api.admin.constant.InquirySearchType;
-import one.dfy.bily.api.admin.dto.Inquiry.InquiryResponse;
 import one.dfy.bily.api.admin.dto.reservation.ReservationDetailResponse;
 import one.dfy.bily.api.admin.dto.reservation.ReservationResponse;
-import one.dfy.bily.api.admin.dto.reservation.ReservationUpdateRequest;
+import one.dfy.bily.api.admin.dto.reservation.ReservationPaymentInfo;
 import one.dfy.bily.api.admin.facade.ReservationFacade;
 import one.dfy.bily.api.admin.service.ReservationService;
 import org.springframework.http.ResponseEntity;
@@ -22,32 +22,33 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/admin")
+@RequestMapping("/api/admin/reservation")
 @Tag(name = "예약 관리 API", description = "예약 관리 관련 API")
 @RequiredArgsConstructor
 public class ReservationApiController {
-    private ReservationService reservationService;
-    private ReservationFacade reservationFacade;
+    private final ReservationService reservationService;
+    private final ReservationFacade reservationFacade;
 
     @GetMapping()
     @Operation(summary = "예약 리스트 조회", description = "검색 타입과 키워드를 통해 예약 리스트를 반환합니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "성공", content = @Content(
+    @ApiResponse(
+            responseCode = "200",
+            description = "성공",
+            content = @Content(
                     mediaType = "application/json",
-                    schema = @Schema(implementation = Map.class),
+                    array = @ArraySchema(schema = @Schema(implementation = ReservationResponse.class)),
                     examples = @ExampleObject(
                             name = "성공 응답 예시",
-                            externalValue = "/swagger/json/inquiry/findInquiryListByKeywordAndDate.json"
+                            externalValue = "/swagger/json/reservation/findInquiryListByKeywordAndDate.json"
                     )
-            ))
-    })
+            )
+    )
     public ResponseEntity<List<ReservationResponse>> findInquiryListByKeywordAndDate(
             @Parameter(description = "예약 검색 타입", required = false) @RequestParam(value = "type", required = false) InquirySearchType type,
-            @Parameter(description = "예약 검색 단어", required = false) @RequestParam(value = "keyword", required = false)String keyword,
+            @Parameter(description = "예약 검색 단어", required = false) @RequestParam(value = "keyword", required = false) String keyword,
             @Parameter(
                     description = "예약 검색 시작일 (예: 2025-04-06T00:00:00)",
                     required = false,
@@ -68,34 +69,55 @@ public class ReservationApiController {
 
     @GetMapping("/{reservation-id}")
     @Operation(summary = "예약 상세 조회", description = "예약 상세정보를 반환합니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "성공", content = @Content(
+    @ApiResponse(
+            responseCode = "200",
+            description = "성공",
+            content = @Content(
                     mediaType = "application/json",
-                    schema = @Schema(implementation = Map.class),
+                    schema = @Schema(implementation = ReservationDetailResponse.class),
                     examples = @ExampleObject(
                             name = "성공 응답 예시",
-                            externalValue = "/swagger/json/inquiry/findInquiryListByKeywordAndDate.json"
+                            externalValue = "/swagger/json/reservation/findReservationDetail.json"
                     )
-            ))
-    })
+            )
+    )
     public ResponseEntity<ReservationDetailResponse> findReservationDetail(@PathVariable(name = "reservation-id") Long reservationId) {
         return ResponseEntity.ok(reservationFacade.findReservationDetail(reservationId));
     }
 
-    @PatchMapping()
-    @Operation(summary = "예약 리스트 조회", description = "검색 타입과 키워드를 통해 예약 리스트를 반환합니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "성공", content = @Content(
+    @GetMapping("/payment/{reservation-id}")
+    @Operation(summary = "예약 상태 및 견적 조회", description = "예약 상태 및 견적 정보를 반환합니다.")
+    @ApiResponse(
+            responseCode = "200",
+            description = "성공",
+            content = @Content(
                     mediaType = "application/json",
-                    schema = @Schema(implementation = Map.class),
+                    schema = @Schema(implementation = ReservationPaymentInfo.class),
                     examples = @ExampleObject(
                             name = "성공 응답 예시",
-                            externalValue = "/swagger/json/inquiry/findInquiryListByKeywordAndDate.json"
+                            externalValue = "/swagger/json/reservation/findReservationPaymentById.json"
                     )
-            ))
-    })
-    public ResponseEntity<ReservationUpdateRequest> updateReservation(@RequestBody ReservationUpdateRequest reservationUpdateRequest) {
-        return ResponseEntity.ok(reservationService.updateReservation(reservationUpdateRequest));
+            )
+    )
+    public ResponseEntity<ReservationPaymentInfo> findReservationPaymentById(@PathVariable(name = "reservation-id") Long reservationId) {
+        return ResponseEntity.ok(reservationService.findReservationPaymentById(reservationId));
     }
 
+    @PatchMapping()
+    @Operation(summary = "예약 수정", description = "예약 수정 후 수정내용을 반환합니다.")
+    @ApiResponse(
+            responseCode = "200",
+            description = "성공",
+            content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ReservationPaymentInfo.class),
+                    examples = @ExampleObject(
+                            name = "성공 응답 예시",
+                            externalValue = "/swagger/json/reservation/updateReservation.json"
+                    )
+            )
+    )
+    public ResponseEntity<ReservationPaymentInfo> updateReservation(@RequestBody ReservationPaymentInfo reservationPaymentInfo) {
+        return ResponseEntity.ok(reservationService.updateReservation(reservationPaymentInfo));
+    }
 }

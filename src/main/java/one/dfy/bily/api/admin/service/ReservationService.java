@@ -6,7 +6,7 @@ import one.dfy.bily.api.admin.constant.PaymentType;
 import one.dfy.bily.api.admin.dto.Inquiry.InquiryFile;
 import one.dfy.bily.api.admin.dto.reservation.ReservationDetailResponse;
 import one.dfy.bily.api.admin.dto.reservation.ReservationResponse;
-import one.dfy.bily.api.admin.dto.reservation.ReservationUpdateRequest;
+import one.dfy.bily.api.admin.dto.reservation.ReservationPaymentInfo;
 import one.dfy.bily.api.admin.mapper.ReservationMapper;
 import one.dfy.bily.api.admin.model.reservation.Payment;
 import one.dfy.bily.api.admin.model.reservation.Reservation;
@@ -19,15 +19,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class ReservationService {
 
-    private ReservationRepository reservationRepository;
-    private PaymentRepository paymentRepository;
+    private final ReservationRepository reservationRepository;
+    private final PaymentRepository paymentRepository;
 
     @Transactional(readOnly = true)
     public List<ReservationResponse> findReservationListByKeywordAndDate(InquirySearchType type, String keyword, LocalDateTime startAt, LocalDateTime endAt, int page, int pageSize) {
@@ -54,7 +53,15 @@ public class ReservationService {
     }
 
     @Transactional
-    public ReservationUpdateRequest updateReservation(ReservationUpdateRequest request) {
+    public ReservationPaymentInfo findReservationPaymentById(Long id) {
+        Reservation reservation  = reservationRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("유효하지 않은 예약 정보입니다."));
+        List<Payment> paymentList = paymentRepository.findByReservation(reservation);
+
+        return ReservationMapper.toReservationPaymentInfo(reservation, paymentList);
+    }
+
+    @Transactional
+    public ReservationPaymentInfo updateReservation(ReservationPaymentInfo request) {
         Reservation reservation  = reservationRepository.findById(request.id()).orElseThrow(() -> new IllegalArgumentException("유효하지 않은 예약 정보입니다."));
         List<Payment> paymentList = paymentRepository.findByReservation(reservation);
 

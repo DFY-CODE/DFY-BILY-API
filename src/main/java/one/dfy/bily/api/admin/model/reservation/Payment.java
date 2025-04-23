@@ -24,6 +24,7 @@ public class Payment extends BaseEntity {
     @JoinColumn(name = "RESERVATION_ID", referencedColumnName = "ID", nullable = false)
     private Reservation reservation;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "TYPE")
     private PaymentType type;
 
@@ -38,7 +39,11 @@ public class Payment extends BaseEntity {
     }
 
     public void updatePayment(LocalDateTime paymentDate, BigDecimal amount) {
-        this.amount = amount;
-        this.paymentDate = paymentDate;
+        if (amount != null) {
+            this.amount = amount;
+        }
+        if (paymentDate != null) {
+            this.paymentDate = paymentDate;
+        }
     }
 }

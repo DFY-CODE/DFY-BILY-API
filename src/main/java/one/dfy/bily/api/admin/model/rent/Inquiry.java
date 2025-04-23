@@ -66,18 +66,20 @@ public class Inquiry extends BaseEntity {
     private String hostCompany;
 
     public void updateFrom(InquiryUpdateRequest request, Space space) {
-        this.companyName = request.companyName();
-        this.contactPerson = request.contactPerson();
-        this.phoneNumber = request.phoneNumber();
-        this.email = request.email();
-        this.position = request.position();
-        this.hostCompany = request.hostCompany();
-        this.eventCategory = request.eventCategory();
-        this.content = request.content();
-        this.space = space;
+        if (request.companyName() != null) this.companyName = request.companyName();
+        if (request.contactPerson() != null) this.contactPerson = request.contactPerson();
+        if (request.phoneNumber() != null) this.phoneNumber = request.phoneNumber();
+        if (request.email() != null) this.email = request.email();
+        if (request.position() != null) this.position = request.position();
+        if (request.hostCompany() != null) this.hostCompany = request.hostCompany();
+        if (request.eventCategory() != null) this.eventCategory = request.eventCategory();
+        if (request.content() != null) this.content = request.content();
+        if (space != null) this.space = space;
 
-        InquiryPreferredDate preferred = request.preferredDates().get(0);
-        this.preferredStartDate = preferred.from();
-        this.preferredEndDate = preferred.to();
+        if (request.preferredDates() != null && !request.preferredDates().isEmpty()) {
+            InquiryPreferredDate preferred = request.preferredDates().get(0);
+            if (preferred.from() != null) this.preferredStartDate = preferred.from();
+            if (preferred.to() != null) this.preferredEndDate = preferred.to();
+        }
     }
 }
