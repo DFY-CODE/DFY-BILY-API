@@ -19,9 +19,9 @@ spring:
   servlet:
     multipart:
       enabled: true
-      max-file-size: 50MB  # 개별 파일 최대 크기 (요구사항에 따라 조정 가능)
-      max-request-size: 100MB  # 요청 전체 크기 (여러 파일 포함)
-      file-size-threshold: 2MB  # 임계값, 2MB 초과 시 디스크에 임시 저장
+      max-file-size: 50MB  # 개별 파일 최대 크기
+      max-request-size: 100MB  # 요청 전체 크기
+      file-size-threshold: 2MB  # 임계값 초과 시 디스크에 임시 저장
 
   jackson:
     serialization:
@@ -30,27 +30,39 @@ spring:
       import: optional:file:.env.prod[.properties]
     profiles:
       active: prod
+
   autoconfigure:
     exclude: org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
-    application:
-      name: one-dfy-bily-api
-    h2:
-      console:
-        enabled: true
-    web:
-      resources:
-        static-locations: classpath:/static/
+
+  application:
+    name: one-dfy-bily-api
+
+  h2:
+    console:
+      enabled: true
+
+  web:
+    resources:
+      static-locations: classpath:/static/
+
+  thymeleaf:
+    check-template-location: false  # 설정 위치 수정
+
   mail:
     host: smtp.naver.com
     port: 587
-    username: kfgreen@naver.com
-    password: "@!kim0242"
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    protocol: smtp
     properties:
       mail:
         smtp:
           auth: true
           starttls:
             enable: true
+          timeout: 5000
+          connectiontimeout: 5000
+          writetimeout: 5000
   datasource:
     url: jdbc:mysql://15.165.245.177:3306/bliydatabase
     username: bliy

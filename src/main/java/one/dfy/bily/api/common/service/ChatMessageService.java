@@ -14,21 +14,34 @@ public class ChatMessageService {
     private ChatMessageMapper chatMessageMapper;
 
     // 메시지 저장
-    public void sendMessage(Long chatRoomId, Long senderId, Long receiverId, String messageContent) {
+    public void sendMessage(Long chatRoomId, Long senderId, Long receiverId, String chatPairKey, String content) {
+        //String chatPairKey = generateChatPairKey(senderId, receiverId);
+
         ChatMessage chatMessage = new ChatMessage();
         chatMessage.setChatRoomId(chatRoomId);
         chatMessage.setSenderId(senderId);
         chatMessage.setReceiverId(receiverId);
-        chatMessage.setMessageContent(messageContent);
-        chatMessage.setIsRead(false);
-        chatMessage.setSentAt(LocalDateTime.now()); // 현재 시간 설정
+        chatMessage.setMessageContent(content);
+        chatMessage.setIsRead(0);
+        chatMessage.setSentAt(LocalDateTime.now());
+        chatMessage.setChatPairKey(chatPairKey);
 
         chatMessageMapper.saveMessage(chatMessage);
+    }
+
+    private String generateChatPairKey(Long senderId, Long receiverId) {
+        Long low = Math.min(senderId, receiverId);
+        Long high = Math.max(senderId, receiverId);
+        return low + "_" + high;
     }
 
     // 특정 사용자에게 온 메시지 조회
     public List<ChatMessage> getReceivedMessages(Long chatRoomId) {
         return chatMessageMapper.findMessagesByReceiver(chatRoomId);
+    }
+
+    public List<ChatMessage> getLatestMessagesByChatPair(Long chatRoomId) {
+        return chatMessageMapper.findLatestMessagesByChatRoomId(chatRoomId);
     }
 
     // 특정 사용자가 보낸 메시지 조회
@@ -39,6 +52,14 @@ public class ChatMessageService {
     // 메시지를 읽음 처리
     public void markMessageAsRead(Long messageId) {
         chatMessageMapper.markMessageAsRead(messageId);
+    }
+
+    public List<ChatMessage> getChatDetail(Long chatRoomId, String chatPairKey) {
+        return chatMessageMapper.findChatDetails(chatRoomId, chatPairKey);
+    }
+
+    public void markMessagesAsRead(Long chatRoomId, Long senderId, Long receiverId) {
+        chatMessageMapper.markMessagesAsRead(chatRoomId, senderId, receiverId);
     }
 }
 
