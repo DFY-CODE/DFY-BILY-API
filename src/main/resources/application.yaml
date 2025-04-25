@@ -117,3 +117,7 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html # Swagger UI 경로 설정
     enabled: true # Swagger UI 활성화 여부
+
+s3:
+  path:
+    inquiry: images/inquiry

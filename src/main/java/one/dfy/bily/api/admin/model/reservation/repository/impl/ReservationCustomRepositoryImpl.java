@@ -4,8 +4,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import one.dfy.bily.api.admin.dto.reservation.ReservationResponse;
 import one.dfy.bily.api.admin.mapper.ReservationMapper;
-import one.dfy.bily.api.admin.model.rent.Inquiry;
-import one.dfy.bily.api.admin.model.rent.QInquiry;
+import one.dfy.bily.api.admin.model.inquiry.QInquiry;
 import one.dfy.bily.api.admin.model.reservation.QReservation;
 import one.dfy.bily.api.admin.model.reservation.Reservation;
 import one.dfy.bily.api.admin.model.reservation.repository.ReservationCustomRepository;
@@ -17,7 +16,6 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Repository
 @RequiredArgsConstructor

@@ -1,15 +1,13 @@
-package one.dfy.bily.api.admin.model.rent.repository.impl;
+package one.dfy.bily.api.admin.model.inquiry.repository.impl;
 
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
-import one.dfy.bily.api.admin.dto.Inquiry.InquiryFile;
+import one.dfy.bily.api.admin.dto.Inquiry.InquiryFileName;
 import one.dfy.bily.api.admin.dto.Inquiry.InquiryResponse;
 import one.dfy.bily.api.admin.mapper.InquiryMapper;
-import one.dfy.bily.api.admin.model.rent.Inquiry;
-import one.dfy.bily.api.admin.model.rent.QInquiry;
-import one.dfy.bily.api.admin.model.rent.QInquiryFileInfo;
-import one.dfy.bily.api.admin.model.rent.repository.InquiryRepositoryCustom;
+import one.dfy.bily.api.admin.model.inquiry.*;
+import one.dfy.bily.api.admin.model.inquiry.repository.InquiryRepositoryCustom;
 import one.dfy.bily.api.admin.model.space.QSpace;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -37,8 +35,9 @@ public class InquiryRepositoryCustomImpl implements InquiryRepositoryCustom {
             Pageable pageable
     ) {
         QInquiry inquiry = QInquiry.inquiry;
-        QInquiryFileInfo file = QInquiryFileInfo.inquiryFileInfo;
+        QInquiryFile file = QInquiryFile.inquiryFile;
         QSpace space = QSpace.space;
+        QPreferredDate inquiryPreferredDate = QPreferredDate.preferredDate;
 
         // 1. 조회
         List<Inquiry> inquiries = queryFactory
@@ -61,14 +60,7 @@ public class InquiryRepositoryCustomImpl implements InquiryRepositoryCustom {
 
         // 3. 파일 목록 조회 및 그룹핑
         Map<Long, List<InquiryFile>> filesById = queryFactory
-                .select(
-                        Projections.constructor(
-                                InquiryFile.class,
-                                file.id,
-                                file.fileName
-                        ),
-                        file.inquiry.id
-                )
+                .select(file, file.inquiry.id)
                 .from(file)
                 .where(file.inquiry.id.in(inquiryIds))
                 .fetch()
@@ -77,9 +69,19 @@ public class InquiryRepositoryCustomImpl implements InquiryRepositoryCustom {
                 .collect(Collectors.groupingBy(
                         tuple -> tuple.get(1, Long.class), // inquiry.id
                         Collectors.mapping(
-                                tuple -> tuple.get(0, InquiryFile.class), // InquiryFile DTO
+                                tuple -> tuple.get(0, InquiryFile.class), // InquiryFileInfo 엔티티
                                 Collectors.toList()
                         )
+                ));
+
+        // 4. 희망 날짜 조회 및 그룹핑
+        Map<Long, List<PreferredDate>> preferredDatesByInquiryId = queryFactory
+                .selectFrom(inquiryPreferredDate)
+                .where(inquiryPreferredDate.inquiry.id.in(inquiryIds))
+                .fetch()
+                .stream()
+                .collect(Collectors.groupingBy(
+                        pd -> pd.getInquiry().getId()
                 ));
 
         // 4. 총 개수 조회
@@ -98,7 +100,7 @@ public class InquiryRepositoryCustomImpl implements InquiryRepositoryCustom {
 
         // 5. DTO 매핑
         List<InquiryResponse> content = inquiries.stream()
-                .map(i -> InquiryMapper.toInquiryResponse(i, filesById))
+                .map(i -> InquiryMapper.toInquiryResponse(i, filesById, preferredDatesByInquiryId))
                 .toList();
 
         return new PageImpl<>(content, pageable, total == null ? 0 : total);

@@ -1,12 +1,14 @@
 package one.dfy.bily.api.admin.dto.Inquiry;
 
-import one.dfy.bily.api.admin.dto.space.SpaceId;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-public record InquiryResponse(
-        Long id,
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+public record InquiryCreateRequest(
         String contactPerson,
         String phoneNumber,
         String email,
@@ -17,12 +19,11 @@ public record InquiryResponse(
         String eventName,
         List<InquiryPreferredDateInfo> preferredDates,
         String content,
-        List<InquiryFileName> fileAttachment,
         LocalDateTime createdAt,
         String status,
         String author,
         Integer spaceId,
         String hostCompany,
         String spaceIdName,
-        SpaceId spaces
+        List<MultipartFile> fileAttachments
 ) {}

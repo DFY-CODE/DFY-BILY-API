@@ -4,9 +4,12 @@ import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import one.dfy.bily.api.admin.dto.Inquiry.InquiryFileDetail;
+import one.dfy.bily.api.admin.model.inquiry.Inquiry;
 import one.dfy.bily.api.common.dto.*;
 import one.dfy.bily.api.common.service.FileService;
 import one.dfy.bily.api.common.service.UserService;
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
@@ -32,6 +35,31 @@ public class S3Uploader {
 
     @Value("${cloud.aws.region.static}")
     private String region;
+
+    @Value("${s3.path.inquiry}")
+    private String inquiryPath;
+
+    private final static String INQURY = "inquiry";
+
+    public InquiryFileDetail inquiryFileUpload(MultipartFile file) {
+
+        String extension = FilenameUtils.getExtension(file.getOriginalFilename());
+        String saveLocation = inquiryPath + UUID.randomUUID() + extension;
+        String newFileName =  INQURY + UUID.randomUUID().toString() + extension;
+
+        try{
+            File uploadFile = convert(file)
+                    .orElseThrow(() -> new IllegalArgumentException("MultipartFile -> File로 전환이 실패했습니다."));
+
+
+            putS3(uploadFile, saveLocation);
+
+        } catch (Exception e) {
+            throw new RuntimeException("파일 업로드 실패");
+        }
+
+        return new InquiryFileDetail(file.getOriginalFilename(), newFileName, extension, saveLocation, file.getSize(),file.getContentType());
+    }
 
     public FileUploadResponse upload(long contentId, long filesize, String fileName, MultipartFile multipartFile, String dirName, String title) throws IOException {
         File uploadFile = convert(multipartFile)

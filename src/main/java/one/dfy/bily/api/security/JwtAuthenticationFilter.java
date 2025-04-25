@@ -9,12 +9,16 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
+import java.util.Collections;
 
 @Slf4j
 @Component
@@ -48,11 +52,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 log.info("Extracted userId: {}", userId);
 
                 if (userId != null) {
-                    // 요청을 새로운 URL로 포워딩 (userId 포함)
-                    String newRequestURI = request.getRequestURI() + "?userId=" + userId;
-                    log.info("🔄 Forwarding request to: {}", newRequestURI);
-                    request.getRequestDispatcher(newRequestURI).forward(request, response);
-                    return;
+                    CustomUserDetails userDetails = new CustomUserDetails(userId); // 사용자 정의 객체
+                    UsernamePasswordAuthenticationToken authToken =
+                            new UsernamePasswordAuthenticationToken(userDetails, null, Collections.emptyList());
+
+                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
                 }
 
             } catch (Exception e) {

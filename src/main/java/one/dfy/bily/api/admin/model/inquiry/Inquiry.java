@@ -1,14 +1,11 @@
-package one.dfy.bily.api.admin.model.rent;
+package one.dfy.bily.api.admin.model.inquiry;
 
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import one.dfy.bily.api.admin.dto.Inquiry.InquiryPreferredDate;
 import one.dfy.bily.api.admin.dto.Inquiry.InquiryUpdateRequest;
 import one.dfy.bily.api.admin.model.space.Space;
 import one.dfy.bily.api.common.model.BaseEntity;
-
-import java.time.LocalDateTime;
 
 @Getter
 @NoArgsConstructor
@@ -43,12 +40,6 @@ public class Inquiry extends BaseEntity {
     @Column(name = "EVENT_NAME", nullable = false)
     private String eventName;
 
-    @Column(name = "PREFERRED_START_DATE", nullable = false)
-    private LocalDateTime preferredStartDate;
-
-    @Column(name = "PREFERRED_END_DATE", nullable = false)
-    private LocalDateTime preferredEndDate;
-
     @Column(name = "CONTENT")
     private String content;
 
@@ -65,6 +56,36 @@ public class Inquiry extends BaseEntity {
     @Column(name = "HOST_COMPANY", nullable = false)
     private String hostCompany;
 
+    public Inquiry(
+            String contactPerson,
+            String phoneNumber,
+            String email,
+            String companyName,
+            String position,
+            String companyWebsite,
+            String eventCategory,
+            String eventName,
+            String content,
+            String status,
+            String author,
+            Space space,
+            String hostCompany
+    ) {
+        this.contactPerson = contactPerson;
+        this.phoneNumber = phoneNumber;
+        this.email = email;
+        this.companyName = companyName;
+        this.position = position;
+        this.companyWebsite = companyWebsite;
+        this.eventCategory = eventCategory;
+        this.eventName = eventName;
+        this.content = content;
+        this.status = status;
+        this.author = author;
+        this.space = space;
+        this.hostCompany = hostCompany;
+    }
+
     public void updateFrom(InquiryUpdateRequest request, Space space) {
         if (request.companyName() != null) this.companyName = request.companyName();
         if (request.contactPerson() != null) this.contactPerson = request.contactPerson();
@@ -75,11 +96,5 @@ public class Inquiry extends BaseEntity {
         if (request.eventCategory() != null) this.eventCategory = request.eventCategory();
         if (request.content() != null) this.content = request.content();
         if (space != null) this.space = space;
-
-        if (request.preferredDates() != null && !request.preferredDates().isEmpty()) {
-            InquiryPreferredDate preferred = request.preferredDates().get(0);
-            if (preferred.from() != null) this.preferredStartDate = preferred.from();
-            if (preferred.to() != null) this.preferredEndDate = preferred.to();
-        }
     }
 }

@@ -1,18 +1,21 @@
 package one.dfy.bily.api.admin.dto.reservation;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import one.dfy.bily.api.admin.constant.ReservationStatus;
 
 import java.time.LocalDateTime;
 
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public record ReservationPaymentInfo(
-        @JsonProperty("id") Long id,
-        @JsonProperty("inquiry_id") Long inquiryId,
-        @JsonProperty("deposit") PaymentUpdateRequest deposit,
-        @JsonProperty("interim_payment1") PaymentUpdateRequest interimPayment1,
-        @JsonProperty("interim_payment2") PaymentUpdateRequest interimPayment2,
-        @JsonProperty("final_payment") PaymentUpdateRequest finalPayment,
-        @JsonProperty("fixed_date") ReservationPreferredDate fixedDate,
-        @JsonProperty("status") ReservationStatus status,
-        @JsonProperty("created_at") LocalDateTime createdAt
+       Long id,
+        Long inquiryId,
+        PaymentUpdateRequest deposit,
+        PaymentUpdateRequest interimPayment1,
+        PaymentUpdateRequest interimPayment2,
+        PaymentUpdateRequest finalPayment,
+        ReservationPreferredDateInfo fixedDate,
+        ReservationStatus status,
+        LocalDateTime createdAt
 ) { }

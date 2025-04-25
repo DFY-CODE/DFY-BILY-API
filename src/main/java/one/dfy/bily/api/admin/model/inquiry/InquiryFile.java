@@ -1,17 +1,15 @@
-package one.dfy.bily.api.admin.model.rent;
+package one.dfy.bily.api.admin.model.inquiry;
 
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import one.dfy.bily.api.common.model.BaseEntity;
 
-import java.time.LocalDateTime;
-
 @Getter
 @NoArgsConstructor
 @Entity
 @Table(name = "TBL_INQUIRY_FILE_INFO")
-public class InquiryFileInfo extends BaseEntity {
+public class InquiryFile extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,11 +35,33 @@ public class InquiryFileInfo extends BaseEntity {
     private String deleteFlag = "N";
 
     @Column(name = "CREATOR", nullable = false, length = 50)
-    private String creator;
+    private Long creator;
 
     @Column(name = "UPDATER", length = 50)
-    private String updater;
+    private Long updater;
 
     @Column(name = "FILE_TYPE", nullable = false, length = 50)
     private String fileType;
+
+    public InquiryFile(
+            Inquiry inquiry,
+            String fileName,
+            String saveFileName,
+            String saveLocation,
+            Long saveSize,
+            String deleteFlag,
+            Long creator,
+            Long updater,
+            String fileType
+    ) {
+        this.inquiry = inquiry;
+        this.fileName = fileName;
+        this.saveFileName = saveFileName;
+        this.saveLocation = saveLocation;
+        this.saveSize = saveSize;
+        this.deleteFlag = deleteFlag != null ? deleteFlag : "N";
+        this.creator = creator;
+        this.updater = updater;
+        this.fileType = fileType;
+    }
 }

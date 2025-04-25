@@ -1,7 +1,8 @@
 package one.dfy.bily.api.admin.facade;
 
 import lombok.RequiredArgsConstructor;
-import one.dfy.bily.api.admin.dto.Inquiry.InquiryFile;
+import one.dfy.bily.api.admin.dto.Inquiry.InquiryFileName;
+import one.dfy.bily.api.admin.dto.Inquiry.InquiryPreferredDateInfo;
 import one.dfy.bily.api.admin.dto.reservation.ReservationDetailResponse;
 import one.dfy.bily.api.admin.model.reservation.Reservation;
 import one.dfy.bily.api.admin.service.InquiryService;
@@ -18,9 +19,10 @@ public class ReservationFacade {
 
     public ReservationDetailResponse findReservationDetail(Long id){
         Reservation reservation = reservationService.findReservationDetailById(id);
-        List<InquiryFile> inquiryFileList =  inquiryService.findInquiryFileByInquiry(reservation.getInquiry());
+        List<InquiryFileName> inquiryFileNameList =  inquiryService.findInquiryFileByInquiry(reservation.getInquiry());
+        List<InquiryPreferredDateInfo> preferredDateInfos = inquiryService.findInquiryPreferredDateByInquiry(reservation.getInquiry());
 
-        return reservationService.reservationMappingToReservationDetailResponse(reservation, inquiryFileList);
+        return reservationService.reservationMappingToReservationDetailResponse(reservation, inquiryFileNameList, preferredDateInfos);
     }
 
 }

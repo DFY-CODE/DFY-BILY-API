@@ -3,7 +3,8 @@ package one.dfy.bily.api.admin.service;
 import lombok.RequiredArgsConstructor;
 import one.dfy.bily.api.admin.constant.InquirySearchType;
 import one.dfy.bily.api.admin.constant.PaymentType;
-import one.dfy.bily.api.admin.dto.Inquiry.InquiryFile;
+import one.dfy.bily.api.admin.dto.Inquiry.InquiryFileName;
+import one.dfy.bily.api.admin.dto.Inquiry.InquiryPreferredDateInfo;
 import one.dfy.bily.api.admin.dto.reservation.ReservationDetailResponse;
 import one.dfy.bily.api.admin.dto.reservation.ReservationResponse;
 import one.dfy.bily.api.admin.dto.reservation.ReservationPaymentInfo;
@@ -48,8 +49,8 @@ public class ReservationService {
         return reservationRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("유효하지 않은 예약 정보입니다."));
     }
 
-    public ReservationDetailResponse reservationMappingToReservationDetailResponse(Reservation reservation, List<InquiryFile> inquiryFilelist) {
-        return ReservationMapper.toReservationDetailResponse(reservation, inquiryFilelist);
+    public ReservationDetailResponse reservationMappingToReservationDetailResponse(Reservation reservation, List<InquiryFileName> inquiryFilelistName, List<InquiryPreferredDateInfo> preferredDateInfos) {
+        return ReservationMapper.toReservationDetailResponse(reservation, inquiryFilelistName, preferredDateInfos);
     }
 
     @Transactional

@@ -1,6 +1,7 @@
 package one.dfy.bily.api.admin.facade;
 
 import lombok.RequiredArgsConstructor;
+import one.dfy.bily.api.admin.dto.Inquiry.InquiryCreateRequest;
 import one.dfy.bily.api.admin.dto.Inquiry.InquiryResponse;
 import one.dfy.bily.api.admin.dto.Inquiry.InquiryUpdateRequest;
 import one.dfy.bily.api.admin.model.space.Space;
@@ -18,5 +19,11 @@ public class InquiryFacade {
         Space space = spaceService.findById(inquiryUpdateRequest.spaceId());
 
         return inquiryService.updateInquiry(inquiryId, inquiryUpdateRequest, space);
+    }
+
+    public InquiryResponse createInquiry(InquiryCreateRequest request, Long userId) {
+        Space space = spaceService.findById(request.spaceId());
+
+        return inquiryService.createInquiry(request,space,userId);
     }
 }

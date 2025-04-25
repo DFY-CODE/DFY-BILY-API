@@ -11,11 +11,15 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import one.dfy.bily.api.admin.constant.InquirySearchType;
+import one.dfy.bily.api.admin.dto.Inquiry.InquiryCreateRequest;
 import one.dfy.bily.api.admin.dto.Inquiry.InquiryResponse;
 import one.dfy.bily.api.admin.dto.Inquiry.InquiryUpdateRequest;
 import one.dfy.bily.api.admin.facade.InquiryFacade;
+import one.dfy.bily.api.admin.model.space.Space;
 import one.dfy.bily.api.admin.service.InquiryService;
+import one.dfy.bily.api.security.CustomUserDetails;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -84,6 +88,25 @@ public class InquiryApiController {
         return ResponseEntity.ok(inquiryService.findInquiryByInquiryId(inquiryId));
     }
 
+    @PostMapping(consumes = "multipart/form-data")
+    @Operation(summary = "문의 생성", description = "문의 생성 후 데이터를 반환합니다.")
+    @ApiResponse(
+            responseCode = "200",
+            description = "성공",
+            content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = InquiryCreateRequest.class),
+                    examples = @ExampleObject(
+                            name = "성공 응답 예시",
+                            externalValue = "/swagger/json/inquiry/findInquiryByInquiryId.json"
+                    )
+            )
+    )
+    public ResponseEntity<InquiryResponse> createInquiry(@RequestBody InquiryCreateRequest request, @AuthenticationPrincipal CustomUserDetails userDetails) {
+        Long userId = userDetails.getUserId();
+        return ResponseEntity.ok(inquiryFacade.createInquiry(request,userId));
+    }
+
     @PatchMapping("/{inquiry-id}")
     @Operation(summary = "문의 수정", description = "문의 내용을 수정합니다.")
     @ApiResponse(
@@ -91,7 +114,7 @@ public class InquiryApiController {
             description = "성공",
             content = @Content(
                     mediaType = "application/json",
-                    schema = @Schema(implementation = InquiryResponse.class),
+                    schema = @Schema(implementation = InquiryUpdateRequest.class),
                     examples = @ExampleObject(
                             name = "성공 응답 예시",
                             externalValue = "/swagger/json/inquiry/findInquiryByInquiryId.json"

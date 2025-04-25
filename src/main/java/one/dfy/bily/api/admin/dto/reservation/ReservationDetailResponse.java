@@ -1,7 +1,7 @@
 package one.dfy.bily.api.admin.dto.reservation;
 
-import one.dfy.bily.api.admin.dto.Inquiry.InquiryFile;
-import one.dfy.bily.api.admin.dto.Inquiry.InquiryPreferredDate;
+import one.dfy.bily.api.admin.dto.Inquiry.InquiryFileName;
+import one.dfy.bily.api.admin.dto.Inquiry.InquiryPreferredDateInfo;
 import one.dfy.bily.api.admin.dto.space.SpaceId;
 
 import java.time.LocalDateTime;
@@ -18,9 +18,9 @@ public record ReservationDetailResponse(
         String companyWebsite,
         String eventCategory,
         String eventName,
-        InquiryPreferredDate preferredDates,
+        List<InquiryPreferredDateInfo> preferredDates,
         String content,
-        List<InquiryFile> fileAttachment,
+        List<InquiryFileName> fileAttachment,
         LocalDateTime createdAt,
         String status,
         String spaceId,

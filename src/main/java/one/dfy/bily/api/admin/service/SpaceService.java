@@ -260,7 +260,7 @@ public class SpaceService {
 
     }
 
-    public Space findById(Long contentId) {
+    public Space findById(Integer contentId) {
         if (contentId == null) {
             return null;
         }

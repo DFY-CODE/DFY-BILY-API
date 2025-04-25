@@ -5,7 +5,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import one.dfy.bily.api.admin.constant.ReservationStatus;
-import one.dfy.bily.api.admin.model.rent.Inquiry;
+import one.dfy.bily.api.admin.model.inquiry.Inquiry;
 import one.dfy.bily.api.common.model.BaseEntity;
 
 import java.time.LocalDateTime;
@@ -22,7 +22,7 @@ public class Reservation extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "INQUIRY_ID", referencedColumnName = "ID", nullable = false)
-    
+
     private Inquiry inquiry;
 
     @Enumerated(EnumType.STRING)

@@ -1,6 +1,6 @@
-package one.dfy.bily.api.admin.model.rent.repository;
+package one.dfy.bily.api.admin.model.inquiry.repository;
 
-import one.dfy.bily.api.admin.model.rent.Inquiry;
+import one.dfy.bily.api.admin.model.inquiry.Inquiry;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

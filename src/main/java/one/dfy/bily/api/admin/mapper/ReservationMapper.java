@@ -1,16 +1,14 @@
 package one.dfy.bily.api.admin.mapper;
 
 import one.dfy.bily.api.admin.constant.PaymentType;
-import one.dfy.bily.api.admin.dto.Inquiry.InquiryFile;
-import one.dfy.bily.api.admin.dto.Inquiry.InquiryPreferredDate;
+import one.dfy.bily.api.admin.dto.Inquiry.InquiryFileName;
+import one.dfy.bily.api.admin.dto.Inquiry.InquiryPreferredDateInfo;
 import one.dfy.bily.api.admin.dto.reservation.*;
 import one.dfy.bily.api.admin.dto.space.SpaceId;
-import one.dfy.bily.api.admin.model.rent.Inquiry;
 import one.dfy.bily.api.admin.model.reservation.Payment;
 import one.dfy.bily.api.admin.model.reservation.Reservation;
 
 import java.util.List;
-import java.util.function.Function;
 
 public class ReservationMapper {
 
@@ -28,7 +26,7 @@ public class ReservationMapper {
                 reservations.getInquiry().getPosition(),
                 new ReservationInfo(
                         reservations.getStatus().getDescription(),
-                        new ReservationPreferredDate(reservations.getStartDate(), reservations.getEndDate())
+                        new ReservationPreferredDateInfo(reservations.getStartDate(), reservations.getEndDate())
                 ),
                 new SpaceId(reservations.getInquiry().getSpace().getSpaceId())
         );
@@ -36,7 +34,8 @@ public class ReservationMapper {
 
     public static ReservationDetailResponse toReservationDetailResponse(
             Reservation reservation,
-            List<InquiryFile> files
+            List<InquiryFileName> files,
+            List<InquiryPreferredDateInfo> preferredDateInfos
     ) {
 
         return new ReservationDetailResponse(
@@ -50,7 +49,7 @@ public class ReservationMapper {
                 reservation.getInquiry().getCompanyWebsite(),
                 reservation.getInquiry().getEventCategory(),
                 reservation.getInquiry().getEventName(),
-                new InquiryPreferredDate(reservation.getInquiry().getPreferredStartDate(), reservation.getInquiry().getPreferredEndDate()),
+                preferredDateInfos,
                 reservation.getInquiry().getContent(),
                 files,
                 reservation.getInquiry().getCreatedAt(),
@@ -58,7 +57,7 @@ public class ReservationMapper {
                 reservation.getInquiry().getSpace().getSpaceId(),
                 reservation.getInquiry().getHostCompany(),
                 new SpaceId(reservation.getInquiry().getSpace().getSpaceId()),
-                new ReservationInfo(reservation.getStatus().getDescription(), new ReservationPreferredDate(reservation.getStartDate(), reservation.getEndDate()))
+                new ReservationInfo(reservation.getStatus().getDescription(), new ReservationPreferredDateInfo(reservation.getStartDate(), reservation.getEndDate()))
         );
     }
 
@@ -73,7 +72,7 @@ public class ReservationMapper {
                 getPaymentUpdateRequest(payments, PaymentType.INTERIM_PAYMENT1),
                 getPaymentUpdateRequest(payments, PaymentType.INTERIM_PAYMENT2),
                 getPaymentUpdateRequest(payments, PaymentType.FINAL_PAYMENT),
-                new ReservationPreferredDate(reservation.getStartDate(), reservation.getEndDate()),
+                new ReservationPreferredDateInfo(reservation.getStartDate(), reservation.getEndDate()),
                 reservation.getStatus(),
                 reservation.getCreatedAt()
         );

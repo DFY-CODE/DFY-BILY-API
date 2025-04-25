@@ -1,4 +1,4 @@
-package one.dfy.bily.api.admin.model.rent.repository;
+package one.dfy.bily.api.admin.model.inquiry.repository;
 
 import one.dfy.bily.api.admin.dto.Inquiry.InquiryResponse;
 import org.springframework.data.domain.Page;
