@@ -70,38 +70,56 @@ tasks.withType(JavaCompile) {
     options.compilerArgs << "-Xlint:deprecation"
 }
 
-
-tasks.register('buildReactApp') {
+// React 빌드 작업
+/*tasks.register('buildReactApp') {
+    group = "build"
+    description = "React 애플리케이션 빌드 및 Spring Boot 정적 리소스(/backend) 경로로 복사"
     doLast {
-        exec {
-            workingDir "${projectDir}/admin-frontend" // React 앱의 디렉토리 경로
-            commandLine 'npm', 'run', 'build'
-            standardOutput = new ByteArrayOutputStream()
-            errorOutput = new ByteArrayOutputStream()
-            ignoreExitValue = true // 오류 발생 시에도 계속 진행
-            doLast {
-                println "Output: ${standardOutput.toString()}"
-                println "Error: ${errorOutput.toString()}"
+        // React 프로젝트 경로 설정
+        def reactDir = file("${projectDir}/frontend") // React 프로젝트 폴더 (원래는 backend → frontend로 수정)
+        def buildDir = file("${reactDir}/build") // React 빌드 출력물 디렉터리
+        def outputDir = file("${projectDir}/src/main/resources/static/backend") // React 파일이 복사될 최종 경로
+
+        // React 앱 빌드 실행 (npm install → npm run build)
+        try {
+            exec {
+                workingDir reactDir
+                commandLine 'npm', 'install'
             }
+            exec {
+                workingDir reactDir
+                commandLine 'npm', 'run', 'build'
+            }
+        } catch (Exception e) {
+            throw new GradleException("React 빌드 실패: ${e.message}")
         }
 
-        // 기존 build 디렉토리를 삭제하고 복사
-        def staticDir = "${projectDir}/src/main/resources/static"
-        def buildDir = "${projectDir}/admin-frontend/build"
-
-        // 기존 디렉토리 삭제
-        delete fileTree(staticDir) {
-            include '**'
+        // 기존 정적 리소스 디렉터리 삭제
+        if (outputDir.exists()) {
+            project.delete(fileTree(outputDir))
         }
 
-        // 빌드 결과물 복사
-        copy {
+        // React 빌드 파일 복사
+        project.copy {
             from buildDir
-            into staticDir
+            into outputDir
         }
+
+        println "React 빌드 완료. 정적 리소스가 복사되었습니다: ${outputDir.absolutePath}"
     }
 }
 
+
+
+// processResources 태스크: React 빌드 결과물 포함
+tasks.processResources {
+    dependsOn 'buildReactApp' // React 빌드 후 포함
+}
+
+// Spring Boot 빌드 전에 React 빌드 실행
+tasks.named('build') {
+    dependsOn 'buildReactApp'
+}*/
 
 springBoot {
     mainClass = 'one.dfy.bily.api.OneDfyBilyApiApplication'

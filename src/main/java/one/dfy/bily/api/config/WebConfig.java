@@ -10,6 +10,8 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import java.nio.file.Paths;
+
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
@@ -36,11 +38,9 @@ public class WebConfig implements WebMvcConfigurer {
     }
 
     @Override
-    public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        // 빌드된 React 앱의 리소스를 제공
-        registry.addResourceHandler("/**") // 모든 요청에 대해
-                .addResourceLocations("file:src/main/webapp/frontend/","file:src/main/webapp/backend/"); // 새 리소스 위치
-
+    public void addViewControllers(ViewControllerRegistry registry) {
+        registry.addViewController("/{path:[^\\.]*}")
+                .setViewName("forward:/index.html");
     }
 
 }

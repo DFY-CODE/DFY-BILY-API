@@ -10,10 +10,11 @@ import java.time.LocalDateTime;
 public class ChatMessage {
     private Long id;
     private Long chatRoomId; // 공간 ID
+    private String chatPairKey; //chatRoomId + receiverId 조합 그룹화
     private Long senderId;
     private Long receiverId;
     private String messageContent;
-    private Boolean isRead;
+    private int isRead;
     private String senderName; // 🔹 보낸 사람 이름
     private String receiverName; // 🔹 받는 사람 이름
 
