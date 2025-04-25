@@ -7,7 +7,7 @@ import one.dfy.bily.api.common.dto.FileInfoEntity;
 import one.dfy.bily.api.common.dto.FileUploadResponse;
 import one.dfy.bily.api.common.dto.User;
 import one.dfy.bily.api.common.service.FileService;
-import one.dfy.bily.api.common.service.SpaceService;
+import one.dfy.bily.api.admin.service.SpaceService;
 import one.dfy.bily.api.common.service.UserService;
 import one.dfy.bily.api.util.S3Uploader;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,7 +64,7 @@ public class ApiController {
                 String title = titles.get(i);
 
                 String fileName = file.getOriginalFilename();
-                String dirName = "space";
+                String dirName = "space/space";
                 long fileSize = file.getSize();
 
                 s3Uploader.upload(contentId, fileSize, fileName, file, dirName, title);

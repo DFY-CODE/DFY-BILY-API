@@ -30,6 +30,7 @@ spring:
       import: optional:file:.env.prod[.properties]
     profiles:
       active: prod
+    property-naming-strategy: SNAKE_CASE
 
   autoconfigure:
     exclude: org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
@@ -118,4 +119,6 @@ springdoc:
     path: /swagger-ui.html # Swagger UI 경로 설정
     enabled: true # Swagger UI 활성화 여부
 
-
+s3:
+  path:
+    inquiry: images/inquiry

@@ -1,17 +1,17 @@
-package one.dfy.bily.api.common.service;
+package one.dfy.bily.api.admin.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
+import one.dfy.bily.api.admin.model.space.Space;
+import one.dfy.bily.api.admin.model.space.repository.SpaceRepository;
 import one.dfy.bily.api.common.dto.*;
 import one.dfy.bily.api.common.mapper.SpaceMapper;
 import one.dfy.bily.api.util.S3Uploader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,16 +19,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class SpaceService {
-
-    @Autowired
-    private SpaceMapper spaceMapper;
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    @Autowired
-    private S3Uploader s3Uploader;
+    private final SpaceMapper spaceMapper;
+    private final ObjectMapper objectMapper;
+    private final S3Uploader s3Uploader;
+    private final SpaceRepository spaceRepository;
 
     // 페이징 처리된 데이터 반환
     public List<AdminSpaceListDto> getSpaces(int page, int size) {
@@ -264,7 +260,12 @@ public class SpaceService {
 
     }
 
-
+    public Space findById(Integer contentId) {
+        if (contentId == null) {
+            return null;
+        }
+        return spaceRepository.findById(contentId).orElseThrow(() -> new IllegalArgumentException("공간이 존재하지 않습니다."));
+    }
 
 
 
