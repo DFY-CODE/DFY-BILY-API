@@ -59,6 +59,13 @@ public class InquiryService {
 
     }
 
+    @Transactional(readOnly = true)
+    public Inquiry findInquiryById(Long inquiryId){
+
+        return inquiryRepository.findById(inquiryId).orElseThrow(() -> new IllegalArgumentException("유효하지 않은 문의 정보입니다."));
+
+    }
+
     @Transactional
     public InquiryResponse createInquiry(InquiryCreateRequest request, Space space, Long userId) {
 

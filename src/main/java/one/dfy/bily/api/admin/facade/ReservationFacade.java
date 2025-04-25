@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import one.dfy.bily.api.admin.dto.Inquiry.InquiryFileName;
 import one.dfy.bily.api.admin.dto.Inquiry.InquiryPreferredDateInfo;
 import one.dfy.bily.api.admin.dto.reservation.ReservationDetailResponse;
+import one.dfy.bily.api.admin.dto.reservation.ReservationPaymentInfo;
+import one.dfy.bily.api.admin.model.inquiry.Inquiry;
 import one.dfy.bily.api.admin.model.reservation.Reservation;
 import one.dfy.bily.api.admin.service.InquiryService;
 import one.dfy.bily.api.admin.service.ReservationService;
@@ -23,6 +25,12 @@ public class ReservationFacade {
         List<InquiryPreferredDateInfo> preferredDateInfos = inquiryService.findInquiryPreferredDateByInquiry(reservation.getInquiry());
 
         return reservationService.reservationMappingToReservationDetailResponse(reservation, inquiryFileNameList, preferredDateInfos);
+    }
+
+    public ReservationPaymentInfo createReservationPayment(ReservationPaymentInfo request) {
+        Inquiry inquiry = inquiryService.findInquiryById(request.inquiryId());
+
+        return reservationService.createReservationPayment(request, inquiry);
     }
 
 }

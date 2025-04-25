@@ -5,12 +5,45 @@ import one.dfy.bily.api.admin.dto.Inquiry.InquiryFileName;
 import one.dfy.bily.api.admin.dto.Inquiry.InquiryPreferredDateInfo;
 import one.dfy.bily.api.admin.dto.reservation.*;
 import one.dfy.bily.api.admin.dto.space.SpaceId;
+import one.dfy.bily.api.admin.model.inquiry.Inquiry;
 import one.dfy.bily.api.admin.model.reservation.Payment;
 import one.dfy.bily.api.admin.model.reservation.Reservation;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ReservationMapper {
+
+    public static Reservation toReservationEntity(ReservationPaymentInfo dto, Inquiry inquiry) {
+
+        return new Reservation(
+                inquiry,
+                dto.status(),
+                dto.fixedDate().from(),
+                dto.fixedDate().to()
+        );
+    }
+
+    public static List<Payment> toPaymentEntities(ReservationPaymentInfo dto, Reservation reservation) {
+        List<Payment> payments = new ArrayList<>();
+
+        payments.add(toPayment(dto.deposit(), PaymentType.DEPOSIT, reservation));
+        payments.add(toPayment(dto.interimPayment1(), PaymentType.INTERIM_PAYMENT1, reservation));
+        payments.add(toPayment(dto.interimPayment2(), PaymentType.INTERIM_PAYMENT2, reservation));
+        payments.add(toPayment(dto.finalPayment(), PaymentType.FINAL_PAYMENT, reservation));
+
+        return payments;
+    }
+
+    private static Payment toPayment(PaymentRequest request, PaymentType type, Reservation reservation) {
+
+        return new Payment(
+                reservation,
+                type,
+                request.payment(),
+                request.date()
+        );
+    }
 
     public static ReservationResponse toReservationResponse(
             Reservation reservations
@@ -78,11 +111,11 @@ public class ReservationMapper {
         );
     }
 
-    private static PaymentUpdateRequest getPaymentUpdateRequest(List<Payment> payments, PaymentType type) {
+    private static PaymentRequest getPaymentUpdateRequest(List<Payment> payments, PaymentType type) {
         return payments.stream()
                 .filter(p -> p.isEqualType(type))
                 .findFirst()
-                .map(p -> new PaymentUpdateRequest(p.getId(), p.getPaymentDate(), p.getAmount()))
+                .map(p -> new PaymentRequest(p.getId(), p.getPaymentDate(), p.getAmount()))
                 .orElse(null);
     }
 }

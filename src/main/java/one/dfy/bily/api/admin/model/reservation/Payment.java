@@ -34,6 +34,13 @@ public class Payment extends BaseEntity {
     @Column(name = "PAYMENT_DATE")
     private LocalDateTime paymentDate;
 
+    public Payment(Reservation reservation, PaymentType type, BigDecimal amount, LocalDateTime paymentDate) {
+        this.reservation = reservation;
+        this.type = type;
+        this.amount = amount;
+        this.paymentDate = paymentDate;
+    }
+
     public boolean isEqualType(PaymentType type) {
         return this.type == type;
     }

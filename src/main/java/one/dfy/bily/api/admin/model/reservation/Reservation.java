@@ -35,6 +35,13 @@ public class Reservation extends BaseEntity {
     @Column(name = "end_date")
     private LocalDateTime endDate;
 
+    public Reservation(Inquiry inquiry, ReservationStatus status, LocalDateTime startDate, LocalDateTime endDate) {
+        this.inquiry = inquiry;
+        this.status = status;
+        this.startDate = startDate;
+        this.endDate = endDate;
+    }
+
     public void updateReservation(ReservationStatus status, LocalDateTime startDate, LocalDateTime endDate) {
         if (status != null) {
             this.status = status;

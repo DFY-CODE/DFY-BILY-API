@@ -9,6 +9,7 @@ import one.dfy.bily.api.admin.dto.reservation.ReservationDetailResponse;
 import one.dfy.bily.api.admin.dto.reservation.ReservationResponse;
 import one.dfy.bily.api.admin.dto.reservation.ReservationPaymentInfo;
 import one.dfy.bily.api.admin.mapper.ReservationMapper;
+import one.dfy.bily.api.admin.model.inquiry.Inquiry;
 import one.dfy.bily.api.admin.model.reservation.Payment;
 import one.dfy.bily.api.admin.model.reservation.Reservation;
 import one.dfy.bily.api.admin.model.reservation.repository.PaymentRepository;
@@ -59,6 +60,17 @@ public class ReservationService {
         List<Payment> paymentList = paymentRepository.findByReservation(reservation);
 
         return ReservationMapper.toReservationPaymentInfo(reservation, paymentList);
+    }
+
+    @Transactional
+    public ReservationPaymentInfo createReservationPayment(ReservationPaymentInfo request, Inquiry inquiry) {
+        Reservation reservation = ReservationMapper.toReservationEntity(request, inquiry);
+        reservation = reservationRepository.save(reservation);
+
+        List<Payment> payment = ReservationMapper.toPaymentEntities(request, reservation);
+        payment = paymentRepository.saveAll(payment);
+
+        return ReservationMapper.toReservationPaymentInfo(reservation, payment);
     }
 
     @Transactional

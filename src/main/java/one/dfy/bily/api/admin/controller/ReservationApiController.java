@@ -103,6 +103,24 @@ public class ReservationApiController {
         return ResponseEntity.ok(reservationService.findReservationPaymentById(reservationId));
     }
 
+    @PostMapping
+    @Operation(summary = "예약 생성", description = "예약 생성 후 생성내용을 반환합니다.")
+    @ApiResponse(
+            responseCode = "200",
+            description = "성공",
+            content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ReservationPaymentInfo.class),
+                    examples = @ExampleObject(
+                            name = "성공 응답 예시",
+                            externalValue = "/swagger/json/reservation/updateReservation.json"
+                    )
+            )
+    )
+    public ResponseEntity<ReservationPaymentInfo> createReservationPayment(@RequestBody ReservationPaymentInfo reservationPaymentInfo) {
+        return ResponseEntity.ok(reservationFacade.createReservationPayment(reservationPaymentInfo));
+    }
+
     @PatchMapping()
     @Operation(summary = "예약 수정", description = "예약 수정 후 수정내용을 반환합니다.")
     @ApiResponse(
