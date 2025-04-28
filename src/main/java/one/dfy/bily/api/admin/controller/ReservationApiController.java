@@ -61,15 +61,16 @@ public class ReservationApiController {
                     required = false,
                     schema = @Schema(type = "string", format = "date-time", example = "2025-04-06T00:00:00")
             )
-            @RequestParam(value = "start-date", required = false) LocalDateTime startAt,
+            @RequestParam(value = "start_date", required = false) LocalDateTime startAt,
             @Parameter(
                     description = "예약 검색 종료일 (예: 2025-04-06T23:59:59)",
                     required = false,
                     schema = @Schema(type = "string", format = "date-time", example = "2025-04-06T23:59:59")
             )
-            @RequestParam(value = "end-date", required = false) LocalDateTime endAt,
+            @RequestParam(value = "end_date", required = false) LocalDateTime endAt,
             @Parameter(description = "예약 검색 페이지", required = false) @RequestParam(defaultValue = "1") int page,
-            @Parameter(description = "예약 검색 페이지 사이즈", required = false) @RequestParam(defaultValue = "20") int pageSize
+            @Parameter(description = "예약 검색 페이지 사이즈", required = false)
+            @RequestParam(value = "page_size", defaultValue = "20") int pageSize
     ) {
         return ResponseEntity.ok(reservationService.findReservationListByKeywordAndDate(type, keyword, startAt, endAt, page, pageSize));
     }
@@ -128,7 +129,7 @@ public class ReservationApiController {
         return ResponseEntity.ok(reservationFacade.createReservationPayment(reservationPaymentInfo));
     }
 
-    @PatchMapping()
+    @PatchMapping("/{reservation-id}")
     @Operation(summary = "예약 수정", description = "예약 수정 후 수정내용을 반환합니다.")
     @ApiResponse(
             responseCode = "200",
@@ -142,7 +143,7 @@ public class ReservationApiController {
                     )
             )
     )
-    public ResponseEntity<ReservationPaymentInfo> updateReservation(@RequestBody ReservationPaymentInfo reservationPaymentInfo) {
-        return ResponseEntity.ok(reservationService.updateReservation(reservationPaymentInfo));
+    public ResponseEntity<ReservationPaymentInfo> updateReservation(@PathVariable(name = "reservation-id") Long reservationId, @RequestBody ReservationPaymentInfo reservationPaymentInfo) {
+        return ResponseEntity.ok(reservationService.updateReservation(reservationId,reservationPaymentInfo));
     }
 }
