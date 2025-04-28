@@ -4,10 +4,12 @@ import lombok.RequiredArgsConstructor;
 import one.dfy.bily.api.admin.constant.InquirySearchType;
 import one.dfy.bily.api.admin.constant.PaymentType;
 import one.dfy.bily.api.admin.dto.Inquiry.InquiryFileName;
+import one.dfy.bily.api.admin.dto.Inquiry.InquiryKeywordHolder;
 import one.dfy.bily.api.admin.dto.Inquiry.InquiryPreferredDateInfo;
 import one.dfy.bily.api.admin.dto.reservation.ReservationDetailResponse;
 import one.dfy.bily.api.admin.dto.reservation.ReservationResponse;
 import one.dfy.bily.api.admin.dto.reservation.ReservationPaymentInfo;
+import one.dfy.bily.api.admin.mapper.InquiryMapper;
 import one.dfy.bily.api.admin.mapper.ReservationMapper;
 import one.dfy.bily.api.admin.model.inquiry.Inquiry;
 import one.dfy.bily.api.admin.model.reservation.Payment;
@@ -35,10 +37,12 @@ public class ReservationService {
 
         Pageable pageable = PageRequest.of(page-1, pageSize, Sort.by(Sort.Direction.DESC, "id"));
 
+        InquiryKeywordHolder holder = InquiryMapper.mapKeyword(type, keyword);
+
         return reservationRepository.findReservationListByKeywordAndDate(
-                type == InquirySearchType.COMPANY_NAME ? keyword : null,
-                type == InquirySearchType.CONTACT_PERSON ? keyword : null,
-                type == InquirySearchType.SPACE ? keyword : null,
+                holder.companyName(),
+                holder.contactPerson(),
+                holder.spaceName(),
                 startAt,
                 endAt,
                 pageable

@@ -1,5 +1,6 @@
 package one.dfy.bily.api.admin.mapper;
 
+import one.dfy.bily.api.admin.constant.InquirySearchType;
 import one.dfy.bily.api.admin.dto.Inquiry.*;
 import one.dfy.bily.api.admin.dto.space.SpaceId;
 import one.dfy.bily.api.admin.model.inquiry.Inquiry;
@@ -105,5 +106,21 @@ public class InquiryMapper {
 
     public static InquiryPreferredDateInfo inquiryPreferredDateInfoToResponse(PreferredDate preferredDate) {
         return  new InquiryPreferredDateInfo(preferredDate.getPreferredStartDate(), preferredDate.getPreferredEndDate(), preferredDate.getPreferenceLevel());
+    }
+
+    private static InquiryKeywordHolder resolveKeyword(InquirySearchType type, String keyword) {
+        if (type == null || keyword == null) {
+            return new InquiryKeywordHolder(null, null, null);
+        }
+
+        return switch (type) {
+            case COMPANY_NAME -> new InquiryKeywordHolder(keyword, null, null);
+            case CONTACT_PERSON -> new InquiryKeywordHolder(null, keyword, null);
+            case SPACE -> new InquiryKeywordHolder(null, null, keyword);
+        };
+    }
+
+    public static InquiryKeywordHolder mapKeyword(InquirySearchType type, String keyword) {
+        return resolveKeyword(type, keyword);
     }
 }

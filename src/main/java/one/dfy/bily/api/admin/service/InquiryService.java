@@ -31,14 +31,19 @@ public class InquiryService {
     private final S3Uploader s3Uploader;
 
     @Transactional(readOnly = true)
-    public List<InquiryResponse> findInquiryListByKeywordAndDate(InquirySearchType type, String keyword, LocalDateTime startAt, LocalDateTime endAt, int page, int pageSize) {
+    public List<InquiryResponse> findInquiryListByKeywordAndDate(
+            InquirySearchType type, String keyword,
+            LocalDateTime startAt, LocalDateTime endAt,
+            int page, int pageSize
+    ) {
+        Pageable pageable = PageRequest.of(page - 1, pageSize, Sort.by(Sort.Direction.DESC, "id"));
 
-        Pageable pageable = PageRequest.of(page-1, pageSize, Sort.by(Sort.Direction.DESC, "id"));
+        InquiryKeywordHolder holder = InquiryMapper.mapKeyword(type, keyword);
 
         return inquiryRepository.searchInquiries(
-                type == InquirySearchType.COMPANY_NAME ? keyword : null,
-                type == InquirySearchType.CONTACT_PERSON ? keyword : null,
-                type == InquirySearchType.SPACE ? keyword : null,
+                holder.companyName(),
+                holder.contactPerson(),
+                holder.spaceName(),
                 startAt,
                 endAt,
                 pageable
