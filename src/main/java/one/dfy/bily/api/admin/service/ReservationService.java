@@ -78,8 +78,8 @@ public class ReservationService {
     }
 
     @Transactional
-    public ReservationPaymentInfo updateReservation(ReservationPaymentInfo request) {
-        Reservation reservation  = reservationRepository.findById(request.id()).orElseThrow(() -> new IllegalArgumentException("유효하지 않은 예약 정보입니다."));
+    public ReservationPaymentInfo updateReservation(Long reservationId, ReservationPaymentInfo request) {
+        Reservation reservation  = reservationRepository.findById(reservationId).orElseThrow(() -> new IllegalArgumentException("유효하지 않은 예약 정보입니다."));
         List<Payment> paymentList = paymentRepository.findByReservation(reservation);
 
         paymentList.forEach(payment -> {

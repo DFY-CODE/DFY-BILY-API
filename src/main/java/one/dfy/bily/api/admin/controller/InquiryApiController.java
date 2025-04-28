@@ -65,15 +65,16 @@ public class InquiryApiController {
                     required = false,
                     schema = @Schema(type = "string", format = "date-time", example = "2025-04-06T00:00:00")
             )
-            @RequestParam(value = "start-date", required = false) LocalDateTime startAt,
+            @RequestParam(value = "start_date", required = false) LocalDateTime startAt,
             @Parameter(
                     description = "문의 검색 종료일 (예: 2025-04-06T23:59:59)",
                     required = false,
                     schema = @Schema(type = "string", format = "date-time", example = "2025-04-06T23:59:59")
             )
-            @RequestParam(value = "end-date", required = false) LocalDateTime endAt,
+            @RequestParam(value = "end_date", required = false) LocalDateTime endAt,
             @Parameter(description = "문의 검색 페이지", required = false) @RequestParam(defaultValue = "1") int page,
-            @Parameter(description = "문의 검색 페이지 사이즈", required = false) @RequestParam(defaultValue = "20") int pageSize
+            @Parameter(description = "문의 검색 페이지 사이즈", required = false)
+            @RequestParam(value = "page_size", defaultValue = "20") int pageSize
     ) {
         return ResponseEntity.ok(inquiryService.findInquiryListByKeywordAndDate(type, keyword, startAt, endAt, page, pageSize));
     }
