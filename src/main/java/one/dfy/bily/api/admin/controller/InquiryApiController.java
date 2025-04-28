@@ -110,7 +110,7 @@ public class InquiryApiController {
                     )
             )
     )
-    public ResponseEntity<InquiryResponse> createInquiry(@RequestBody InquiryCreateRequest request, @AuthenticationPrincipal CustomUserDetails userDetails) {
+    public ResponseEntity<InquiryResponse> createInquiry(@RequestPart InquiryCreateRequest request, @AuthenticationPrincipal CustomUserDetails userDetails) {
         Long userId = userDetails.getUserId();
         return ResponseEntity.ok(inquiryFacade.createInquiry(request,userId));
     }
