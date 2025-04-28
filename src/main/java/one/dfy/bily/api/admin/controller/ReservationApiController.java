@@ -46,7 +46,15 @@ public class ReservationApiController {
             )
     )
     public ResponseEntity<List<ReservationResponse>> findInquiryListByKeywordAndDate(
-            @Parameter(description = "예약 검색 타입", required = false) @RequestParam(value = "type", required = false) InquirySearchType type,
+            @Parameter(
+                    description = "문의 검색 타입 (공간명, 회사명, 이름)",
+                    required = false,
+                    schema = @Schema(
+                            type = "string",
+                            allowableValues = {"공간명", "회사명", "이름"}
+                    )
+            )
+            @RequestParam(value = "type", required = false) InquirySearchType type,
             @Parameter(description = "예약 검색 단어", required = false) @RequestParam(value = "keyword", required = false) String keyword,
             @Parameter(
                     description = "예약 검색 시작일 (예: 2025-04-06T00:00:00)",
