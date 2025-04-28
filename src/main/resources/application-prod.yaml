@@ -122,3 +122,7 @@ springdoc:
 s3:
   path:
     inquiry: images/inquiry
+
+cors:
+  allowed-origins:
+    - https://bily.pages

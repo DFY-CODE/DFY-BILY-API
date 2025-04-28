@@ -123,3 +123,9 @@ springdoc:
 s3:
   path:
     inquiry: images/inquiry
+
+cors:
+  allowed-origins:
+    - http://localhost:3000
+    - https://bily.pages.dev
+    - http://localhost:8081

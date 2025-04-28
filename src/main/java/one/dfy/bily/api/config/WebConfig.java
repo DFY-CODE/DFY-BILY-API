@@ -11,13 +11,14 @@ import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.nio.file.Paths;
+import java.util.List;
 
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
-    @Value("${env.domain:http://localhost:8081}") // 프로토콜 포함
-    private String domain;
+    @Value("${cors.allowed-origins}")
+    private List<String> domains;
 
     @Bean
     public FilterRegistrationBean<JwtAuthenticationFilter> jwtFilter(JwtAuthenticationFilter jwtAuthenticationFilter) {
@@ -31,7 +32,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/api/**") // 특정 엔드포인트에 대해 설정
-                .allowedOrigins(domain)
+                .allowedOrigins(domains.toArray(new String[0]))
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowCredentials(true) // 중요: 인증 정보 포함
                 .allowedHeaders("Authorization", "Content-Type");
