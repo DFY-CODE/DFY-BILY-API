@@ -1,5 +1,9 @@
-package one.dfy.bily.api.common.dto;
+package one.dfy.bily.api.admin.dto.space;
 import lombok.Data;
+import one.dfy.bily.api.common.dto.AmenityDto;
+import one.dfy.bily.api.common.dto.AvailableUseDto;
+import one.dfy.bily.api.common.dto.SpaceFileInfoDto;
+import one.dfy.bily.api.common.dto.SpaceUseFileInfoDto;
 
 import java.time.LocalDateTime;
 import java.util.List;

@@ -9,6 +9,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
+import one.dfy.bily.api.admin.dto.space.SpaceDetailDto;
+import one.dfy.bily.api.admin.dto.space.SpaceDetailResponse;
+import one.dfy.bily.api.admin.dto.space.SpaceListDto;
+import one.dfy.bily.api.admin.dto.space.SpaceListResponse;
 import one.dfy.bily.api.common.dto.*;
 import one.dfy.bily.api.common.service.FileService;
 import one.dfy.bily.api.admin.service.SpaceService;
@@ -48,7 +52,7 @@ public class SpaceApiController {
                     description = "성공",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = Map.class),
+                            schema = @Schema(implementation = SpaceListResponse.class),
                             examples = @ExampleObject(
                                     name = "성공 응답 예시",
                                     externalValue = "/swagger/json/space/getSpaces.json"
@@ -56,18 +60,16 @@ public class SpaceApiController {
                     )
             )
     })
-    public ResponseEntity<Map<String, Object>> getSpaces(
+    public ResponseEntity<SpaceListResponse> getSpaces(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size) {
 
-        List<AdminSpaceListDto> spacesList = spaceService.getSpaces(page, size);
+        List<SpaceListDto> spacesList = spaceService.getSpaces(page, size);
         int totalCount = spaceService.getTotalCount();
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("spaces", spacesList);
-        response.put("totalCount", totalCount);
 
-        return ResponseEntity.ok(response);
+
+        return ResponseEntity.ok(new SpaceListResponse(spacesList,totalCount));
     }
 
     @GetMapping("/spaces/detail/{contentId}")
@@ -78,7 +80,7 @@ public class SpaceApiController {
                     description = "성공",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = Map.class),
+                            schema = @Schema(implementation = SpaceDetailResponse.class),
                             examples = @ExampleObject(
                                     name = "성공 응답 예시",
                                     externalValue = "/swagger/json/space/getSpaceDetail.json"
@@ -96,15 +98,12 @@ public class SpaceApiController {
                     content = @Content(mediaType = "application/json")
             )
     })
-    public ResponseEntity<Map<String, Object>> getSpaceDetail(
+    public ResponseEntity<SpaceDetailResponse> getSpaceDetail(
             @Parameter(description = "상세 정보를 가져올 contentId", example = "1") @PathVariable int contentId) {
 
         List<SpaceDetailDto> SpaceDetailList = spaceService.getSpacesDetail(contentId);
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("spaces", SpaceDetailList);
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(new SpaceDetailResponse(SpaceDetailList));
     }
 
 

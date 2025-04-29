@@ -6,8 +6,10 @@ import io.github.cdimascio.dotenv.Dotenv;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-@SpringBootApplication(scanBasePackages = "one.dfy.bily.api")
-@MapperScan("one.dfy.bily.api.common.mapper") // 매퍼 패키지 지정
+@SpringBootApplication(scanBasePackages = "one.dfy.bily.api")@MapperScan(basePackages = {
+        "one.dfy.bily.api.common.mapper",
+        "one.dfy.bily.api.admin.mapper",
+})
 public class OneDfyBilyApiApplication {
 
     // .env 파일 로드 및 환경 변수 설정 메서드 분리 (가독성 향상)
