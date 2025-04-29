@@ -1,0 +1,18 @@
+{
+  "spaces": [
+    {
+      "contentId": 1,
+      "displayStatus": 1,
+      "spaceId": "spaceA",
+      "price": 10000,
+      "areaM2": 50.0,
+      "name": "회의실 A",
+      "author": "관리자",
+      "amenitiesList": [],
+      "availableUsesList": [],
+      "amenities": "{}",
+      "availableUses": "[]",
+      "views": "100"
+    }
+  ]
+}

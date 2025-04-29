@@ -1,5 +1,7 @@
-package one.dfy.bily.api.common.mapper;
+package one.dfy.bily.api.admin.mapper;
 
+import one.dfy.bily.api.admin.dto.space.SpaceDetailDto;
+import one.dfy.bily.api.admin.dto.space.SpaceListDto;
 import one.dfy.bily.api.common.dto.*;
 import org.apache.ibatis.annotations.*;
 
@@ -9,7 +11,19 @@ import java.util.List;
 public interface SpaceMapper {
 
     @Select("SELECT CONTENT_ID, DISPLAY_STATUS, SPACE_ID, PRICE, AREA_M2, NAME, AUTHOR, AMENITIES, AVAILABLE_USES, VIEWS  FROM TBL_SPACE LIMIT #{size} OFFSET #{offset}")
-    List<AdminSpaceListDto> getSpaces(@Param("size") int size, @Param("offset") int offset);
+    @Results(id = "SpaceListDtoResultMap", value = {
+            @Result(property = "contentId", column = "CONTENT_ID"),
+            @Result(property = "displayStatus", column = "DISPLAY_STATUS"),
+            @Result(property = "spaceId", column = "SPACE_ID"),
+            @Result(property = "price", column = "PRICE"),
+            @Result(property = "areaM2", column = "AREA_M2"),
+            @Result(property = "name", column = "NAME"),
+            @Result(property = "author", column = "AUTHOR"),
+            @Result(property = "amenities", column = "AMENITIES"),
+            @Result(property = "availableUses", column = "AVAILABLE_USES"),
+            @Result(property = "views", column = "VIEWS")
+    })
+    List<SpaceListDto> getSpaces(@Param("size") int size, @Param("offset") int offset);
 
     // 여러 개의 ID를 기반으로 편의시설 조회
     @Select({

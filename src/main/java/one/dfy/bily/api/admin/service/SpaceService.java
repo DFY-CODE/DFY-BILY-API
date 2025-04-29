@@ -4,12 +4,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import one.dfy.bily.api.admin.dto.space.SpaceDetailDto;
+import one.dfy.bily.api.admin.dto.space.SpaceListDto;
 import one.dfy.bily.api.admin.model.space.Space;
 import one.dfy.bily.api.admin.model.space.repository.SpaceRepository;
 import one.dfy.bily.api.common.dto.*;
-import one.dfy.bily.api.common.mapper.SpaceMapper;
+import one.dfy.bily.api.admin.mapper.SpaceMapper;
 import one.dfy.bily.api.util.S3Uploader;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -27,22 +28,22 @@ public class SpaceService {
     private final SpaceRepository spaceRepository;
 
     // 페이징 처리된 데이터 반환
-    public List<AdminSpaceListDto> getSpaces(int page, int size) {
+    public List<SpaceListDto> getSpaces(int page, int size) {
         int offset = (page - 1) * size;
-        List<AdminSpaceListDto> spaces = spaceMapper.getSpaces(size, offset);
+        List<SpaceListDto> spaces = spaceMapper.getSpaces(size, offset);
 
-        for (AdminSpaceListDto space : spaces) {
+        for (SpaceListDto space : spaces) {
             // JSON 문자열을 List<Integer>로 변환
             List<Integer> amenityIds = parseJsonArray(space.getAmenities());
 
             // amenities 리스트 설정
             List<AmenityDto> amenities = amenityIds.isEmpty() ? new ArrayList<>() : spaceMapper.selectAmenitiesByIds(amenityIds);
-            space.setAmenitiesList(amenities);
+            space.updateAmenitiesList(amenities);
 
             // availableUses 변환 및 설정
             List<Integer> useIds = parseJsonArray(space.getAvailableUses());
             List<AvailableUseDto> availableUses = useIds.isEmpty() ? new ArrayList<>() : spaceMapper.selectAvailableUsesByIds(useIds);
-            space.setAvailableUsesList(availableUses);
+            space.updateAvailableUses(availableUses);
         }
 
 
