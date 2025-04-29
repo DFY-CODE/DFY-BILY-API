@@ -124,5 +124,4 @@ s3:
     inquiry: images/inquiry
 
 cors:
-  allowed-origins:
-    https://bily.pages
+  allowed-origins: "https://bily.pages"
