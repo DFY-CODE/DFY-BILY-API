@@ -125,4 +125,4 @@ s3:
 
 cors:
   allowed-origins:
-    - https://bily.pages
+    https://bily.pages

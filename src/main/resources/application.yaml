@@ -126,6 +126,6 @@ s3:
 
 cors:
   allowed-origins:
-    - http://localhost:3000
-    - https://bily.pages.dev
-    - http://localhost:8081
+    http://localhost:3000
+    https://bily.pages.dev
+    http://localhost:8081
