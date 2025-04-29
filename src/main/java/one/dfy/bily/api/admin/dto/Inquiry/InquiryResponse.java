@@ -1,5 +1,6 @@
 package one.dfy.bily.api.admin.dto.Inquiry;
 
+import one.dfy.bily.api.admin.constant.InquiryStatus;
 import one.dfy.bily.api.admin.dto.space.SpaceId;
 
 import java.time.LocalDateTime;
@@ -19,7 +20,7 @@ public record InquiryResponse(
         String content,
         List<InquiryFileName> fileAttachment,
         LocalDateTime createdAt,
-        String status,
+        InquiryStatus status,
         String author,
         Integer spaceId,
         String hostCompany,

@@ -13,9 +13,9 @@ import lombok.extern.slf4j.Slf4j;
 import one.dfy.bily.api.admin.constant.InquirySearchType;
 import one.dfy.bily.api.admin.dto.Inquiry.InquiryCreateRequest;
 import one.dfy.bily.api.admin.dto.Inquiry.InquiryResponse;
+import one.dfy.bily.api.admin.dto.Inquiry.InquiryStatusUpdateRequest;
 import one.dfy.bily.api.admin.dto.Inquiry.InquiryUpdateRequest;
 import one.dfy.bily.api.admin.facade.InquiryFacade;
-import one.dfy.bily.api.admin.model.space.Space;
 import one.dfy.bily.api.admin.service.InquiryService;
 import one.dfy.bily.api.security.CustomUserDetails;
 import org.springframework.http.ResponseEntity;
@@ -135,5 +135,18 @@ public class InquiryApiController {
             @RequestBody InquiryUpdateRequest request
     ) {
         return ResponseEntity.ok(inquiryFacade.updateInquiry(inquiryId, request));
+    }
+
+    @PatchMapping("/status/{inquiry-id}")
+    @Operation(summary = "문의 수정", description = "문의 내용을 수정합니다.")
+    @ApiResponse(
+            responseCode = "200",
+            description = "성공"
+    )
+    public ResponseEntity<Void> updateInquiryStatus(
+            @PathVariable(name = "inquiry-id") Long inquiryId, @RequestBody InquiryStatusUpdateRequest request
+    ){
+        inquiryService.updateInquiryStatus(inquiryId, request);
+        return ResponseEntity.ok().build();
     }
 }

@@ -131,4 +131,11 @@ public class InquiryService {
                 .map(InquiryMapper::inquiryPreferredDateInfoToResponse)
                 .toList();
     }
+
+    @Transactional
+    public void updateInquiryStatus(Long id, InquiryStatusUpdateRequest request){
+        inquiryRepository.findById(id).ifPresent(inquiry -> {
+            inquiry.updateStatus(request.status());
+        });
+    }
 }

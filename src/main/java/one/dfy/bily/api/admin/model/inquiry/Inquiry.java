@@ -3,8 +3,10 @@ package one.dfy.bily.api.admin.model.inquiry;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import one.dfy.bily.api.admin.constant.InquiryStatus;
 import one.dfy.bily.api.admin.dto.Inquiry.InquiryUpdateRequest;
 import one.dfy.bily.api.admin.model.space.Space;
+import one.dfy.bily.api.common.constant.YesNo;
 import one.dfy.bily.api.common.model.BaseEntity;
 
 @Getter
@@ -44,7 +46,8 @@ public class Inquiry extends BaseEntity {
     private String content;
 
     @Column(name = "STATUS", nullable = false)
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private InquiryStatus status;
 
     @Column(name = "AUTHOR")
     private String author;
@@ -56,6 +59,10 @@ public class Inquiry extends BaseEntity {
     @Column(name = "HOST_COMPANY", nullable = false)
     private String hostCompany;
 
+    @Column(name = "IS_USE", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private YesNo isUse;
+
     public Inquiry(
             String contactPerson,
             String phoneNumber,
@@ -66,7 +73,7 @@ public class Inquiry extends BaseEntity {
             String eventCategory,
             String eventName,
             String content,
-            String status,
+            InquiryStatus status,
             String author,
             Space space,
             String hostCompany
@@ -84,6 +91,7 @@ public class Inquiry extends BaseEntity {
         this.author = author;
         this.space = space;
         this.hostCompany = hostCompany;
+        this.isUse = YesNo.Y;
     }
 
     public void updateFrom(InquiryUpdateRequest request, Space space) {
@@ -96,5 +104,13 @@ public class Inquiry extends BaseEntity {
         if (request.eventCategory() != null) this.eventCategory = request.eventCategory();
         if (request.content() != null) this.content = request.content();
         if (space != null) this.space = space;
+    }
+
+    public void deleteInquiry() {
+        isUse = YesNo.N;
+    }
+
+    public void updateStatus(InquiryStatus status) {
+        this.status = status;
     }
 }
