@@ -1,4 +1,4 @@
-package one.dfy.bily.api.common.controller;
+package one.dfy.bily.api.admin.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -27,7 +27,7 @@ import java.util.*;
 @RestController
 @RequestMapping("/api/admin")
 @Tag(name = "공간관리 API", description = "공간관리 관련 API")
-public class AdminApiController {
+public class SpaceApiController {
 
     @Autowired
     private S3Uploader s3Uploader;
@@ -40,50 +40,22 @@ public class AdminApiController {
 
 
 
+    @GetMapping("/spaces/list")
     @Operation(summary = "공간 목록 조회", description = "페이지네이션된 공간 관리 목록 및 총 개수를 반환합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "성공", content = @Content(
-                    mediaType = "application/json",
-                    schema = @Schema(implementation = Map.class),
-                    examples = @ExampleObject(
-                            name = "성공 응답 예시",
-                            value = "{\n" +
-                                    "  \"spaces\": [\n" +
-                                    "    {\n" +
-                                    "      \"contentId\": 1,\n" +
-                                    "      \"displayStatus\": 1,\n" +
-                                    "      \"spaceId\": \"spaceA\",\n" +
-                                    "      \"price\": 10000,\n" +
-                                    "      \"areaM2\": 50.0,\n" +
-                                    "      \"name\": \"회의실 A\",\n" +
-                                    "      \"author\": \"관리자\",\n" +
-                                    "      \"amenitiesList\": [],\n" +
-                                    "      \"availableUsesList\": [],\n" +
-                                    "      \"amenities\": \"{}\",\n" +
-                                    "      \"availableUses\": \"[]\",\n" +
-                                    "      \"views\": \"100\"\n" +
-                                    "    },\n" +
-                                    "    {\n" +
-                                    "      \"contentId\": 2,\n" +
-                                    "      \"displayStatus\": 0,\n" +
-                                    "      \"spaceId\": \"spaceB\",\n" +
-                                    "      \"price\": 20000,\n" +
-                                    "      \"areaM2\": 100.0,\n" +
-                                    "      \"name\": \"강당 B\",\n" +
-                                    "      \"author\": \"관리자2\",\n" +
-                                    "      \"amenitiesList\": [],\n" +
-                                    "      \"availableUsesList\": [],\n" +
-                                    "      \"amenities\": \"{}\",\n" +
-                                    "      \"availableUses\": \"[]\",\n" +
-                                    "      \"views\": \"200\"\n" +
-                                    "    }\n" +
-                                    "  ],\n" +
-                                    "  \"totalCount\": 100\n" +
-                                    "}"
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = Map.class),
+                            examples = @ExampleObject(
+                                    name = "성공 응답 예시",
+                                    externalValue = "/swagger/json/space/getSpaces.json"
+                            )
                     )
-            ))
+            )
     })
-    @GetMapping("/spaces/list")
     public ResponseEntity<Map<String, Object>> getSpaces(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size) {
@@ -101,33 +73,28 @@ public class AdminApiController {
     @GetMapping("/spaces/detail/{contentId}")
     @Operation(summary = "공간 상세 조회", description = "contentId를 통해 특정 공간의 세부 정보를 반환합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "성공", content = @Content(
-                    mediaType = "application/json",
-                    schema = @Schema(implementation = Map.class),
-                    examples = @ExampleObject(
-                            name = "성공 응답 예시",
-                            value = "{\n" +
-                                    "  \"spaces\": [\n" +
-                                    "    {\n" +
-                                    "      \"contentId\": 1,\n" +
-                                    "      \"displayStatus\": 1,\n" +
-                                    "      \"spaceId\": \"spaceA\",\n" +
-                                    "      \"price\": 10000,\n" +
-                                    "      \"areaM2\": 50.0,\n" +
-                                    "      \"name\": \"회의실 A\",\n" +
-                                    "      \"author\": \"관리자\",\n" +
-                                    "      \"amenitiesList\": [],\n" +
-                                    "      \"availableUsesList\": [],\n" +
-                                    "      \"amenities\": \"{}\",\n" +
-                                    "      \"availableUses\": \"[]\",\n" +
-                                    "      \"views\": \"100\"\n" +
-                                    "    }\n" +
-                                    "  ]\n" +
-                                    "}"
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = Map.class),
+                            examples = @ExampleObject(
+                                    name = "성공 응답 예시",
+                                    externalValue = "/swagger/json/space/getSpaceDetail.json"
+                            )
                     )
-            )),
-            @ApiResponse(responseCode = "404", description = "존재하지 않는 공간 ID입니다.", content = @Content(mediaType = "application/json")),
-            @ApiResponse(responseCode = "500", description = "서버 오류가 발생했습니다.")
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "존재하지 않는 공간 ID입니다.",
+                    content = @Content(mediaType = "application/json")
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "서버 오류가 발생했습니다.",
+                    content = @Content(mediaType = "application/json")
+            )
     })
     public ResponseEntity<Map<String, Object>> getSpaceDetail(
             @Parameter(description = "상세 정보를 가져올 contentId", example = "1") @PathVariable int contentId) {
