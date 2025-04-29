@@ -36,6 +36,7 @@ public class Reservation extends BaseEntity {
     @Column(name = "end_date")
     private LocalDateTime endDate;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "IS_USE", nullable = false)
     private YesNo isUse;
 

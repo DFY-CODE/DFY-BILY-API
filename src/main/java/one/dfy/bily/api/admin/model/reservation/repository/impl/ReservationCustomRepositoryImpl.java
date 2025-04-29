@@ -9,6 +9,7 @@ import one.dfy.bily.api.admin.model.reservation.QReservation;
 import one.dfy.bily.api.admin.model.reservation.Reservation;
 import one.dfy.bily.api.admin.model.reservation.repository.ReservationCustomRepository;
 import one.dfy.bily.api.admin.model.space.QSpace;
+import one.dfy.bily.api.common.constant.YesNo;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -46,7 +47,8 @@ public class ReservationCustomRepositoryImpl implements ReservationCustomReposit
                         contactPerson != null ? inquiry.contactPerson.contains(contactPerson) : null,
                         spaceIdKeyword != null ? space.spaceId.contains(spaceIdKeyword) : null,
                         startAt != null ? inquiry.createdAt.goe(startAt) : null,
-                        endAt != null ? inquiry.createdAt.loe(endAt) : null
+                        endAt != null ? inquiry.createdAt.loe(endAt) : null,
+                        reservation.isUse.eq(YesNo.Y)
                 )
                 .orderBy(reservation.id.desc())
                 .offset(pageable.getOffset())
