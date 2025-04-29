@@ -66,8 +66,8 @@ spring:
           writetimeout: 5000
   datasource:
     url: jdbc:mysql://15.165.245.177:3306/bliydatabase
-    username: bliy
-    password: Admin2025!
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
 mybatis:
@@ -124,4 +124,4 @@ s3:
     inquiry: images/inquiry
 
 cors:
-  allowed-origins: "https://bily.pages"
+  allowed-origins: "http://localhost:3000,https://bily.pages.dev,http://localhost:8081"

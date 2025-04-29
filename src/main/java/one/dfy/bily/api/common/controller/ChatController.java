@@ -32,7 +32,8 @@ public class ChatController {
                 message.getSenderId(),
                 message.getReceiverId(),
                 message.getChatPairKey(),
-                message.getMessageContent()
+                message.getMessageContent(),
+                message.getMessageType()
         );
 
         return message; // 클라이언트에 broadcast

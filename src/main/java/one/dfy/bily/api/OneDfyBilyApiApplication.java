@@ -21,6 +21,12 @@ public class OneDfyBilyApiApplication {
         System.setProperty("AWS_ACCESS_KEY", dotenv.get("AWS_ACCESS_KEY"));
         System.setProperty("AWS_SECRET_KEY", dotenv.get("AWS_SECRET_KEY"));
         System.setProperty("AWS_REGION", dotenv.get("AWS_REGION"));
+
+        System.setProperty("MAIL_USERNAME", dotenv.get("MAIL_USERNAME"));
+        System.setProperty("MAIL_PASSWORD", dotenv.get("MAIL_PASSWORD"));
+        System.setProperty("DB_USERNAME", dotenv.get("DB_USERNAME"));
+        System.setProperty("DB_PASSWORD", dotenv.get("DB_PASSWORD"));
+
     }
 
     public static void main(String[] args) {

@@ -17,6 +17,7 @@ public class ChatMessage {
     private int isRead;
     private String senderName; // 🔹 보낸 사람 이름
     private String receiverName; // 🔹 받는 사람 이름
+    private String messageType; //  메시지 타입 코드 (I:문의, R:예약, S:공간관리)
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime sentAt;

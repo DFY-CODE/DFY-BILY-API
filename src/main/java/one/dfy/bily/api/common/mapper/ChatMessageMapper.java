@@ -11,10 +11,10 @@ public interface ChatMessageMapper {
     @Insert("""
     INSERT INTO TBL_CHAT_MESSAGE (
         SENDER_ID, RECEIVER_ID, MESSAGE_CONTENT,
-        IS_READ, SENT_AT, CHAT_ROOM_ID, CHAT_PAIR_KEY
+        IS_READ, SENT_AT, CHAT_ROOM_ID, CHAT_PAIR_KEY, MESSAGE_TYPE
     ) VALUES (
         #{senderId}, #{receiverId}, #{messageContent},
-        #{isRead}, #{sentAt}, #{chatRoomId}, #{chatPairKey}
+        #{isRead}, #{sentAt}, #{chatRoomId}, #{chatPairKey}, #{messageType}
     )
 """)
     void saveMessage(ChatMessage chatMessage);
@@ -61,11 +61,13 @@ public interface ChatMessageMapper {
         SELECT CHAT_PAIR_KEY, MAX(SENT_AT) AS maxSentAt
         FROM TBL_CHAT_MESSAGE
         WHERE CHAT_ROOM_ID = #{chatRoomId}
+          AND MESSAGE_TYPE = #{messageType} -- messageType 조건 추가
         GROUP BY CHAT_PAIR_KEY
     ) latest 
     ON c.CHAT_PAIR_KEY = latest.CHAT_PAIR_KEY 
        AND c.SENT_AT = latest.maxSentAt
     WHERE c.CHAT_ROOM_ID = #{chatRoomId}
+      AND c.MESSAGE_TYPE = #{messageType} -- messageType 조건 추가
     ORDER BY c.SENT_AT DESC
 """)
     @Results({
@@ -80,7 +82,7 @@ public interface ChatMessageMapper {
             @Result(property = "senderName", column = "senderName"),
             @Result(property = "receiverName", column = "receiverName")
     })
-    List<ChatMessage> findLatestMessagesByChatRoomId(@Param("chatRoomId") Long chatRoomId);
+    List<ChatMessage> findLatestMessagesByChatRoomId(@Param("chatRoomId") Long chatRoomId, @Param("messageType") String messageType);
 
 
 
@@ -91,7 +93,7 @@ public interface ChatMessageMapper {
     @Update("UPDATE TBL_CHAT_MESSAGE SET IS_READ = 1 WHERE MESSAGE_ID = #{messageId}")
     void markMessageAsRead(@Param("messageId") Long messageId);
 
-    // 대화 상세 (chatRoomId, senderId)
+    // 대화 상세 (chatRoomId, senderId, messageType)
     @Select("""
     SELECT
         c.MESSAGE_ID,
@@ -108,6 +110,7 @@ public interface ChatMessageMapper {
     JOIN TBL_USER receiver ON c.RECEIVER_ID = receiver.USER_ID
     WHERE c.CHAT_ROOM_ID = #{chatRoomId}
       AND c.CHAT_PAIR_KEY = #{chatPairKey}
+      AND (#{messageType} IS NULL OR c.MESSAGE_TYPE = #{messageType}) -- messageType 조건 추가
     ORDER BY c.SENT_AT ASC
 """)
     @Results({
@@ -122,7 +125,8 @@ public interface ChatMessageMapper {
             @Result(property = "receiverName", column = "receiverName")
     })
     List<ChatMessage> findChatDetails(@Param("chatRoomId") Long chatRoomId,
-                                      @Param("chatPairKey") String chatPairKey);
+                                      @Param("chatPairKey") String chatPairKey,
+                                      @Param("messageType") String messageType); // messageType 추가
 
 
     // 읽음 처리 (chatRoomId + senderId → receiverId)
@@ -132,4 +136,3 @@ public interface ChatMessageMapper {
                             @Param("senderId") Long senderId,
                             @Param("receiverId") Long receiverId);
 }
-

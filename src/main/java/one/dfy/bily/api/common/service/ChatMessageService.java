@@ -14,7 +14,7 @@ public class ChatMessageService {
     private ChatMessageMapper chatMessageMapper;
 
     // 메시지 저장
-    public void sendMessage(Long chatRoomId, Long senderId, Long receiverId, String chatPairKey, String content) {
+    public void sendMessage(Long chatRoomId, Long senderId, Long receiverId, String chatPairKey, String content, String messageType) {
         //String chatPairKey = generateChatPairKey(senderId, receiverId);
 
         ChatMessage chatMessage = new ChatMessage();
@@ -25,6 +25,7 @@ public class ChatMessageService {
         chatMessage.setIsRead(0);
         chatMessage.setSentAt(LocalDateTime.now());
         chatMessage.setChatPairKey(chatPairKey);
+        chatMessage.setMessageType(messageType);
 
         chatMessageMapper.saveMessage(chatMessage);
     }
@@ -40,8 +41,8 @@ public class ChatMessageService {
         return chatMessageMapper.findMessagesByReceiver(chatRoomId);
     }
 
-    public List<ChatMessage> getLatestMessagesByChatPair(Long chatRoomId) {
-        return chatMessageMapper.findLatestMessagesByChatRoomId(chatRoomId);
+    public List<ChatMessage> getLatestMessagesByChatPair(Long chatRoomId, String messageType) {
+        return chatMessageMapper.findLatestMessagesByChatRoomId(chatRoomId, messageType);
     }
 
     // 특정 사용자가 보낸 메시지 조회
@@ -54,8 +55,8 @@ public class ChatMessageService {
         chatMessageMapper.markMessageAsRead(messageId);
     }
 
-    public List<ChatMessage> getChatDetail(Long chatRoomId, String chatPairKey) {
-        return chatMessageMapper.findChatDetails(chatRoomId, chatPairKey);
+    public List<ChatMessage> getChatDetail(Long chatRoomId, String chatPairKey,  String messageType) {
+        return chatMessageMapper.findChatDetails(chatRoomId, chatPairKey, messageType);
     }
 
     public void markMessagesAsRead(Long chatRoomId, Long senderId, Long receiverId) {
