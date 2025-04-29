@@ -67,8 +67,6 @@ public class SpaceApiController {
         List<SpaceListDto> spacesList = spaceService.getSpaces(page, size);
         int totalCount = spaceService.getTotalCount();
 
-
-
         return ResponseEntity.ok(new SpaceListResponse(spacesList,totalCount));
     }
 
