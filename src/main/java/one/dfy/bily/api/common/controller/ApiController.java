@@ -7,7 +7,7 @@ import one.dfy.bily.api.common.dto.FileInfoEntity;
 import one.dfy.bily.api.common.dto.FileUploadResponse;
 import one.dfy.bily.api.common.dto.User;
 import one.dfy.bily.api.common.service.FileService;
-import one.dfy.bily.api.admin.service.SpaceService;
+import one.dfy.bily.api.space.service.SpaceService;
 import one.dfy.bily.api.common.service.UserService;
 import one.dfy.bily.api.util.S3Uploader;
 import org.springframework.beans.factory.annotation.Autowired;
