@@ -1,0 +1,33 @@
+{
+  "spaces": [
+    {
+      "contentId": 1,
+      "displayStatus": 1,
+      "spaceId": "spaceA",
+      "price": 10000,
+      "areaM2": 50.0,
+      "name": "회의실 A",
+      "author": "관리자",
+      "amenitiesList": [],
+      "availableUsesList": [],
+      "amenities": "{}",
+      "availableUses": "[]",
+      "views": "100"
+    },
+    {
+      "contentId": 2,
+      "displayStatus": 0,
+      "spaceId": "spaceB",
+      "price": 20000,
+      "areaM2": 100.0,
+      "name": "강당 B",
+      "author": "관리자2",
+      "amenitiesList": [],
+      "availableUsesList": [],
+      "amenities": "{}",
+      "availableUses": "[]",
+      "views": "200"
+    }
+  ],
+  "totalCount": 100
+}
