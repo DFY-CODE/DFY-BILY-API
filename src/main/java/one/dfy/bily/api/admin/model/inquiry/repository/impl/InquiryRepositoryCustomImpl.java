@@ -9,6 +9,7 @@ import one.dfy.bily.api.admin.mapper.InquiryMapper;
 import one.dfy.bily.api.admin.model.inquiry.*;
 import one.dfy.bily.api.admin.model.inquiry.repository.InquiryRepositoryCustom;
 import one.dfy.bily.api.admin.model.space.QSpace;
+import one.dfy.bily.api.common.constant.YesNo;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -48,7 +49,8 @@ public class InquiryRepositoryCustomImpl implements InquiryRepositoryCustom {
                         contactPerson != null ? inquiry.contactPerson.contains(contactPerson) : null,
                         spaceIdKeyword != null ? space.spaceId.contains(spaceIdKeyword) : null,
                         startAt != null ? inquiry.createdAt.goe(startAt) : null,
-                        endAt != null ? inquiry.createdAt.loe(endAt) : null
+                        endAt != null ? inquiry.createdAt.loe(endAt) : null,
+                        inquiry.isUse.eq(YesNo.Y)
                 )
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())

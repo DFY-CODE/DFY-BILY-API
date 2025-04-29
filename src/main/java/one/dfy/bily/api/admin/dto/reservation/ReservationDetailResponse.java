@@ -1,5 +1,6 @@
 package one.dfy.bily.api.admin.dto.reservation;
 
+import one.dfy.bily.api.admin.constant.InquiryStatus;
 import one.dfy.bily.api.admin.dto.Inquiry.InquiryFileName;
 import one.dfy.bily.api.admin.dto.Inquiry.InquiryPreferredDateInfo;
 import one.dfy.bily.api.admin.dto.space.SpaceId;
@@ -22,7 +23,7 @@ public record ReservationDetailResponse(
         String content,
         List<InquiryFileName> fileAttachment,
         LocalDateTime createdAt,
-        String status,
+        InquiryStatus status,
         String spaceId,
         String hostCompany,
         SpaceId spaces,

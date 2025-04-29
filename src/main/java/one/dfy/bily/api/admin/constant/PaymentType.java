@@ -7,9 +7,9 @@ public enum PaymentType {
     FINAL_PAYMENT("잔금")
     ;
 
-    private String name;
+    private final String description;
 
-    PaymentType(String name) {
-        this.name = name;
+    PaymentType(String description) {
+        this.description = description;
     }
 }

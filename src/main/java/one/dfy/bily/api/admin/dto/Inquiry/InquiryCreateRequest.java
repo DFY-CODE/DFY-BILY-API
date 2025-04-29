@@ -2,6 +2,7 @@ package one.dfy.bily.api.admin.dto.Inquiry;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import one.dfy.bily.api.admin.constant.InquiryStatus;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
@@ -20,7 +21,7 @@ public record InquiryCreateRequest(
         List<InquiryPreferredDateInfo> preferredDates,
         String content,
         LocalDateTime createdAt,
-        String status,
+        InquiryStatus status,
         String author,
         Integer spaceId,
         String hostCompany,

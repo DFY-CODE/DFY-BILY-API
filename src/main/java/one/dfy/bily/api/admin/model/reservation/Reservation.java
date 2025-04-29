@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import one.dfy.bily.api.admin.constant.ReservationStatus;
 import one.dfy.bily.api.admin.model.inquiry.Inquiry;
+import one.dfy.bily.api.common.constant.YesNo;
 import one.dfy.bily.api.common.model.BaseEntity;
 
 import java.time.LocalDateTime;
@@ -35,11 +36,15 @@ public class Reservation extends BaseEntity {
     @Column(name = "end_date")
     private LocalDateTime endDate;
 
+    @Column(name = "IS_USE", nullable = false)
+    private YesNo isUse;
+
     public Reservation(Inquiry inquiry, ReservationStatus status, LocalDateTime startDate, LocalDateTime endDate) {
         this.inquiry = inquiry;
         this.status = status;
         this.startDate = startDate;
         this.endDate = endDate;
+        this.isUse = YesNo.Y;
     }
 
     public void updateReservation(ReservationStatus status, LocalDateTime startDate, LocalDateTime endDate) {
@@ -52,5 +57,9 @@ public class Reservation extends BaseEntity {
         if (endDate != null) {
             this.endDate = endDate;
         }
+    }
+
+    public void deleteReservation() {
+        this.isUse = YesNo.N;
     }
 }
