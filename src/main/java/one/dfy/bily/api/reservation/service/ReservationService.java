@@ -7,6 +7,7 @@ import one.dfy.bily.api.inquiry.dto.InquiryFileName;
 import one.dfy.bily.api.inquiry.dto.InquiryKeywordHolder;
 import one.dfy.bily.api.inquiry.dto.InquiryPreferredDateInfo;
 import one.dfy.bily.api.reservation.dto.ReservationDetailResponse;
+import one.dfy.bily.api.reservation.dto.ReservationListResponse;
 import one.dfy.bily.api.reservation.dto.ReservationResponse;
 import one.dfy.bily.api.reservation.dto.ReservationPaymentInfo;
 import one.dfy.bily.api.inquiry.mapper.InquiryMapper;
@@ -16,6 +17,7 @@ import one.dfy.bily.api.reservation.model.Payment;
 import one.dfy.bily.api.reservation.model.Reservation;
 import one.dfy.bily.api.reservation.model.repository.PaymentRepository;
 import one.dfy.bily.api.reservation.model.repository.ReservationRepository;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -33,20 +35,23 @@ public class ReservationService {
     private final PaymentRepository paymentRepository;
 
     @Transactional(readOnly = true)
-    public List<ReservationResponse> findReservationListByKeywordAndDate(InquirySearchType type, String keyword, LocalDateTime startAt, LocalDateTime endAt, int page, int pageSize) {
+    public ReservationListResponse findReservationListByKeywordAndDate(InquirySearchType type, String keyword, LocalDateTime startAt, LocalDateTime endAt, int page, int pageSize) {
 
         Pageable pageable = PageRequest.of(page-1, pageSize, Sort.by(Sort.Direction.DESC, "id"));
 
         InquiryKeywordHolder holder = InquiryMapper.mapKeyword(type, keyword);
 
-        return reservationRepository.findReservationListByKeywordAndDate(
+
+        Page<ReservationResponse> responsePage = reservationRepository.findReservationListByKeywordAndDate(
                 holder.companyName(),
                 holder.contactPerson(),
                 holder.spaceName(),
                 startAt,
                 endAt,
                 pageable
-        ).getContent();
+        );
+
+        return ReservationMapper.toReservationListResponse(responsePage);
     }
 
     @Transactional(readOnly = true)

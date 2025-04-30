@@ -1,5 +1,7 @@
 package one.dfy.bily.api.reservation.mapper;
 
+import one.dfy.bily.api.common.dto.Pagination;
+import one.dfy.bily.api.common.mapper.PaginationMapper;
 import one.dfy.bily.api.reservation.constant.PaymentType;
 import one.dfy.bily.api.inquiry.dto.InquiryFileName;
 import one.dfy.bily.api.inquiry.dto.InquiryPreferredDateInfo;
@@ -8,6 +10,8 @@ import one.dfy.bily.api.inquiry.model.Inquiry;
 import one.dfy.bily.api.reservation.model.Payment;
 import one.dfy.bily.api.reservation.model.Reservation;
 import one.dfy.bily.api.reservation.dto.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -117,5 +121,12 @@ public class ReservationMapper {
                 .findFirst()
                 .map(p -> new PaymentRequest(p.getId(), p.getPaymentDate(), p.getAmount()))
                 .orElse(null);
+    }
+
+    public static ReservationListResponse toReservationListResponse(Page<ReservationResponse> reservationResponsePage) {
+        Pageable pageable = reservationResponsePage.getPageable();
+        Pagination pagination = PaginationMapper.toPagination(pageable, reservationResponsePage.getTotalElements(), reservationResponsePage.getTotalPages());
+
+        return new ReservationListResponse(reservationResponsePage.getContent(), pagination);
     }
 }

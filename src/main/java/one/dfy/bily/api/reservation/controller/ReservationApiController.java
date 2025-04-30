@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import one.dfy.bily.api.inquiry.constant.InquirySearchType;
 import one.dfy.bily.api.reservation.dto.ReservationDetailResponse;
+import one.dfy.bily.api.reservation.dto.ReservationListResponse;
 import one.dfy.bily.api.reservation.dto.ReservationResponse;
 import one.dfy.bily.api.reservation.dto.ReservationPaymentInfo;
 import one.dfy.bily.api.reservation.facade.ReservationFacade;
@@ -45,7 +46,7 @@ public class ReservationApiController {
                     )
             )
     )
-    public ResponseEntity<List<ReservationResponse>> findInquiryListByKeywordAndDate(
+    public ResponseEntity<ReservationListResponse> findInquiryListByKeywordAndDate(
             @Parameter(
                     description = "문의 검색 타입 (공간명, 회사명, 이름)",
                     required = false,
