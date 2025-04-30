@@ -1,5 +1,7 @@
 package one.dfy.bily.api.inquiry.mapper;
 
+import one.dfy.bily.api.common.dto.Pagination;
+import one.dfy.bily.api.common.mapper.PaginationMapper;
 import one.dfy.bily.api.inquiry.constant.InquirySearchType;
 import one.dfy.bily.api.space.dto.SpaceId;
 import one.dfy.bily.api.inquiry.model.Inquiry;
@@ -7,6 +9,8 @@ import one.dfy.bily.api.inquiry.model.InquiryFile;
 import one.dfy.bily.api.inquiry.model.PreferredDate;
 import one.dfy.bily.api.space.model.Space;
 import one.dfy.bily.api.inquiry.dto.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Map;
@@ -122,5 +126,13 @@ public class InquiryMapper {
 
     public static InquiryKeywordHolder mapKeyword(InquirySearchType type, String keyword) {
         return resolveKeyword(type, keyword);
+    }
+
+    public static InquiryListResponse toInquiryListResponse(Page<InquiryResponse> inquiryResponsePage) {
+        Pageable pageable = inquiryResponsePage.getPageable();
+        Pagination pagination = PaginationMapper.toPagination(pageable, inquiryResponsePage.getTotalElements(), inquiryResponsePage.getTotalPages());
+
+        return new InquiryListResponse(inquiryResponsePage.getContent(),pagination);
+
     }
 }

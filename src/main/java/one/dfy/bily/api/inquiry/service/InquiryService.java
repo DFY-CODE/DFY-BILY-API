@@ -12,6 +12,7 @@ import one.dfy.bily.api.inquiry.model.repository.InquiryRepository;
 import one.dfy.bily.api.space.model.Space;
 import one.dfy.bily.api.inquiry.dto.*;
 import one.dfy.bily.api.util.S3Uploader;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -31,7 +32,7 @@ public class InquiryService {
     private final S3Uploader s3Uploader;
 
     @Transactional(readOnly = true)
-    public List<InquiryResponse> findInquiryListByKeywordAndDate(
+    public InquiryListResponse findInquiryListByKeywordAndDate(
             InquirySearchType type, String keyword,
             LocalDateTime startAt, LocalDateTime endAt,
             int page, int pageSize
@@ -40,14 +41,16 @@ public class InquiryService {
 
         InquiryKeywordHolder holder = InquiryMapper.mapKeyword(type, keyword);
 
-        return inquiryRepository.searchInquiries(
+        Page<InquiryResponse> inquiryResponsePage =  inquiryRepository.searchInquiries(
                 holder.companyName(),
                 holder.contactPerson(),
                 holder.spaceName(),
                 startAt,
                 endAt,
                 pageable
-        ).getContent();
+        );
+
+        return InquiryMapper.toInquiryListResponse(inquiryResponsePage);
     }
 
     @Transactional(readOnly = true)

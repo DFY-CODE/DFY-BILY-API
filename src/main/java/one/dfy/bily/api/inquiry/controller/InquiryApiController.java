@@ -11,10 +11,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import one.dfy.bily.api.inquiry.constant.InquirySearchType;
-import one.dfy.bily.api.inquiry.dto.InquiryCreateRequest;
-import one.dfy.bily.api.inquiry.dto.InquiryResponse;
-import one.dfy.bily.api.inquiry.dto.InquiryStatusUpdateRequest;
-import one.dfy.bily.api.inquiry.dto.InquiryUpdateRequest;
+import one.dfy.bily.api.inquiry.dto.*;
 import one.dfy.bily.api.inquiry.facade.InquiryFacade;
 import one.dfy.bily.api.inquiry.service.InquiryService;
 import one.dfy.bily.api.security.CustomUserDetails;
@@ -49,7 +46,7 @@ public class InquiryApiController {
                     )
             )
     )
-    public ResponseEntity<List<InquiryResponse>> findInquiryListByKeywordAndDate(
+    public ResponseEntity<InquiryListResponse> findInquiryListByKeywordAndDate(
             @Parameter(
                     description = "문의 검색 타입 (공간명, 회사명, 이름)",
                     required = false,
