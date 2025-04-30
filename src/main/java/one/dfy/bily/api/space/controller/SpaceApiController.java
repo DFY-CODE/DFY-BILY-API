@@ -60,11 +60,7 @@ public class SpaceApiController {
     public ResponseEntity<SpaceListResponse> getSpaces(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size) {
-
-        List<SpaceListDto> spacesList = spaceService.getSpaces(page, size);
-        int totalCount = spaceService.getTotalCount();
-
-        return ResponseEntity.ok(new SpaceListResponse(spacesList,totalCount));
+        return ResponseEntity.ok(spaceService.getSpaces(page, size));
     }
 
     @GetMapping("/spaces/detail/{contentId}")

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import one.dfy.bily.api.common.mapper.PaginationMapper;
 import one.dfy.bily.api.space.model.Space;
 import one.dfy.bily.api.space.model.repository.SpaceRepository;
 import one.dfy.bily.api.common.dto.*;
@@ -27,7 +28,7 @@ public class SpaceService {
     private final SpaceRepository spaceRepository;
 
     // 페이징 처리된 데이터 반환
-    public List<SpaceListDto> getSpaces(int page, int size) {
+    public SpaceListResponse getSpaces(int page, int size) {
         int offset = (page - 1) * size;
         List<SpaceListDto> spaces = spaceMapper.getSpaces(size, offset);
 
@@ -45,8 +46,10 @@ public class SpaceService {
             space.updateAvailableUses(availableUses);
         }
 
+        int totalCount = getTotalCount();
+        Pagination pagination = new Pagination(page, size, (long) totalCount, (int) Math.ceil((double) totalCount / size));
 
-        return spaces;
+        return new SpaceListResponse(spaces, pagination);
     }
 
     public List<SpaceDetailDto> getSpacesDetail(int contentId) {
