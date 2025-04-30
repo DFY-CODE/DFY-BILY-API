@@ -42,28 +42,24 @@ public class Reservation extends BaseEntity {
     @Column(name = "USER_ID")
     private Long userId;
 
-    @Column(name = "CREATE_AT")
-    private LocalDateTime createAt;
-
     @Column(name = "CREATOR")
     private Long creator;
-
-    @Column(name = "UPDATE_AT")
-    private LocalDateTime updateAt;
 
     @Column(name = "UPDATER")
     private Long updater;
 
-    public Reservation(Inquiry inquiry, ReservationStatus status, LocalDateTime startDate, LocalDateTime endDate, Long userId) {
+    public Reservation(Inquiry inquiry, ReservationStatus status, LocalDateTime startDate, LocalDateTime endDate, Long userId, Long creator, Long updater) {
         this.inquiry = inquiry;
         this.status = status;
         this.startDate = startDate;
         this.endDate = endDate;
         this.isUse = YesNo.Y;
         this.userId = userId;
+        this.creator = creator;
+        this.updater = updater;
     }
 
-    public void updateReservation(ReservationStatus status, LocalDateTime startDate, LocalDateTime endDate) {
+    public void updateReservation(ReservationStatus status, LocalDateTime startDate, LocalDateTime endDate, Long updater) {
         if (status != null) {
             this.status = status;
         }
@@ -73,6 +69,7 @@ public class Reservation extends BaseEntity {
         if (endDate != null) {
             this.endDate = endDate;
         }
+        this.updater = updater;
     }
 
     public void deleteReservation() {

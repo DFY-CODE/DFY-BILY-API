@@ -72,8 +72,8 @@ public class ReservationService {
     }
 
     @Transactional
-    public ReservationPaymentInfo createReservationPayment(ReservationPaymentInfo request, Inquiry inquiry) {
-        Reservation reservation = ReservationMapper.toReservationEntity(request, inquiry);
+    public ReservationPaymentInfo createReservationPayment(ReservationPaymentInfo request, Inquiry inquiry, Long adminId) {
+        Reservation reservation = ReservationMapper.toReservationEntity(request, inquiry, adminId);
         reservation = reservationRepository.save(reservation);
 
         List<Payment> payment = ReservationMapper.toPaymentEntities(request, reservation);
@@ -83,7 +83,7 @@ public class ReservationService {
     }
 
     @Transactional
-    public ReservationPaymentInfo updateReservation(Long reservationId, ReservationPaymentInfo request) {
+    public ReservationPaymentInfo updateReservation(Long reservationId, ReservationPaymentInfo request, Long adminId) {
         Reservation reservation  = reservationRepository.findById(reservationId).orElseThrow(() -> new IllegalArgumentException("유효하지 않은 예약 정보입니다."));
         List<Payment> paymentList = paymentRepository.findByReservation(reservation);
 
@@ -91,21 +91,22 @@ public class ReservationService {
             if(payment.isEqualType(PaymentType.DEPOSIT)){
                 payment.updatePayment(request.deposit().date(),request.deposit().payment());
             }
+
             if(payment.isEqualType(PaymentType.INTERIM_PAYMENT1)){
                 payment.updatePayment(request.interimPayment1().date(),request.interimPayment1().payment());
-
             }
+
             if(payment.isEqualType(PaymentType.INTERIM_PAYMENT2)){
                 payment.updatePayment(request.interimPayment2().date(),request.interimPayment2().payment());
-
             }
+
             if(payment.isEqualType(PaymentType.FINAL_PAYMENT)){
                 payment.updatePayment(request.finalPayment().date(),request.finalPayment().payment());
-
             }
+
         });
 
-        reservation.updateReservation(request.status(), request.fixedDate().from(), request.fixedDate().to());
+        reservation.updateReservation(request.status(), request.fixedDate().from(), request.fixedDate().to(), adminId);
 
         return request;
     }

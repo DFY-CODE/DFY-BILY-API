@@ -18,14 +18,16 @@ import java.util.List;
 
 public class ReservationMapper {
 
-    public static Reservation toReservationEntity(ReservationPaymentInfo dto, Inquiry inquiry) {
+    public static Reservation toReservationEntity(ReservationPaymentInfo dto, Inquiry inquiry, Long adminId) {
 
         return new Reservation(
                 inquiry,
                 dto.status(),
                 dto.fixedDate().from(),
                 dto.fixedDate().to(),
-                inquiry.getUserId()
+                inquiry.getUserId(),
+                adminId,
+                adminId
         );
     }
 

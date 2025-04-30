@@ -27,10 +27,10 @@ public class ReservationFacade {
         return reservationService.reservationMappingToReservationDetailResponse(reservation, inquiryFileNameList, preferredDateInfos);
     }
 
-    public ReservationPaymentInfo createReservationPayment(ReservationPaymentInfo request, Long userId) {
+    public ReservationPaymentInfo createReservationPayment(ReservationPaymentInfo request, Long adminId) {
         Inquiry inquiry = inquiryService.findInquiryById(request.inquiryId());
 
-        return reservationService.createReservationPayment(request, inquiry);
+        return reservationService.createReservationPayment(request, inquiry, adminId);
     }
 
 }
