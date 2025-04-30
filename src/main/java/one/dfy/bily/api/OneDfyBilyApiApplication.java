@@ -8,7 +8,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication(scanBasePackages = "one.dfy.bily.api")@MapperScan(basePackages = {
         "one.dfy.bily.api.common.mapper",
-        "one.dfy.bily.api.admin.mapper",
+        "one.dfy.bily.api.space.mapper",
+        "one.dfy.bily.api.chat.mapper"
 })
 public class OneDfyBilyApiApplication {
 
