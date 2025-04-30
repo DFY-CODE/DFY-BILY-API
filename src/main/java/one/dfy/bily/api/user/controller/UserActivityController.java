@@ -9,8 +9,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import one.dfy.bily.api.reservation.dto.ReservationAndInquiryListResponse;
-import one.dfy.bily.api.reservation.dto.ReservationDetailResponse;
+import one.dfy.bily.api.user.dto.UserActivityList;
 import one.dfy.bily.api.user.facade.UserActivityFacade;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,14 +33,14 @@ public class UserActivityController {
             description = "성공",
             content = @Content(
                     mediaType = "application/json",
-                    schema = @Schema(implementation = ReservationAndInquiryListResponse.class),
+                    schema = @Schema(implementation = UserActivityList.class),
                     examples = @ExampleObject(
                             name = "성공 응답 예시",
                             externalValue = "/swagger/json/user/activity/findReservationAndInquiry.json"
                     )
             )
     )
-    public ResponseEntity<ReservationAndInquiryListResponse> findReservationAndInquiry(
+    public ResponseEntity<UserActivityList> findReservationAndInquiry(
             @Parameter(description = "회원 아이디(번호)", required = false) Long userId,
             @Parameter(description = "예약 검색 페이지", required = false) @RequestParam(defaultValue = "1") int page,
             @Parameter(description = "예약 검색 페이지 사이즈", required = false)

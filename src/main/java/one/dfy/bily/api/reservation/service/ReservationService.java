@@ -6,10 +6,7 @@ import one.dfy.bily.api.reservation.constant.PaymentType;
 import one.dfy.bily.api.inquiry.dto.InquiryFileName;
 import one.dfy.bily.api.inquiry.dto.InquiryKeywordHolder;
 import one.dfy.bily.api.inquiry.dto.InquiryPreferredDateInfo;
-import one.dfy.bily.api.reservation.dto.ReservationDetailResponse;
-import one.dfy.bily.api.reservation.dto.ReservationListResponse;
-import one.dfy.bily.api.reservation.dto.ReservationResponse;
-import one.dfy.bily.api.reservation.dto.ReservationPaymentInfo;
+import one.dfy.bily.api.reservation.dto.*;
 import one.dfy.bily.api.inquiry.mapper.InquiryMapper;
 import one.dfy.bily.api.reservation.mapper.ReservationMapper;
 import one.dfy.bily.api.inquiry.model.Inquiry;
@@ -17,6 +14,7 @@ import one.dfy.bily.api.reservation.model.Payment;
 import one.dfy.bily.api.reservation.model.Reservation;
 import one.dfy.bily.api.reservation.model.repository.PaymentRepository;
 import one.dfy.bily.api.reservation.model.repository.ReservationRepository;
+import one.dfy.bily.api.user.dto.UserActivityList;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -121,4 +119,5 @@ public class ReservationService {
     public long countReservationAndInquiryRow(Long userId) {
         return reservationRepository.countReservationAndInquiry(userId);
     }
+
 }

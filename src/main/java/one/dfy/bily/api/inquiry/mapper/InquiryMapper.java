@@ -3,7 +3,7 @@ package one.dfy.bily.api.inquiry.mapper;
 import one.dfy.bily.api.common.dto.Pagination;
 import one.dfy.bily.api.common.mapper.PaginationMapper;
 import one.dfy.bily.api.inquiry.constant.InquirySearchType;
-import one.dfy.bily.api.reservation.dto.ReservationAndInquiry;
+import one.dfy.bily.api.user.dto.UserActivity;
 import one.dfy.bily.api.reservation.dto.ReservationPreferredDateInfo;
 import one.dfy.bily.api.space.dto.SpaceId;
 import one.dfy.bily.api.inquiry.model.Inquiry;
@@ -157,7 +157,7 @@ public class InquiryMapper {
                 ));
     }
 
-    public static ReservationAndInquiry toReservationAndInquiryInfo(Object[] row, Map<Long, List<InquiryPreferredDateInfo>> preferredDatesMap) {
+    public static UserActivity toReservationAndInquiryInfo(Object[] row, Map<Long, List<InquiryPreferredDateInfo>> preferredDatesMap) {
         Long id = row[0] != null ? ((Number) row[0]).longValue() : null;
         String type = row[1] != null ? (String) row[1] : null;
         String spaceName = row[2] != null ? (String) row[2] : null;
@@ -171,7 +171,7 @@ public class InquiryMapper {
         String status = row[10] != null ? (String) row[10] : null;
         LocalDateTime createdAt = row[11] != null ? ((Timestamp) row[11]).toLocalDateTime() : null;
 
-        return new ReservationAndInquiry(
+        return new UserActivity(
                 id,
                 type,
                 spaceName,

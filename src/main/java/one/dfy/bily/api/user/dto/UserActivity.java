@@ -1,11 +1,12 @@
-package one.dfy.bily.api.reservation.dto;
+package one.dfy.bily.api.user.dto;
 
 import one.dfy.bily.api.inquiry.dto.InquiryPreferredDateInfo;
+import one.dfy.bily.api.reservation.dto.ReservationPreferredDateInfo;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-public record ReservationAndInquiry (
+public record UserActivity(
         Long id,
         String type,
         String spaceName,

@@ -2,6 +2,8 @@ package one.dfy.bily.api.reservation.model.repository;
 
 import one.dfy.bily.api.reservation.model.Reservation;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 

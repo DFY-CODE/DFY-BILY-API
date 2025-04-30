@@ -9,7 +9,7 @@ import one.dfy.bily.api.inquiry.model.PreferredDate;
 import one.dfy.bily.api.inquiry.model.repository.InquiryFileRepository;
 import one.dfy.bily.api.inquiry.model.repository.PreferredDateRepository;
 import one.dfy.bily.api.inquiry.model.repository.InquiryRepository;
-import one.dfy.bily.api.reservation.dto.ReservationAndInquiry;
+import one.dfy.bily.api.user.dto.UserActivity;
 import one.dfy.bily.api.space.model.Space;
 import one.dfy.bily.api.inquiry.dto.*;
 import one.dfy.bily.api.util.S3Uploader;
@@ -145,7 +145,7 @@ public class InquiryService {
     }
 
     @Transactional(readOnly = true)
-    public List<ReservationAndInquiry> mappingToReservationAndInquiryInfo(List<Object[]> rawResults){
+    public List<UserActivity> mappingToReservationAndInquiryInfo(List<Object[]> rawResults){
         List<Long> inquiryIds = rawResults.stream()
                 .filter(r -> "INQUIRY".equals(r[1]))
                 .map(r -> ((Number) r[0]).longValue())
