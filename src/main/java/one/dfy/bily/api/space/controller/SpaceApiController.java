@@ -26,7 +26,7 @@ import java.util.*;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/admin")
+@RequestMapping("/api")
 @Tag(name = "공간관리 API", description = "공간관리 관련 API")
 public class SpaceApiController {
 

@@ -25,7 +25,7 @@ import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/admin/reservation")
+@RequestMapping("/api/reservation")
 @Tag(name = "예약 관리 API", description = "예약 관리 관련 API")
 @RequiredArgsConstructor
 public class ReservationApiController {
