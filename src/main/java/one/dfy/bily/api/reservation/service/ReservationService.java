@@ -109,4 +109,15 @@ public class ReservationService {
 
         return request;
     }
+
+    @Transactional(readOnly = true)
+    public List<Object[]> findReservationAndInquiryRow(Long userId, int page, int pageSize) {
+        int offset = (page - 1) * pageSize;
+        return reservationRepository.findReservationAndInquiryRow(userId, pageSize, offset);
+    }
+
+    @Transactional(readOnly = true)
+    public long countReservationAndInquiryRow(Long userId) {
+        return reservationRepository.countReservationAndInquiry(userId);
+    }
 }

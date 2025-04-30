@@ -8,4 +8,6 @@ import java.util.List;
 
 public interface PreferredDateRepository extends JpaRepository<PreferredDate, Long> {
     List<PreferredDate> findByInquiry(Inquiry inquiry);
+    List<PreferredDate> findByInquiryIdIn(List<Long> inquiryIds);
+
 }

@@ -23,29 +23,44 @@ public class Reservation extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "INQUIRY_ID", referencedColumnName = "ID", nullable = false)
-
     private Inquiry inquiry;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "STATUS")
     private ReservationStatus status;
 
-    @Column(name = "start_date")
+    @Column(name = "START_DATE")
     private LocalDateTime startDate;
 
-    @Column(name = "end_date")
+    @Column(name = "END_DATE")
     private LocalDateTime endDate;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "IS_USE", nullable = false)
     private YesNo isUse;
 
-    public Reservation(Inquiry inquiry, ReservationStatus status, LocalDateTime startDate, LocalDateTime endDate) {
+    @Column(name = "USER_ID")
+    private Long userId;
+
+    @Column(name = "CREATE_AT")
+    private LocalDateTime createAt;
+
+    @Column(name = "CREATOR")
+    private Long creator;
+
+    @Column(name = "UPDATE_AT")
+    private LocalDateTime updateAt;
+
+    @Column(name = "UPDATER")
+    private Long updater;
+
+    public Reservation(Inquiry inquiry, ReservationStatus status, LocalDateTime startDate, LocalDateTime endDate, Long userId) {
         this.inquiry = inquiry;
         this.status = status;
         this.startDate = startDate;
         this.endDate = endDate;
         this.isUse = YesNo.Y;
+        this.userId = userId;
     }
 
     public void updateReservation(ReservationStatus status, LocalDateTime startDate, LocalDateTime endDate) {

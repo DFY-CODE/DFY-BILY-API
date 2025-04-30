@@ -11,13 +11,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import one.dfy.bily.api.inquiry.constant.InquirySearchType;
-import one.dfy.bily.api.reservation.dto.ReservationDetailResponse;
-import one.dfy.bily.api.reservation.dto.ReservationListResponse;
-import one.dfy.bily.api.reservation.dto.ReservationResponse;
-import one.dfy.bily.api.reservation.dto.ReservationPaymentInfo;
+import one.dfy.bily.api.reservation.dto.*;
 import one.dfy.bily.api.reservation.facade.ReservationFacade;
 import one.dfy.bily.api.reservation.service.ReservationService;
+import one.dfy.bily.api.security.CustomUserDetails;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -126,8 +125,9 @@ public class ReservationApiController {
                     )
             )
     )
-    public ResponseEntity<ReservationPaymentInfo> createReservationPayment(@RequestBody ReservationPaymentInfo reservationPaymentInfo) {
-        return ResponseEntity.ok(reservationFacade.createReservationPayment(reservationPaymentInfo));
+    public ResponseEntity<ReservationPaymentInfo> createReservationPayment(@RequestBody ReservationPaymentInfo reservationPaymentInfo, @AuthenticationPrincipal CustomUserDetails userDetails) {
+        Long userId = userDetails.getUserId();
+        return ResponseEntity.ok(reservationFacade.createReservationPayment(reservationPaymentInfo, userId));
     }
 
     @PatchMapping("/{reservation-id}")

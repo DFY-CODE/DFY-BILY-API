@@ -24,7 +24,8 @@ public class ReservationMapper {
                 inquiry,
                 dto.status(),
                 dto.fixedDate().from(),
-                dto.fixedDate().to()
+                dto.fixedDate().to(),
+                inquiry.getUserId()
         );
     }
 

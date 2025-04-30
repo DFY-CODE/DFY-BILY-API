@@ -63,6 +63,9 @@ public class Inquiry extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private YesNo isUse;
 
+    @Column(name = "USER_ID")
+    private Long userId;
+
     public Inquiry(
             String contactPerson,
             String phoneNumber,
@@ -76,7 +79,8 @@ public class Inquiry extends BaseEntity {
             InquiryStatus status,
             String author,
             Space space,
-            String hostCompany
+            String hostCompany,
+            Long userId
     ) {
         this.contactPerson = contactPerson;
         this.phoneNumber = phoneNumber;
@@ -92,6 +96,7 @@ public class Inquiry extends BaseEntity {
         this.space = space;
         this.hostCompany = hostCompany;
         this.isUse = YesNo.Y;
+        this.userId = userId;
     }
 
     public void updateFrom(InquiryUpdateRequest request, Space space) {

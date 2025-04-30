@@ -9,6 +9,7 @@ import one.dfy.bily.api.inquiry.model.PreferredDate;
 import one.dfy.bily.api.inquiry.model.repository.InquiryFileRepository;
 import one.dfy.bily.api.inquiry.model.repository.PreferredDateRepository;
 import one.dfy.bily.api.inquiry.model.repository.InquiryRepository;
+import one.dfy.bily.api.reservation.dto.ReservationAndInquiry;
 import one.dfy.bily.api.space.model.Space;
 import one.dfy.bily.api.inquiry.dto.*;
 import one.dfy.bily.api.util.S3Uploader;
@@ -21,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -77,7 +79,7 @@ public class InquiryService {
     @Transactional
     public InquiryResponse createInquiry(InquiryCreateRequest request, Space space, Long userId) {
 
-        Inquiry inquiry = InquiryMapper.inquiryCreateRequestToEntity(request, space);
+        Inquiry inquiry = InquiryMapper.inquiryCreateRequestToEntity(request, space, userId);
         inquiryRepository.save(inquiry);
 
         List<PreferredDate> preferredDates = request.preferredDates().stream()
@@ -140,5 +142,21 @@ public class InquiryService {
         inquiryRepository.findById(id).ifPresent(inquiry -> {
             inquiry.updateStatus(request.status());
         });
+    }
+
+    @Transactional(readOnly = true)
+    public List<ReservationAndInquiry> mappingToReservationAndInquiryInfo(List<Object[]> rawResults){
+        List<Long> inquiryIds = rawResults.stream()
+                .filter(r -> "INQUIRY".equals(r[1]))
+                .map(r -> ((Number) r[0]).longValue())
+                .toList();
+
+        List<PreferredDate> preferredDates = preferredDateRepository.findByInquiryIdIn(inquiryIds);
+        Map<Long, List<InquiryPreferredDateInfo>> preferredDatesMap = InquiryMapper.toPreferredDateMap(preferredDates);
+
+
+        return rawResults.stream()
+                .map(row -> InquiryMapper.toReservationAndInquiryInfo(row, preferredDatesMap))
+                .toList();
     }
 }

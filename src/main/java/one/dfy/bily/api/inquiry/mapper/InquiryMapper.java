@@ -3,6 +3,8 @@ package one.dfy.bily.api.inquiry.mapper;
 import one.dfy.bily.api.common.dto.Pagination;
 import one.dfy.bily.api.common.mapper.PaginationMapper;
 import one.dfy.bily.api.inquiry.constant.InquirySearchType;
+import one.dfy.bily.api.reservation.dto.ReservationAndInquiry;
+import one.dfy.bily.api.reservation.dto.ReservationPreferredDateInfo;
 import one.dfy.bily.api.space.dto.SpaceId;
 import one.dfy.bily.api.inquiry.model.Inquiry;
 import one.dfy.bily.api.inquiry.model.InquiryFile;
@@ -12,12 +14,15 @@ import one.dfy.bily.api.inquiry.dto.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class InquiryMapper {
 
-    public static Inquiry inquiryCreateRequestToEntity(InquiryCreateRequest request, Space space) {
+    public static Inquiry inquiryCreateRequestToEntity(InquiryCreateRequest request, Space space, Long userId) {
         return new Inquiry(
                 request.contactPerson(),
                 request.phoneNumber(),
@@ -31,7 +36,8 @@ public class InquiryMapper {
                 request.status(),
                 request.author(),
                 space,
-                request.hostCompany()
+                request.hostCompany(),
+                userId
         );
     }
 
@@ -134,5 +140,50 @@ public class InquiryMapper {
 
         return new InquiryListResponse(inquiryResponsePage.getContent(),pagination);
 
+    }
+
+    public static Map<Long, List<InquiryPreferredDateInfo>> toPreferredDateMap(List<PreferredDate> preferredDates) {
+        return preferredDates.stream()
+                .collect(Collectors.groupingBy(
+                        p -> p.getInquiry().getId(),
+                        Collectors.mapping(
+                                p -> new InquiryPreferredDateInfo(
+                                        p.getPreferredStartDate(),
+                                        p.getPreferredEndDate(),
+                                        p.getPreferenceLevel()
+                                ),
+                                Collectors.toList()
+                        )
+                ));
+    }
+
+    public static ReservationAndInquiry toReservationAndInquiryInfo(Object[] row, Map<Long, List<InquiryPreferredDateInfo>> preferredDatesMap) {
+        Long id = row[0] != null ? ((Number) row[0]).longValue() : null;
+        String type = row[1] != null ? (String) row[1] : null;
+        String spaceName = row[2] != null ? (String) row[2] : null;
+        String location = row[3] != null ? (String) row[3] : null;
+        int areaM2 = row[4] != null ? ((Number) row[4]).intValue() : 0;
+        int areaPy = row[5] != null ? ((Number) row[5]).intValue() : 0;
+        int maxCapacity = row[6] != null ? ((Number) row[6]).intValue() : 0;
+        LocalDateTime from = row[7] != null ? ((Timestamp) row[7]).toLocalDateTime() : null;
+        LocalDateTime to = row[8] != null ? ((Timestamp) row[8]).toLocalDateTime() : null;
+        Long price = row[9] != null ? ((Number) row[9]).longValue() : 0L;
+        String status = row[10] != null ? (String) row[10] : null;
+        LocalDateTime createdAt = row[11] != null ? ((Timestamp) row[11]).toLocalDateTime() : null;
+
+        return new ReservationAndInquiry(
+                id,
+                type,
+                spaceName,
+                location,
+                areaM2,
+                areaPy,
+                maxCapacity,
+                "INQUIRY".equals(type) ? preferredDatesMap.getOrDefault(id, null) : null,
+                "RESERVATION".equals(type) ? new ReservationPreferredDateInfo(from, to) : null,
+                price,
+                status,
+                createdAt
+        );
     }
 }
