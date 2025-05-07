@@ -9,9 +9,10 @@ import one.dfy.bily.api.inquiry.model.PreferredDate;
 import one.dfy.bily.api.inquiry.model.repository.InquiryFileRepository;
 import one.dfy.bily.api.inquiry.model.repository.PreferredDateRepository;
 import one.dfy.bily.api.inquiry.model.repository.InquiryRepository;
+import one.dfy.bily.api.user.dto.UserActivity;
 import one.dfy.bily.api.space.model.Space;
 import one.dfy.bily.api.inquiry.dto.*;
-import one.dfy.bily.api.util.S3Uploader;
+import one.dfy.bily.api.util.S3Util;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -21,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -29,7 +31,7 @@ public class InquiryService {
     private final InquiryRepository inquiryRepository;
     private final InquiryFileRepository inquiryFileRepository;
     private final PreferredDateRepository preferredDateRepository;
-    private final S3Uploader s3Uploader;
+    private final S3Util s3Util;
 
     @Transactional(readOnly = true)
     public InquiryListResponse findInquiryListByKeywordAndDate(
@@ -77,7 +79,7 @@ public class InquiryService {
     @Transactional
     public InquiryResponse createInquiry(InquiryCreateRequest request, Space space, Long userId) {
 
-        Inquiry inquiry = InquiryMapper.inquiryCreateRequestToEntity(request, space);
+        Inquiry inquiry = InquiryMapper.inquiryCreateRequestToEntity(request, space, userId);
         inquiryRepository.save(inquiry);
 
         List<PreferredDate> preferredDates = request.preferredDates().stream()
@@ -86,7 +88,7 @@ public class InquiryService {
         preferredDateRepository.saveAll(preferredDates);
 
         List<InquiryFile> inquiryFiles = request.fileAttachments().stream()
-                .map(s3Uploader::inquiryFileUpload)
+                .map(s3Util::inquiryFileUpload)
                 .toList()
                 .stream()
                 .map(file -> InquiryMapper.inquiryFileToEntity(file, inquiry, userId))
@@ -140,5 +142,21 @@ public class InquiryService {
         inquiryRepository.findById(id).ifPresent(inquiry -> {
             inquiry.updateStatus(request.status());
         });
+    }
+
+    @Transactional(readOnly = true)
+    public List<UserActivity> mappingToReservationAndInquiryInfo(List<Object[]> rawResults, Map<Integer, List<String>> fileNameListMap){
+        List<Long> inquiryIds = rawResults.stream()
+                .filter(r -> "INQUIRY".equals(r[2]))
+                .map(r -> ((Number) r[0]).longValue())
+                .toList();
+
+        List<PreferredDate> preferredDates = preferredDateRepository.findByInquiryIdIn(inquiryIds);
+        Map<Long, List<InquiryPreferredDateInfo>> preferredDatesMap = InquiryMapper.toPreferredDateMap(preferredDates);
+
+
+        return rawResults.stream()
+                .map(row -> InquiryMapper.toReservationAndInquiryInfo(row, preferredDatesMap, fileNameListMap))
+                .toList();
     }
 }

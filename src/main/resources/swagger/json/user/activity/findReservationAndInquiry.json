@@ -1,0 +1,365 @@
+{
+  "reservation_and_inquiry_list": [
+    {
+      "id": 44,
+      "type": "INQUIRY",
+      "space_name": "성수역 도보 3분",
+      "location": "서울특별시 강남구 강남대로140길9",
+      "area_m2": 122,
+      "area_py": 31,
+      "max_capacity": 40,
+      "inquirypreferred_date_list": [
+        {
+          "from": "2025-03-11T00:00:00",
+          "to": "2025-03-18T23:59:59",
+          "preference_level": 1
+        }
+      ],
+      "reservation_preferred_date": null,
+      "price": 1000000,
+      "status": "NEW",
+      "created_at": "2025-03-12T08:28:45"
+    },
+    {
+      "id": 43,
+      "type": "INQUIRY",
+      "space_name": "성수역 도보 3분",
+      "location": "서울특별시 강남구 강남대로140길9",
+      "area_m2": 122,
+      "area_py": 31,
+      "max_capacity": 40,
+      "inquirypreferred_date_list": [
+        {
+          "from": "2025-03-17T00:00:00",
+          "to": "2025-03-17T23:59:59",
+          "preference_level": 1
+        }
+      ],
+      "reservation_preferred_date": null,
+      "price": 1000000,
+      "status": "NEW",
+      "created_at": "2025-03-12T08:28:03"
+    },
+    {
+      "id": 40,
+      "type": "INQUIRY",
+      "space_name": "성수역 도보 3분",
+      "location": "서울특별시 강남구 강남대로140길9",
+      "area_m2": 122,
+      "area_py": 31,
+      "max_capacity": 40,
+      "inquirypreferred_date_list": [
+        {
+          "from": "2025-03-11T00:00:00",
+          "to": "2025-03-12T23:59:59",
+          "preference_level": 1
+        }
+      ],
+      "reservation_preferred_date": null,
+      "price": 1000000,
+      "status": "NEW",
+      "created_at": "2025-03-12T08:24:52"
+    },
+    {
+      "id": 39,
+      "type": "INQUIRY",
+      "space_name": "신정동 최고의 팝업 공간",
+      "location": "서울특별시 양천구 신정로100",
+      "area_m2": 75,
+      "area_py": 23,
+      "max_capacity": 15,
+      "inquirypreferred_date_list": [
+        {
+          "from": "2025-03-17T00:00:00",
+          "to": "2025-03-20T23:59:59",
+          "preference_level": 1
+        }
+      ],
+      "reservation_preferred_date": null,
+      "price": 800000,
+      "status": "NEW",
+      "created_at": "2025-03-12T08:18:03"
+    },
+    {
+      "id": 38,
+      "type": "INQUIRY",
+      "space_name": "성수역 도보 3분",
+      "location": "서울특별시 강남구 강남대로140길9",
+      "area_m2": 122,
+      "area_py": 31,
+      "max_capacity": 40,
+      "inquirypreferred_date_list": [
+        {
+          "from": "2025-02-25T00:00:00",
+          "to": "2025-03-04T23:59:59",
+          "preference_level": 1
+        }
+      ],
+      "reservation_preferred_date": null,
+      "price": 1000000,
+      "status": "NEW",
+      "created_at": "2025-03-12T08:16:56"
+    },
+    {
+      "id": 37,
+      "type": "INQUIRY",
+      "space_name": "성수역 도보 3분",
+      "location": "서울특별시 강남구 강남대로140길9",
+      "area_m2": 122,
+      "area_py": 31,
+      "max_capacity": 40,
+      "inquirypreferred_date_list": [
+        {
+          "from": "2025-03-11T00:00:00",
+          "to": "2025-03-18T23:59:59",
+          "preference_level": 1
+        }
+      ],
+      "reservation_preferred_date": null,
+      "price": 1000000,
+      "status": "NEW",
+      "created_at": "2025-03-12T08:10:18"
+    },
+    {
+      "id": 35,
+      "type": "INQUIRY",
+      "space_name": "성수역 도보 3분",
+      "location": "서울특별시 강남구 강남대로140길9",
+      "area_m2": 122,
+      "area_py": 31,
+      "max_capacity": 40,
+      "inquirypreferred_date_list": [
+        {
+          "from": "2025-03-11T00:00:00",
+          "to": "2025-03-11T23:59:59",
+          "preference_level": 1
+        }
+      ],
+      "reservation_preferred_date": null,
+      "price": 1000000,
+      "status": "NEW",
+      "created_at": "2025-03-12T07:55:56"
+    },
+    {
+      "id": 34,
+      "type": "INQUIRY",
+      "space_name": "성수역 도보 3분",
+      "location": "서울특별시 강남구 강남대로140길9",
+      "area_m2": 122,
+      "area_py": 31,
+      "max_capacity": 40,
+      "inquirypreferred_date_list": [
+        {
+          "from": "2025-03-05T00:00:00",
+          "to": "2025-03-12T23:59:59",
+          "preference_level": 1
+        }
+      ],
+      "reservation_preferred_date": null,
+      "price": 1000000,
+      "status": "NEW",
+      "created_at": "2025-03-12T07:55:16"
+    },
+    {
+      "id": 16,
+      "type": "RESERVATION",
+      "space_name": "성수역 도보 3분",
+      "location": "서울특별시 강남구 강남대로140길9",
+      "area_m2": 122,
+      "area_py": 31,
+      "max_capacity": 40,
+      "inquirypreferred_date_list": null,
+      "reservation_preferred_date": {
+        "from": "2025-03-03T15:00:00",
+        "to": "2025-03-03T15:00:00"
+      },
+      "price": 1000000,
+      "status": "IN_PROGRESS",
+      "created_at": "2025-03-12T07:55:16"
+    },
+    {
+      "id": 33,
+      "type": "INQUIRY",
+      "space_name": "인터넷이 자꾸 끊기는 프랜차이즈 카페",
+      "location": "서울특별시 강남구 언주로 702",
+      "area_m2": 200,
+      "area_py": 60,
+      "max_capacity": 30,
+      "inquirypreferred_date_list": [
+        {
+          "from": "2025-03-24T00:00:00",
+          "to": "2025-03-29T23:59:59",
+          "preference_level": 1
+        }
+      ],
+      "reservation_preferred_date": null,
+      "price": 1230000,
+      "status": "NEW",
+      "created_at": "2025-03-12T07:50:49"
+    },
+    {
+      "id": 15,
+      "type": "RESERVATION",
+      "space_name": "인터넷이 자꾸 끊기는 프랜차이즈 카페",
+      "location": "서울특별시 강남구 언주로 702",
+      "area_m2": 200,
+      "area_py": 60,
+      "max_capacity": 30,
+      "inquirypreferred_date_list": null,
+      "reservation_preferred_date": {
+        "from": "2025-03-03T15:00:00",
+        "to": "2025-03-03T15:00:00"
+      },
+      "price": 1230000,
+      "status": "IN_PROGRESS",
+      "created_at": "2025-03-12T07:50:49"
+    },
+    {
+      "id": 14,
+      "type": "RESERVATION",
+      "space_name": "성수역 도보 3분",
+      "location": "서울특별시 강남구 강남대로140길9",
+      "area_m2": 122,
+      "area_py": 31,
+      "max_capacity": 40,
+      "inquirypreferred_date_list": null,
+      "reservation_preferred_date": {
+        "from": "2025-03-03T15:00:00",
+        "to": "2025-03-03T15:00:00"
+      },
+      "price": 1000000,
+      "status": "CANCELLED",
+      "created_at": "2025-03-12T07:50:30"
+    },
+    {
+      "id": 32,
+      "type": "INQUIRY",
+      "space_name": "성수역 도보 3분",
+      "location": "서울특별시 강남구 강남대로140길9",
+      "area_m2": 122,
+      "area_py": 31,
+      "max_capacity": 40,
+      "inquirypreferred_date_list": null,
+      "reservation_preferred_date": null,
+      "price": 1000000,
+      "status": "NEW",
+      "created_at": "2025-03-12T07:50:30"
+    },
+    {
+      "id": 13,
+      "type": "RESERVATION",
+      "space_name": "성수역 도보 3분",
+      "location": "서울특별시 강남구 강남대로140길9",
+      "area_m2": 122,
+      "area_py": 31,
+      "max_capacity": 40,
+      "inquirypreferred_date_list": null,
+      "reservation_preferred_date": {
+        "from": "2025-03-03T15:00:00",
+        "to": "2025-03-03T15:00:00"
+      },
+      "price": 1000000,
+      "status": "CONTRACT_COMPLETED",
+      "created_at": "2025-03-12T07:49:49"
+    },
+    {
+      "id": 31,
+      "type": "INQUIRY",
+      "space_name": "성수역 도보 3분",
+      "location": "서울특별시 강남구 강남대로140길9",
+      "area_m2": 122,
+      "area_py": 31,
+      "max_capacity": 40,
+      "inquirypreferred_date_list": null,
+      "reservation_preferred_date": null,
+      "price": 1000000,
+      "status": "NEW",
+      "created_at": "2025-03-12T07:49:49"
+    },
+    {
+      "id": 12,
+      "type": "RESERVATION",
+      "space_name": "성수역 도보 3분",
+      "location": "서울특별시 강남구 강남대로140길9",
+      "area_m2": 122,
+      "area_py": 31,
+      "max_capacity": 40,
+      "inquirypreferred_date_list": null,
+      "reservation_preferred_date": {
+        "from": "2025-03-03T15:00:00",
+        "to": "2025-03-03T15:00:00"
+      },
+      "price": 1000000,
+      "status": "CONTRACT_COMPLETED",
+      "created_at": "2025-03-12T07:46:19"
+    },
+    {
+      "id": 30,
+      "type": "INQUIRY",
+      "space_name": "성수역 도보 3분",
+      "location": "서울특별시 강남구 강남대로140길9",
+      "area_m2": 122,
+      "area_py": 31,
+      "max_capacity": 40,
+      "inquirypreferred_date_list": null,
+      "reservation_preferred_date": null,
+      "price": 1000000,
+      "status": "NEW",
+      "created_at": "2025-03-12T07:46:19"
+    },
+    {
+      "id": 11,
+      "type": "RESERVATION",
+      "space_name": "성수역 도보 3분",
+      "location": "서울특별시 강남구 강남대로140길9",
+      "area_m2": 122,
+      "area_py": 31,
+      "max_capacity": 40,
+      "inquirypreferred_date_list": null,
+      "reservation_preferred_date": {
+        "from": "2025-03-03T15:00:00",
+        "to": "2025-03-03T15:00:00"
+      },
+      "price": 1000000,
+      "status": "VENUE_RESERVED",
+      "created_at": "2025-03-12T07:42:06"
+    },
+    {
+      "id": 28,
+      "type": "INQUIRY",
+      "space_name": "성수역 도보 3분",
+      "location": "서울특별시 강남구 강남대로140길9",
+      "area_m2": 122,
+      "area_py": 31,
+      "max_capacity": 40,
+      "inquirypreferred_date_list": null,
+      "reservation_preferred_date": null,
+      "price": 1000000,
+      "status": "NEW",
+      "created_at": "2025-03-12T07:42:06"
+    },
+    {
+      "id": 10,
+      "type": "RESERVATION",
+      "space_name": "성수역 도보 3분",
+      "location": "서울특별시 강남구 강남대로140길9",
+      "area_m2": 122,
+      "area_py": 31,
+      "max_capacity": 40,
+      "inquirypreferred_date_list": null,
+      "reservation_preferred_date": {
+        "from": "2025-02-24T15:00:00",
+        "to": "2025-03-04T14:59:59"
+      },
+      "price": 1000000,
+      "status": "CONTRACT_COMPLETED",
+      "created_at": "2025-03-12T07:41:29"
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "page_size": 20,
+    "total_items": 33,
+    "total_pages": 2
+  }
+}

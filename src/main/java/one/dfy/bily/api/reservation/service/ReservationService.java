@@ -6,10 +6,7 @@ import one.dfy.bily.api.reservation.constant.PaymentType;
 import one.dfy.bily.api.inquiry.dto.InquiryFileName;
 import one.dfy.bily.api.inquiry.dto.InquiryKeywordHolder;
 import one.dfy.bily.api.inquiry.dto.InquiryPreferredDateInfo;
-import one.dfy.bily.api.reservation.dto.ReservationDetailResponse;
-import one.dfy.bily.api.reservation.dto.ReservationListResponse;
-import one.dfy.bily.api.reservation.dto.ReservationResponse;
-import one.dfy.bily.api.reservation.dto.ReservationPaymentInfo;
+import one.dfy.bily.api.reservation.dto.*;
 import one.dfy.bily.api.inquiry.mapper.InquiryMapper;
 import one.dfy.bily.api.reservation.mapper.ReservationMapper;
 import one.dfy.bily.api.inquiry.model.Inquiry;
@@ -17,6 +14,9 @@ import one.dfy.bily.api.reservation.model.Payment;
 import one.dfy.bily.api.reservation.model.Reservation;
 import one.dfy.bily.api.reservation.model.repository.PaymentRepository;
 import one.dfy.bily.api.reservation.model.repository.ReservationRepository;
+import one.dfy.bily.api.user.dto.ReservationActivity;
+import one.dfy.bily.api.user.dto.UserActivity;
+import one.dfy.bily.api.user.dto.UserActivityList;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -72,8 +73,8 @@ public class ReservationService {
     }
 
     @Transactional
-    public ReservationPaymentInfo createReservationPayment(ReservationPaymentInfo request, Inquiry inquiry) {
-        Reservation reservation = ReservationMapper.toReservationEntity(request, inquiry);
+    public ReservationPaymentInfo createReservationPayment(ReservationPaymentInfo request, Inquiry inquiry, Long adminId) {
+        Reservation reservation = ReservationMapper.toReservationEntity(request, inquiry, adminId);
         reservation = reservationRepository.save(reservation);
 
         List<Payment> payment = ReservationMapper.toPaymentEntities(request, reservation);
@@ -83,7 +84,7 @@ public class ReservationService {
     }
 
     @Transactional
-    public ReservationPaymentInfo updateReservation(Long reservationId, ReservationPaymentInfo request) {
+    public ReservationPaymentInfo updateReservation(Long reservationId, ReservationPaymentInfo request, Long adminId) {
         Reservation reservation  = reservationRepository.findById(reservationId).orElseThrow(() -> new IllegalArgumentException("유효하지 않은 예약 정보입니다."));
         List<Payment> paymentList = paymentRepository.findByReservation(reservation);
 
@@ -91,22 +92,62 @@ public class ReservationService {
             if(payment.isEqualType(PaymentType.DEPOSIT)){
                 payment.updatePayment(request.deposit().date(),request.deposit().payment());
             }
+
             if(payment.isEqualType(PaymentType.INTERIM_PAYMENT1)){
                 payment.updatePayment(request.interimPayment1().date(),request.interimPayment1().payment());
-
             }
+
             if(payment.isEqualType(PaymentType.INTERIM_PAYMENT2)){
                 payment.updatePayment(request.interimPayment2().date(),request.interimPayment2().payment());
-
             }
+
             if(payment.isEqualType(PaymentType.FINAL_PAYMENT)){
                 payment.updatePayment(request.finalPayment().date(),request.finalPayment().payment());
-
             }
+
         });
 
-        reservation.updateReservation(request.status(), request.fixedDate().from(), request.fixedDate().to());
+        reservation.updateReservation(request.status(), request.fixedDate().from(), request.fixedDate().to(), adminId);
 
         return request;
+    }
+
+    @Transactional(readOnly = true)
+    public List<Object[]> findReservationAndInquiryRow(Long userId, int page, int pageSize) {
+        int offset = (page - 1) * pageSize;
+        return reservationRepository.findReservationAndInquiryRow(userId, pageSize, offset);
+    }
+
+    @Transactional(readOnly = true)
+    public long countReservationAndInquiryRow(Long userId) {
+        return reservationRepository.countReservationAndInquiry(userId);
+    }
+
+    public List<Integer> getInquiryIds(List<Object[]> result) {
+        return result.stream()
+                .map(r -> ((Number) r[1]).intValue())
+                .toList();
+    }
+
+    public List<Integer> getReservationActivityInquiryIds(List<ReservationActivity> result) {
+        return result.stream()
+                .map(ReservationActivity::contentId)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public Page<ReservationActivity> findReservationListByUserId(Long userId, int page, int pageSize) {
+
+        Pageable pageable = PageRequest.of(page - 1, pageSize, Sort.by(Sort.Direction.DESC, "id"));
+        return reservationRepository.findReservationListByUserId(userId, pageable);
+    }
+
+    public List<UserActivity> reservationActivityToUserActivityList(
+            List<ReservationActivity> reservations,
+            Map<Integer, List<String>> fileNameListMap
+    ) {
+        return reservations.stream()
+                .map(reservation -> ReservationMapper.fromReservationActivity(reservation, fileNameListMap))
+                .toList();
     }
 }

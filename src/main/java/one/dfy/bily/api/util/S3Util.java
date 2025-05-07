@@ -25,7 +25,7 @@ import java.util.*;
 @Slf4j
 @RequiredArgsConstructor
 @Component
-public class S3Uploader {
+public class S3Util {
 
     private final AmazonS3Client amazonS3Client;
     private final FileService fileService;
@@ -41,29 +41,44 @@ public class S3Uploader {
     @Value("${s3.path.inquiry}")
     private String inquiryPath;
 
-    private final static String INQURY = "inquiry";
+    @Value("${s3.path.space}")
+    private String spacePath;
 
     public InquiryFileDetail inquiryFileUpload(MultipartFile file) {
+        return uploadFileToS3(file, inquiryPath);
+    }
 
-        String extension = FilenameUtils.getExtension(file.getOriginalFilename());
-        String saveLocation = inquiryPath + UUID.randomUUID() + extension;
-        String newFileName =  INQURY + UUID.randomUUID().toString() + extension;
+    public InquiryFileDetail spaceFileUpload(MultipartFile file) {
+        return uploadFileToS3(file, spacePath);
+    }
 
-        try{
+    public InquiryFileDetail uploadFileToS3(MultipartFile file, String path) {
+        String extension = "." + FilenameUtils.getExtension(file.getOriginalFilename());
+        String newFileName = UUID.randomUUID() + extension;
+        String saveLocation = path + newFileName;
+
+        try {
             File uploadFile = convert(file)
                     .orElseThrow(() -> new IllegalArgumentException("MultipartFile -> File로 전환이 실패했습니다."));
 
-
             putS3(uploadFile, saveLocation);
-
         } catch (Exception e) {
-            throw new RuntimeException("파일 업로드 실패");
+            throw new RuntimeException("파일 업로드 실패", e);
         }
 
-        return new InquiryFileDetail(file.getOriginalFilename(), newFileName, extension, saveLocation, file.getSize(),file.getContentType());
+        return new InquiryFileDetail(
+                file.getOriginalFilename(),
+                newFileName,
+                extension,
+                path,
+                file.getSize(),
+                file.getContentType()
+        );
     }
 
-    public FileUploadResponse upload(long contentId, long filesize, String fileName, MultipartFile multipartFile, String dirName, String title) throws IOException {
+
+
+    public FileUploadResponse upload(long contentId, long filesize, String fileName, MultipartFile multipartFile, String title) throws IOException {
         File uploadFile = convert(multipartFile)
                 .orElseThrow(() -> new IllegalArgumentException("MultipartFile -> File로 전환이 실패했습니다."));
 
@@ -71,8 +86,8 @@ public class S3Uploader {
 
         fileInfoEntity.setFileName(multipartFile.getOriginalFilename());
         String fileExtension = getFileExtension(fileName);
-        String newFileName = "images/" + dirName + UUID.randomUUID().toString() + fileExtension;
-        String saveFileName = dirName + UUID.randomUUID().toString() + fileExtension;
+        String saveFileName = UUID.randomUUID() + fileExtension;
+        String newFileName = "images/" + saveFileName;
 
         fileInfoEntity.setContentId(contentId);
         fileInfoEntity.setSaveFileName(saveFileName);
@@ -285,8 +300,11 @@ public class S3Uploader {
 
     private String putS3(File uploadFile, String newFileName) {
         amazonS3Client.putObject(new PutObjectRequest(bucket, newFileName, uploadFile));
-        String url = "https://" + bucket + ".s3." + region + ".amazonaws.com/" + newFileName;
-        return url;
+        return "https://" + bucket + ".s3." + region + ".amazonaws.com/" + newFileName;
+    }
+
+    public String getSpaceS3Url() {
+        return "https://" + bucket + ".s3." + region + ".amazonaws.com/"+spacePath;
     }
 
     private String getFileExtension(String fileName) {
