@@ -1,5 +1,7 @@
 package one.dfy.bily.api.reservation.model.repository.impl;
 
+import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +13,8 @@ import one.dfy.bily.api.reservation.model.Reservation;
 import one.dfy.bily.api.reservation.model.repository.ReservationCustomRepository;
 import one.dfy.bily.api.common.constant.YesNo;
 import one.dfy.bily.api.space.model.QSpace;
+import one.dfy.bily.api.space.model.QSpaceFileInfo;
+import one.dfy.bily.api.user.dto.ReservationActivity;
 import one.dfy.bily.api.user.dto.UserActivity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -78,5 +82,48 @@ public class ReservationCustomRepositoryImpl implements ReservationCustomReposit
 
         return new PageImpl<>(reservationResponseList, pageable, total == null ? 0 : total);
     }
+
+    @Override
+    public Page<ReservationActivity> findReservationListByUserId(Long userId, Pageable pageable) {
+        QReservation reservation = QReservation.reservation;
+        QInquiry inquiry = QInquiry.inquiry;
+        QSpace space = QSpace.space;
+
+        // 데이터 조회 (페이징 적용)
+        List<ReservationActivity> contents = queryFactory
+                .select(Projections.constructor(ReservationActivity.class,
+                        reservation.id,
+                        space.contentId,
+                        space.name,
+                        space.location,
+                        space.areaM2,
+                        space.areaPy,
+                        space.maxCapacity,
+                        reservation.startDate,
+                        reservation.endDate,
+                        space.price,
+                        reservation.status,
+                        reservation.createdAt
+                ))
+                .from(reservation)
+                .join(reservation.inquiry, inquiry)
+                .join(inquiry.space, space)
+                .where(reservation.userId.eq(userId), reservation.isUse.eq(YesNo.Y))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        // 전체 개수 조회
+        Long total = queryFactory
+                .select(reservation.count())
+                .from(reservation)
+                .join(reservation.inquiry, inquiry)
+                .join(inquiry.space, space)
+                .where(reservation.userId.eq(userId), reservation.isUse.eq(YesNo.Y))
+                .fetchOne();
+
+        return new PageImpl<>(contents, pageable, total);
+    }
+
 }
 

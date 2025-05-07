@@ -69,6 +69,6 @@ public class UserActivityController {
             @Parameter(description = "예약 검색 페이지 사이즈", required = false)
             @RequestParam(value = "page_size", defaultValue = "20") int pageSize
     ) {
-        return ResponseEntity.ok(userActivityFacade.findReservationAndInquiryListByUserId(userId,page,pageSize));
+        return ResponseEntity.ok(userActivityFacade.findReservationListByUserId(userId,page,pageSize));
     }
 }

@@ -10,11 +10,15 @@ import one.dfy.bily.api.inquiry.model.Inquiry;
 import one.dfy.bily.api.reservation.model.Payment;
 import one.dfy.bily.api.reservation.model.Reservation;
 import one.dfy.bily.api.reservation.dto.*;
+import one.dfy.bily.api.user.dto.ReservationActivity;
+import one.dfy.bily.api.user.dto.UserActivity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 public class ReservationMapper {
 
@@ -131,5 +135,29 @@ public class ReservationMapper {
         Pagination pagination = PaginationMapper.toPagination(pageable, reservationResponsePage.getTotalElements(), reservationResponsePage.getTotalPages());
 
         return new ReservationListResponse(reservationResponsePage.getContent(), pagination);
+    }
+
+    public static UserActivity fromReservationActivity(
+            ReservationActivity reservation,
+            Map<Integer, List<String>> fileNameListMap
+    ) {
+        return new UserActivity(
+                reservation.id(),
+                "RESERVATION",
+                reservation.spaceName(),
+                reservation.location(),
+                reservation.areaM2(),
+                reservation.areaPy(),
+                reservation.maxCapacity(),
+                null, // inquiryPreferredDateList는 예약에서는 없음
+                new ReservationPreferredDateInfo(
+                        reservation.startDate(),
+                        reservation.endDate()
+                ),
+                reservation.price(),
+                reservation.status().toString(),
+                reservation.createdAt(),
+                fileNameListMap.getOrDefault(reservation.contentId(), Collections.emptyList())
+        );
     }
 }

@@ -28,7 +28,7 @@ public class Space {
     private String spaceId;
 
     @Column(name = "PRICE")
-    private Integer price;
+    private Long price;
 
     @Column(name = "AREA_M2", precision = 10, scale = 2)
     private BigDecimal areaM2;
@@ -76,7 +76,7 @@ public class Space {
     private String availableUses;
 
     @Column(name = "AREA_PY")
-    private String areaPy;
+    private Integer areaPy;
 
     @Column(name = "LATITUDE", precision = 16, scale = 6)
     private BigDecimal latitude;

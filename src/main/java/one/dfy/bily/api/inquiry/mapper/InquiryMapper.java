@@ -14,6 +14,7 @@ import one.dfy.bily.api.inquiry.dto.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -167,7 +168,7 @@ public class InquiryMapper {
         String type = toStr(row[2]);
         String spaceName = toStr(row[3]);
         String location = toStr(row[4]);
-        int areaM2 = toPrimitiveInt(row[5]);
+        BigDecimal areaM2 = toBigDecimal(row[5]);
         int areaPy = toPrimitiveInt(row[6]);
         int maxCapacity = toPrimitiveInt(row[7]);
         LocalDateTime from = toDateTime(row[8]);
@@ -212,5 +213,9 @@ public class InquiryMapper {
 
     private static LocalDateTime toDateTime(Object obj) {
         return obj instanceof Timestamp ts ? ts.toLocalDateTime() : null;
+    }
+
+    private static BigDecimal toBigDecimal(Object obj) {
+        return obj instanceof BigDecimal bd ? bd : null;
     }
 }

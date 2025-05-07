@@ -303,8 +303,8 @@ public class S3Util {
         return "https://" + bucket + ".s3." + region + ".amazonaws.com/" + newFileName;
     }
 
-    public String getS3Url() {
-        return "https://" + bucket + ".s3." + region + ".amazonaws.com/";
+    public String getSpaceS3Url() {
+        return "https://" + bucket + ".s3." + region + ".amazonaws.com/"+spacePath;
     }
 
     private String getFileExtension(String fileName) {

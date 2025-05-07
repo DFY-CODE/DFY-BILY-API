@@ -273,8 +273,8 @@ public class SpaceService {
         return spaceRepository.findById(contentId).orElseThrow(() -> new IllegalArgumentException("공간이 존재하지 않습니다."));
     }
 
-    public Map<Integer, List<String>> findByContentIds(List<Long> contentIds) {
-        String s3Url = s3Util.getS3Url();  // 예: https://your-bucket.s3.amazonaws.com/
+    public Map<Integer, List<String>> findByContentIds(List<Integer> contentIds) {
+        String s3Url = s3Util.getSpaceS3Url();  // 예: https://your-bucket.s3.amazonaws.com/
 
         if (contentIds == null || contentIds.isEmpty()) {
             return Map.of();  // null 대신 빈 Map 반환 권장

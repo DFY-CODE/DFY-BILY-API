@@ -7,5 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface SpaceFileInfoRepository extends JpaRepository<SpaceFileInfo, Integer> {
-    List<SpaceFileInfo> findByContentIdIn(List<Long> contentIds);
+    List<SpaceFileInfo> findByContentIdIn(List<Integer> contentIds);
 }

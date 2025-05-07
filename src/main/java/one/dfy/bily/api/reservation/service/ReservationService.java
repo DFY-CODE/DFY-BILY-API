@@ -14,6 +14,8 @@ import one.dfy.bily.api.reservation.model.Payment;
 import one.dfy.bily.api.reservation.model.Reservation;
 import one.dfy.bily.api.reservation.model.repository.PaymentRepository;
 import one.dfy.bily.api.reservation.model.repository.ReservationRepository;
+import one.dfy.bily.api.user.dto.ReservationActivity;
+import one.dfy.bily.api.user.dto.UserActivity;
 import one.dfy.bily.api.user.dto.UserActivityList;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -24,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -120,10 +123,31 @@ public class ReservationService {
         return reservationRepository.countReservationAndInquiry(userId);
     }
 
-    public List<Long> getInquiryIds(List<Object[]> result) {
+    public List<Integer> getInquiryIds(List<Object[]> result) {
         return result.stream()
-                .map(r -> ((Number) r[1]).longValue())
+                .map(r -> ((Number) r[1]).intValue())
                 .toList();
     }
 
+    public List<Integer> getReservationActivityInquiryIds(List<ReservationActivity> result) {
+        return result.stream()
+                .map(ReservationActivity::contentId)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public Page<ReservationActivity> findReservationListByUserId(Long userId, int page, int pageSize) {
+
+        Pageable pageable = PageRequest.of(page - 1, pageSize, Sort.by(Sort.Direction.DESC, "id"));
+        return reservationRepository.findReservationListByUserId(userId, pageable);
+    }
+
+    public List<UserActivity> reservationActivityToUserActivityList(
+            List<ReservationActivity> reservations,
+            Map<Integer, List<String>> fileNameListMap
+    ) {
+        return reservations.stream()
+                .map(reservation -> ReservationMapper.fromReservationActivity(reservation, fileNameListMap))
+                .toList();
+    }
 }
