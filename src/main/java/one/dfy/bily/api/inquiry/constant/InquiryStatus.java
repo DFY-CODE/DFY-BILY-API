@@ -2,9 +2,11 @@ package one.dfy.bily.api.inquiry.constant;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+import lombok.Getter;
 
 import java.util.stream.Stream;
 
+@Getter
 public enum InquiryStatus {
     NEW("신규"),
     IN_REVIEW("검토중"),
