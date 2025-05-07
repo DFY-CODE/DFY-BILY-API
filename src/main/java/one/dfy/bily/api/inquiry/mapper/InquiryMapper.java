@@ -157,19 +157,25 @@ public class InquiryMapper {
                 ));
     }
 
-    public static UserActivity toReservationAndInquiryInfo(Object[] row, Map<Long, List<InquiryPreferredDateInfo>> preferredDatesMap) {
-        Long id = row[0] != null ? ((Number) row[0]).longValue() : null;
-        String type = row[1] != null ? (String) row[1] : null;
-        String spaceName = row[2] != null ? (String) row[2] : null;
-        String location = row[3] != null ? (String) row[3] : null;
-        int areaM2 = row[4] != null ? ((Number) row[4]).intValue() : 0;
-        int areaPy = row[5] != null ? ((Number) row[5]).intValue() : 0;
-        int maxCapacity = row[6] != null ? ((Number) row[6]).intValue() : 0;
-        LocalDateTime from = row[7] != null ? ((Timestamp) row[7]).toLocalDateTime() : null;
-        LocalDateTime to = row[8] != null ? ((Timestamp) row[8]).toLocalDateTime() : null;
-        Long price = row[9] != null ? ((Number) row[9]).longValue() : 0L;
-        String status = row[10] != null ? (String) row[10] : null;
-        LocalDateTime createdAt = row[11] != null ? ((Timestamp) row[11]).toLocalDateTime() : null;
+    public static UserActivity toReservationAndInquiryInfo(
+            Object[] row,
+            Map<Long, List<InquiryPreferredDateInfo>> preferredDatesMap,
+            Map<Integer, List<String>> fileNameListMap
+    ) {
+        Long id = toLong(row[0]);
+        Integer contentId = toInt(row[1]);
+        String type = toStr(row[2]);
+        String spaceName = toStr(row[3]);
+        String location = toStr(row[4]);
+        int areaM2 = toPrimitiveInt(row[5]);
+        int areaPy = toPrimitiveInt(row[6]);
+        int maxCapacity = toPrimitiveInt(row[7]);
+        LocalDateTime from = toDateTime(row[8]);
+        LocalDateTime to = toDateTime(row[9]);
+        Long price = toLong(row[10]);
+        String status = toStr(row[11]);
+        LocalDateTime createdAt = toDateTime(row[12]);
+
 
         return new UserActivity(
                 id,
@@ -183,7 +189,28 @@ public class InquiryMapper {
                 "RESERVATION".equals(type) ? new ReservationPreferredDateInfo(from, to) : null,
                 price,
                 status,
-                createdAt
+                createdAt,
+                fileNameListMap.getOrDefault(contentId, null)
         );
+    }
+
+    private static String toStr(Object obj) {
+        return obj != null ? obj.toString() : null;
+    }
+
+    private static Long toLong(Object obj) {
+        return obj instanceof Number num ? num.longValue() : null;
+    }
+
+    private static Integer toInt(Object obj) {
+        return obj instanceof Number num ? num.intValue() : null;
+    }
+
+    private static int toPrimitiveInt(Object obj) {
+        return obj instanceof Number num ? num.intValue() : 0;
+    }
+
+    private static LocalDateTime toDateTime(Object obj) {
+        return obj instanceof Timestamp ts ? ts.toLocalDateTime() : null;
     }
 }

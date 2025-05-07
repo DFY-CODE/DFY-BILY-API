@@ -12,7 +12,7 @@ import one.dfy.bily.api.inquiry.model.repository.InquiryRepository;
 import one.dfy.bily.api.user.dto.UserActivity;
 import one.dfy.bily.api.space.model.Space;
 import one.dfy.bily.api.inquiry.dto.*;
-import one.dfy.bily.api.util.S3Uploader;
+import one.dfy.bily.api.util.S3Util;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -31,7 +31,7 @@ public class InquiryService {
     private final InquiryRepository inquiryRepository;
     private final InquiryFileRepository inquiryFileRepository;
     private final PreferredDateRepository preferredDateRepository;
-    private final S3Uploader s3Uploader;
+    private final S3Util s3Util;
 
     @Transactional(readOnly = true)
     public InquiryListResponse findInquiryListByKeywordAndDate(
@@ -88,7 +88,7 @@ public class InquiryService {
         preferredDateRepository.saveAll(preferredDates);
 
         List<InquiryFile> inquiryFiles = request.fileAttachments().stream()
-                .map(s3Uploader::inquiryFileUpload)
+                .map(s3Util::inquiryFileUpload)
                 .toList()
                 .stream()
                 .map(file -> InquiryMapper.inquiryFileToEntity(file, inquiry, userId))
@@ -145,9 +145,9 @@ public class InquiryService {
     }
 
     @Transactional(readOnly = true)
-    public List<UserActivity> mappingToReservationAndInquiryInfo(List<Object[]> rawResults){
+    public List<UserActivity> mappingToReservationAndInquiryInfo(List<Object[]> rawResults, Map<Integer, List<String>> fileNameListMap){
         List<Long> inquiryIds = rawResults.stream()
-                .filter(r -> "INQUIRY".equals(r[1]))
+                .filter(r -> "INQUIRY".equals(r[2]))
                 .map(r -> ((Number) r[0]).longValue())
                 .toList();
 
@@ -156,7 +156,7 @@ public class InquiryService {
 
 
         return rawResults.stream()
-                .map(row -> InquiryMapper.toReservationAndInquiryInfo(row, preferredDatesMap))
+                .map(row -> InquiryMapper.toReservationAndInquiryInfo(row, preferredDatesMap, fileNameListMap))
                 .toList();
     }
 }

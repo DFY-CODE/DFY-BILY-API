@@ -48,4 +48,27 @@ public class UserActivityController {
     ) {
         return ResponseEntity.ok(userActivityFacade.findReservationAndInquiryListByUserId(userId,page,pageSize));
     }
+
+    @GetMapping("/reservation")
+    @Operation(summary = "나의 예약 리스트 조회", description = "나의 예약 리스트정보를 반환합니다.")
+    @ApiResponse(
+            responseCode = "200",
+            description = "성공",
+            content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = UserActivityList.class),
+                    examples = @ExampleObject(
+                            name = "성공 응답 예시",
+                            externalValue = "/swagger/json/user/activity/findReservation.json"
+                    )
+            )
+    )
+    public ResponseEntity<UserActivityList> findReservation(
+            @Parameter(description = "회원 아이디(번호)", required = false) Long userId,
+            @Parameter(description = "예약 검색 페이지", required = false) @RequestParam(defaultValue = "1") int page,
+            @Parameter(description = "예약 검색 페이지 사이즈", required = false)
+            @RequestParam(value = "page_size", defaultValue = "20") int pageSize
+    ) {
+        return ResponseEntity.ok(userActivityFacade.findReservationAndInquiryListByUserId(userId,page,pageSize));
+    }
 }

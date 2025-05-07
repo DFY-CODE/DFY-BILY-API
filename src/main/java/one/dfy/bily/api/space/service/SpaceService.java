@@ -4,19 +4,21 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import one.dfy.bily.api.common.mapper.PaginationMapper;
 import one.dfy.bily.api.space.model.Space;
+import one.dfy.bily.api.space.model.SpaceFileInfo;
+import one.dfy.bily.api.space.model.repository.SpaceFileInfoRepository;
 import one.dfy.bily.api.space.model.repository.SpaceRepository;
 import one.dfy.bily.api.common.dto.*;
 import one.dfy.bily.api.space.mapper.SpaceMapper;
 import one.dfy.bily.api.space.dto.*;
-import one.dfy.bily.api.util.S3Uploader;
+import one.dfy.bily.api.util.S3Util;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -24,8 +26,9 @@ import java.util.stream.Collectors;
 public class SpaceService {
     private final SpaceMapper spaceMapper;
     private final ObjectMapper objectMapper;
-    private final S3Uploader s3Uploader;
+    private final S3Util s3Util;
     private final SpaceRepository spaceRepository;
+    private final SpaceFileInfoRepository spaceFileInfoRepository;
 
     // 페이징 처리된 데이터 반환
     public SpaceListResponse getSpaces(int page, int size) {
@@ -270,6 +273,22 @@ public class SpaceService {
         return spaceRepository.findById(contentId).orElseThrow(() -> new IllegalArgumentException("공간이 존재하지 않습니다."));
     }
 
+    public Map<Integer, List<String>> findByContentIds(List<Long> contentIds) {
+        String s3Url = s3Util.getS3Url();  // 예: https://your-bucket.s3.amazonaws.com/
 
+        if (contentIds == null || contentIds.isEmpty()) {
+            return Map.of();  // null 대신 빈 Map 반환 권장
+        }
+
+        return spaceFileInfoRepository.findByContentIdIn(contentIds)
+                .stream()
+                .collect(Collectors.groupingBy(
+                        SpaceFileInfo::getContentId,
+                        Collectors.mapping(
+                                file -> s3Url + file.getSaveFileName(),
+                                Collectors.toList()
+                        )
+                ));
+    }
 
 }

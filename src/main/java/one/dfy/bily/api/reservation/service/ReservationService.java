@@ -120,4 +120,10 @@ public class ReservationService {
         return reservationRepository.countReservationAndInquiry(userId);
     }
 
+    public List<Long> getInquiryIds(List<Object[]> result) {
+        return result.stream()
+                .map(r -> ((Number) r[1]).longValue())
+                .toList();
+    }
+
 }

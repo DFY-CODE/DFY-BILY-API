@@ -15,6 +15,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long>,
     (
       SELECT
         i.ID AS id,
+        i.ID AS content_id,
         'INQUIRY' AS type,
         s.NAME AS space_name,
         s.LOCATION AS location,
@@ -34,6 +35,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long>,
     (
       SELECT
         r.ID AS id,
+        i.ID AS content_id,
         'RESERVATION' AS type,
         s.NAME AS space_name,
         s.LOCATION AS location,

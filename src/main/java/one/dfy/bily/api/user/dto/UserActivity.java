@@ -18,6 +18,7 @@ public record UserActivity(
         ReservationPreferredDateInfo reservationPreferredDate,
         Long price,
         String status,
-        LocalDateTime createdAt
+        LocalDateTime createdAt,
+        List<String> fileList
 ){
 }

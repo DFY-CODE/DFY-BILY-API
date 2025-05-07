@@ -9,7 +9,7 @@ import one.dfy.bily.api.common.dto.User;
 import one.dfy.bily.api.common.service.FileService;
 import one.dfy.bily.api.space.service.SpaceService;
 import one.dfy.bily.api.common.service.UserService;
-import one.dfy.bily.api.util.S3Uploader;
+import one.dfy.bily.api.util.S3Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +25,7 @@ import java.util.*;
 public class ApiController {
 
     @Autowired
-    private S3Uploader s3Uploader;
+    private S3Util s3Util;
     @Autowired
     private FileService fileService;
     @Autowired
@@ -64,10 +64,9 @@ public class ApiController {
                 String title = titles.get(i);
 
                 String fileName = file.getOriginalFilename();
-                String dirName = "space/space";
                 long fileSize = file.getSize();
 
-                s3Uploader.upload(contentId, fileSize, fileName, file, dirName, title);
+                s3Util.upload(contentId, fileSize, fileName, file, title);
             }
 
             return ResponseEntity.ok(Map.of("message", "업로드 성공"));
@@ -96,7 +95,7 @@ public class ApiController {
         String dirName = "business-card";  // 명함 이미지 저장 디렉토리
         long fileSize = multipartFile.getSize();
 
-        FileUploadResponse response = s3Uploader.uploadBusinessCard(userId, fileSize, fileName, multipartFile, dirName);
+        FileUploadResponse response = s3Util.uploadBusinessCard(userId, fileSize, fileName, multipartFile, dirName);
 
         return ResponseEntity.ok(response);
     }

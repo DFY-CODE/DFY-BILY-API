@@ -14,7 +14,7 @@ import one.dfy.bily.api.common.service.FileService;
 import one.dfy.bily.api.space.service.SpaceService;
 import one.dfy.bily.api.common.service.UserService;
 import one.dfy.bily.api.space.dto.*;
-import one.dfy.bily.api.util.S3Uploader;
+import one.dfy.bily.api.util.S3Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -31,7 +31,7 @@ import java.util.*;
 public class SpaceApiController {
 
     @Autowired
-    private S3Uploader s3Uploader;
+    private S3Util s3Util;
     @Autowired
     private FileService fileService;
     @Autowired
@@ -176,7 +176,7 @@ public class SpaceApiController {
                 for (int i = 0; i < spaceImages.size(); i++) {
                     MultipartFile file = spaceImages.get(i);
                     String title = (spaceImageTitles != null && i < spaceImageTitles.size()) ? spaceImageTitles.get(i) : file.getOriginalFilename();
-                    SpaceFileDto uploadedFile = s3Uploader.spaceUpload(newContentId, file.getSize(), file.getOriginalFilename(), file, "space", title);
+                    SpaceFileDto uploadedFile = s3Util.spaceUpload(newContentId, file.getSize(), file.getOriginalFilename(), file, "space", title);
                     uploadedFile.setFileOrder(spaceImageOrders != null && i < spaceImageOrders.size() ? spaceImageOrders.get(i) : (i + 1));
                     spaceFileDtos.add(uploadedFile);
                 }
@@ -188,7 +188,7 @@ public class SpaceApiController {
                 for (int i = 0; i < useCaseImages.size(); i++) {
                     MultipartFile file = useCaseImages.get(i);
                     String title = (useCaseImageTitles != null && i < useCaseImageTitles.size()) ? useCaseImageTitles.get(i) : file.getOriginalFilename();
-                    SpaceUseFileDto uploadedFile = s3Uploader.spaceUseUpload(newContentId, file.getSize(), file.getOriginalFilename(), file, "useCase", title);
+                    SpaceUseFileDto uploadedFile = s3Util.spaceUseUpload(newContentId, file.getSize(), file.getOriginalFilename(), file, "useCase", title);
                     uploadedFile.setFileOrder(i + 1);
                     spaceUseFileDtos.add(uploadedFile);
                 }
@@ -199,7 +199,7 @@ public class SpaceApiController {
             if (blueprint != null && !blueprint.isEmpty()) {
                 for (MultipartFile file : blueprint) {
                     if (file != null && !file.isEmpty()) {
-                        SpaceBulePrintFileDto uploadedFile = s3Uploader.blueprintUpload(
+                        SpaceBulePrintFileDto uploadedFile = s3Util.blueprintUpload(
                                 newContentId,
                                 file.getSize(),
                                 file.getOriginalFilename(),
@@ -348,7 +348,7 @@ public class SpaceApiController {
                 for (int i = 0; i < spaceImages.size(); i++) {
                     MultipartFile file = spaceImages.get(i);
                     String title = (spaceImageTitles != null && i < spaceImageTitles.size()) ? spaceImageTitles.get(i) : file.getOriginalFilename();
-                    SpaceFileDto uploadedFile = s3Uploader.spaceUpload(contentId, file.getSize(), file.getOriginalFilename(), file, "space", title);
+                    SpaceFileDto uploadedFile = s3Util.spaceUpload(contentId, file.getSize(), file.getOriginalFilename(), file, "space", title);
                     uploadedFile.setFileOrder(spaceImageOrders != null && i < spaceImageOrders.size() ? spaceImageOrders.get(i) : (i + 1));
                     spaceFileDtos.add(uploadedFile);
                 }
@@ -360,7 +360,7 @@ public class SpaceApiController {
                 for (int i = 0; i < useCaseImages.size(); i++) {
                     MultipartFile file = useCaseImages.get(i);
                     String title = (useCaseImageTitles != null && i < useCaseImageTitles.size()) ? useCaseImageTitles.get(i) : file.getOriginalFilename();
-                    SpaceUseFileDto uploadedFile = s3Uploader.spaceUseUpload(contentId, file.getSize(), file.getOriginalFilename(), file, "useCase", title);
+                    SpaceUseFileDto uploadedFile = s3Util.spaceUseUpload(contentId, file.getSize(), file.getOriginalFilename(), file, "useCase", title);
                     uploadedFile.setFileOrder(useCaseImageOrders != null && i < useCaseImageOrders.size() ? useCaseImageOrders.get(i) : (i + 1));
                     spaceUseFileDtos.add(uploadedFile);
                 }
@@ -371,7 +371,7 @@ public class SpaceApiController {
             if (blueprint != null && !blueprint.isEmpty()) {
                 for (MultipartFile file : blueprint) {
                     if (file != null && !file.isEmpty()) {
-                        SpaceBulePrintFileDto uploadedFile = s3Uploader.blueprintUpload(
+                        SpaceBulePrintFileDto uploadedFile = s3Util.blueprintUpload(
                                 contentId,
                                 file.getSize(),
                                 file.getOriginalFilename(),

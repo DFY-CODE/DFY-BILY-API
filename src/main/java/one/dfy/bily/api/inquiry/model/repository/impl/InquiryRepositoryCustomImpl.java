@@ -105,4 +105,6 @@ public class InquiryRepositoryCustomImpl implements InquiryRepositoryCustom {
 
         return new PageImpl<>(content, pageable, total == null ? 0 : total);
     }
+
+
 }

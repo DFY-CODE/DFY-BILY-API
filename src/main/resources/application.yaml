@@ -28,7 +28,6 @@ spring:
       import: optional:file:.env[.properties]
     profiles:
       active: dev
-    property-naming-strategy: SNAKE_CASE
 
   autoconfigure:
     exclude: org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
@@ -122,7 +121,8 @@ springdoc:
 
 s3:
   path:
-    inquiry: images/inquiry
+    inquiry: images/inquiry/
+    space: images/space/
 
 cors:
   allowed-origins: "http://localhost:3000,https://bily.pages.dev,http://localhost:8081"
