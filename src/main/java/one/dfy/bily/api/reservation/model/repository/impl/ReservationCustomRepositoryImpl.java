@@ -55,7 +55,7 @@ public class ReservationCustomRepositoryImpl implements ReservationCustomReposit
                         spaceIdKeyword != null ? space.spaceId.contains(spaceIdKeyword) : null,
                         startAt != null ? inquiry.createdAt.goe(startAt) : null,
                         endAt != null ? inquiry.createdAt.loe(endAt) : null,
-                        reservation.isUse.eq(YesNo.Y)
+                        reservation.isUsed.eq(true)
                 )
                 .orderBy(reservation.id.desc())
                 .offset(pageable.getOffset())
@@ -108,7 +108,7 @@ public class ReservationCustomRepositoryImpl implements ReservationCustomReposit
                 .from(reservation)
                 .join(reservation.inquiry, inquiry)
                 .join(inquiry.space, space)
-                .where(reservation.userId.eq(userId), reservation.isUse.eq(YesNo.Y))
+                .where(reservation.userId.eq(userId), reservation.isUsed.eq(true))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -119,7 +119,7 @@ public class ReservationCustomRepositoryImpl implements ReservationCustomReposit
                 .from(reservation)
                 .join(reservation.inquiry, inquiry)
                 .join(inquiry.space, space)
-                .where(reservation.userId.eq(userId), reservation.isUse.eq(YesNo.Y))
+                .where(reservation.userId.eq(userId), reservation.isUsed.eq(true))
                 .fetchOne();
 
         return new PageImpl<>(contents, pageable, total);

@@ -35,9 +35,8 @@ public class Reservation extends BaseEntity {
     @Column(name = "END_DATE")
     private LocalDateTime endDate;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "IS_USE", nullable = false)
-    private YesNo isUse;
+    @Column(name = "IS_USED", nullable = false)
+    private boolean isUsed;
 
     @Column(name = "USER_ID")
     private Long userId;
@@ -53,7 +52,7 @@ public class Reservation extends BaseEntity {
         this.status = status;
         this.startDate = startDate;
         this.endDate = endDate;
-        this.isUse = YesNo.Y;
+        this.isUsed = true;
         this.userId = userId;
         this.creator = creator;
         this.updater = updater;
@@ -73,6 +72,6 @@ public class Reservation extends BaseEntity {
     }
 
     public void deleteReservation() {
-        this.isUse = YesNo.N;
+        this.isUsed = true;
     }
 }

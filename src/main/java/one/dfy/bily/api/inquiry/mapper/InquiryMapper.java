@@ -51,7 +51,6 @@ public class InquiryMapper {
                 file.newFileName(),
                 file.saveLocation(),
                 file.fileSize(),
-                "N",
                 userId,
                 userId,
                 file.fileType()

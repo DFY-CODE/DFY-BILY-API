@@ -59,9 +59,8 @@ public class Inquiry extends BaseEntity {
     @Column(name = "HOST_COMPANY", nullable = false)
     private String hostCompany;
 
-    @Column(name = "IS_USE", nullable = false)
-    @Enumerated(EnumType.STRING)
-    private YesNo isUse;
+    @Column(name = "IS_USED", nullable = false)
+    private boolean isUsed;
 
     @Column(name = "USER_ID")
     private Long userId;
@@ -95,7 +94,7 @@ public class Inquiry extends BaseEntity {
         this.author = author;
         this.space = space;
         this.hostCompany = hostCompany;
-        this.isUse = YesNo.Y;
+        this.isUsed = true;
         this.userId = userId;
     }
 
@@ -112,7 +111,7 @@ public class Inquiry extends BaseEntity {
     }
 
     public void deleteInquiry() {
-        isUse = YesNo.N;
+        isUsed = false;
     }
 
     public void updateStatus(InquiryStatus status) {

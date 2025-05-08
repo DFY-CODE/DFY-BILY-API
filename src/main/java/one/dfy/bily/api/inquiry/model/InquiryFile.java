@@ -31,8 +31,8 @@ public class InquiryFile extends BaseEntity {
     @Column(name = "SAVE_SIZE", nullable = false)
     private Long saveSize;
 
-    @Column(name = "DELETE_FLAG", length = 10)
-    private String deleteFlag = "N";
+    @Column(name = "IS_USED", length = 10)
+    private boolean isUsed = true;
 
     @Column(name = "CREATOR", nullable = false, length = 50)
     private Long creator;
@@ -49,7 +49,6 @@ public class InquiryFile extends BaseEntity {
             String saveFileName,
             String saveLocation,
             Long saveSize,
-            String deleteFlag,
             Long creator,
             Long updater,
             String fileType
@@ -59,7 +58,7 @@ public class InquiryFile extends BaseEntity {
         this.saveFileName = saveFileName;
         this.saveLocation = saveLocation;
         this.saveSize = saveSize;
-        this.deleteFlag = deleteFlag != null ? deleteFlag : "N";
+        this.isUsed = true;
         this.creator = creator;
         this.updater = updater;
         this.fileType = fileType;
