@@ -29,7 +29,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long>,
         i.CREATED_AT AS created_at
       FROM TBL_INQUIRY i
       JOIN TBL_SPACE s ON i.CONTENT_ID = s.CONTENT_ID
-      WHERE i.USER_ID = :userId AND i.IS_USE = 'Y'
+      WHERE i.USER_ID = :userId AND i.IS_USED = true
     )
     UNION ALL
     (
@@ -50,7 +50,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long>,
       FROM TBL_RESERVATION r
       JOIN TBL_INQUIRY i ON r.INQUIRY_ID = i.ID
       JOIN TBL_SPACE s ON i.CONTENT_ID = s.CONTENT_ID
-      WHERE r.USER_ID = :userId AND r.IS_USE = 'Y'
+      WHERE r.USER_ID = :userId AND r.IS_USED = true
     )
      ORDER BY created_at DESC
     LIMIT :limit OFFSET :offset
@@ -61,9 +61,9 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long>,
 
     @Query(value = """
     SELECT COUNT(*) FROM (
-        SELECT i.ID FROM TBL_INQUIRY i WHERE i.USER_ID = :userId AND i.IS_USE = 'Y'
+        SELECT i.ID FROM TBL_INQUIRY i WHERE i.USER_ID = :userId AND i.IS_USED = true
         UNION ALL
-        SELECT r.ID FROM TBL_RESERVATION r WHERE r.USER_ID = :userId AND r.IS_USE = 'Y'
+        SELECT r.ID FROM TBL_RESERVATION r WHERE r.USER_ID = :userId AND r.IS_USED = true
     ) AS total
 """, nativeQuery = true)
     long countReservationAndInquiry(@Param("userId") Long userId);

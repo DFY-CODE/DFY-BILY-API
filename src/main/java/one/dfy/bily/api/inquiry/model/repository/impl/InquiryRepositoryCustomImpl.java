@@ -51,7 +51,7 @@ public class InquiryRepositoryCustomImpl implements InquiryRepositoryCustom {
                         spaceIdKeyword != null ? space.spaceId.contains(spaceIdKeyword) : null,
                         startAt != null ? inquiry.createdAt.goe(startAt) : null,
                         endAt != null ? inquiry.createdAt.loe(endAt) : null,
-                        inquiry.isUse.eq(YesNo.Y)
+                        inquiry.isUsed.eq(true)
                 )
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -129,7 +129,7 @@ public class InquiryRepositoryCustomImpl implements InquiryRepositoryCustom {
                 ))
                 .from(inquiry)
                 .join(inquiry.space, space)
-                .where(inquiry.userId.eq(userId), inquiry.isUse.eq(YesNo.Y))
+                .where(inquiry.userId.eq(userId), inquiry.isUsed.eq(true))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -138,7 +138,7 @@ public class InquiryRepositoryCustomImpl implements InquiryRepositoryCustom {
                 .select(inquiry.count())
                 .from(inquiry)
                 .join(inquiry.space, space)
-                .where(inquiry.userId.eq(userId), inquiry.isUse.eq(YesNo.Y))
+                .where(inquiry.userId.eq(userId), inquiry.isUsed.eq(true))
                 .fetchOne();
 
         return new PageImpl<>(contents, pageable, total != null ? total : 0L);
