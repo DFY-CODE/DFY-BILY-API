@@ -1,5 +1,6 @@
 package one.dfy.bily.api.inquiry.model.repository.impl;
 
+import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import one.dfy.bily.api.inquiry.dto.InquiryResponse;
@@ -8,6 +9,8 @@ import one.dfy.bily.api.inquiry.model.*;
 import one.dfy.bily.api.inquiry.model.repository.InquiryRepositoryCustom;
 import one.dfy.bily.api.common.constant.YesNo;
 import one.dfy.bily.api.space.model.QSpace;
+import one.dfy.bily.api.user.dto.InquiryActivity;
+import one.dfy.bily.api.user.dto.UserActivity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -104,6 +107,41 @@ public class InquiryRepositoryCustomImpl implements InquiryRepositoryCustom {
                 .toList();
 
         return new PageImpl<>(content, pageable, total == null ? 0 : total);
+    }
+
+    @Override
+    public Page<InquiryActivity> findInquiryActivitiesByUserId(Long userId, Pageable pageable) {
+        QInquiry inquiry = QInquiry.inquiry;
+        QSpace space = QSpace.space;
+
+        List<InquiryActivity> contents = queryFactory
+                .select(Projections.constructor(InquiryActivity.class,
+                        inquiry.id,
+                        space.contentId,
+                        space.name,
+                        space.location,
+                        space.areaM2,
+                        space.areaPy,
+                        space.maxCapacity,
+                        space.price,
+                        inquiry.status,
+                        inquiry.createdAt
+                ))
+                .from(inquiry)
+                .join(inquiry.space, space)
+                .where(inquiry.userId.eq(userId), inquiry.isUse.eq(YesNo.Y))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        Long total = queryFactory
+                .select(inquiry.count())
+                .from(inquiry)
+                .join(inquiry.space, space)
+                .where(inquiry.userId.eq(userId), inquiry.isUse.eq(YesNo.Y))
+                .fetchOne();
+
+        return new PageImpl<>(contents, pageable, total != null ? total : 0L);
     }
 
 

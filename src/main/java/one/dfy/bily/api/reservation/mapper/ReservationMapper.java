@@ -136,28 +136,4 @@ public class ReservationMapper {
 
         return new ReservationListResponse(reservationResponsePage.getContent(), pagination);
     }
-
-    public static UserActivity fromReservationActivity(
-            ReservationActivity reservation,
-            Map<Integer, List<String>> fileNameListMap
-    ) {
-        return new UserActivity(
-                reservation.id(),
-                "RESERVATION",
-                reservation.spaceName(),
-                reservation.location(),
-                reservation.areaM2(),
-                reservation.areaPy(),
-                reservation.maxCapacity(),
-                null, // inquiryPreferredDateList는 예약에서는 없음
-                new ReservationPreferredDateInfo(
-                        reservation.startDate(),
-                        reservation.endDate()
-                ),
-                reservation.price(),
-                reservation.status().toString(),
-                reservation.createdAt(),
-                fileNameListMap.getOrDefault(reservation.contentId(), Collections.emptyList())
-        );
-    }
 }

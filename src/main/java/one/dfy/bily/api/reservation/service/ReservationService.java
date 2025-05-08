@@ -17,6 +17,7 @@ import one.dfy.bily.api.reservation.model.repository.ReservationRepository;
 import one.dfy.bily.api.user.dto.ReservationActivity;
 import one.dfy.bily.api.user.dto.UserActivity;
 import one.dfy.bily.api.user.dto.UserActivityList;
+import one.dfy.bily.api.user.facade.UserActivityFacade;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -142,12 +143,5 @@ public class ReservationService {
         return reservationRepository.findReservationListByUserId(userId, pageable);
     }
 
-    public List<UserActivity> reservationActivityToUserActivityList(
-            List<ReservationActivity> reservations,
-            Map<Integer, List<String>> fileNameListMap
-    ) {
-        return reservations.stream()
-                .map(reservation -> ReservationMapper.fromReservationActivity(reservation, fileNameListMap))
-                .toList();
-    }
+
 }
