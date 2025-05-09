@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import one.dfy.bily.api.space.model.SavedSpace;
 import one.dfy.bily.api.space.model.Space;
 import one.dfy.bily.api.space.model.SpaceFileInfo;
 import one.dfy.bily.api.space.model.repository.SpaceFileInfoRepository;
@@ -11,8 +12,14 @@ import one.dfy.bily.api.space.model.repository.SpaceRepository;
 import one.dfy.bily.api.common.dto.*;
 import one.dfy.bily.api.space.mapper.SpaceMapper;
 import one.dfy.bily.api.space.dto.*;
+import one.dfy.bily.api.space.model.repository.SavedSpaceRepository;
 import one.dfy.bily.api.util.S3Util;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -29,6 +36,7 @@ public class SpaceService {
     private final S3Util s3Util;
     private final SpaceRepository spaceRepository;
     private final SpaceFileInfoRepository spaceFileInfoRepository;
+    private final SavedSpaceRepository savedSpaceRepository;
 
     // 페이징 처리된 데이터 반환
     public SpaceListResponse getSpaces(int page, int size) {
@@ -273,22 +281,66 @@ public class SpaceService {
         return spaceRepository.findById(contentId).orElseThrow(() -> new IllegalArgumentException("공간이 존재하지 않습니다."));
     }
 
-    public Map<Integer, List<String>> findByContentIds(List<Integer> contentIds) {
-        String s3Url = s3Util.getSpaceS3Url();  // 예: https://your-bucket.s3.amazonaws.com/
+    @Transactional
+    public Map<Integer, String> findSpaceFileByContentIds(List<Integer> contentIds) {
+        String s3Url = s3Util.getSpaceS3Url();
 
         if (contentIds == null || contentIds.isEmpty()) {
-            return Map.of();  // null 대신 빈 Map 반환 권장
+            return Map.of();
         }
 
-        return spaceFileInfoRepository.findByContentIdIn(contentIds)
+        return spaceFileInfoRepository.findFirstByContentIdGroup(contentIds)
                 .stream()
-                .collect(Collectors.groupingBy(
+                .collect(Collectors.toMap(
                         SpaceFileInfo::getContentId,
-                        Collectors.mapping(
-                                file -> s3Url + file.getSaveFileName(),
-                                Collectors.toList()
-                        )
+                        file -> s3Url + file.getSaveFileName()
                 ));
+    }
+
+    @Transactional
+    public SpaceCommonResponse createSavedSpace(Integer spaceId, Long userId) {
+        Space space = findById(spaceId);
+
+        savedSpaceRepository.findBySpaceAndUserId(space, userId)
+                        .ifPresentOrElse(
+                                existing -> {
+                                    existing.updateUsed(true);
+                                },
+                                () -> savedSpaceRepository.save(new SavedSpace(space, userId))
+                        );
+
+        return new SpaceCommonResponse(true,"장소를 저장했습니다.");
+    }
+
+    @Transactional
+    public SpaceCommonResponse cancelSavedSpace(Integer spaceId, Long userId) {
+        Space space = findById(spaceId);
+
+        savedSpaceRepository.findBySpaceAndUserId(space, userId)
+                .ifPresent(
+                        existing -> {
+                            existing.updateUsed(false);
+                        }
+                );
+
+        return new SpaceCommonResponse(true,"장소를 저장을 취소했습니다.");
+    }
+
+    @Transactional(readOnly = true)
+    public Page<SavedSpace> findSavedSpaceByUserId(Long userId, int page, int size) {
+        Pageable pageable = PageRequest.of(page - 1 , size, Sort.by("createdAt").descending());
+
+        return savedSpaceRepository.findByUserId(userId, pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public Map<Integer, String> findSpaceFileBySpaceList(List<SavedSpace> spaceList){
+        List<Integer> spaceIds = spaceList.stream()
+                .map(SavedSpace::getSpace)
+                .map(Space::getContentId)
+                .toList();
+
+        return findSpaceFileByContentIds(spaceIds);
     }
 
 }

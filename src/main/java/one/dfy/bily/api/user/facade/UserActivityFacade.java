@@ -3,19 +3,16 @@ package one.dfy.bily.api.user.facade;
 import lombok.RequiredArgsConstructor;
 import one.dfy.bily.api.common.annotation.Facade;
 import one.dfy.bily.api.common.dto.Pagination;
+import one.dfy.bily.api.common.mapper.PaginationMapper;
 import one.dfy.bily.api.inquiry.dto.InquiryPreferredDateInfo;
 import one.dfy.bily.api.inquiry.service.InquiryService;
-import one.dfy.bily.api.reservation.dto.ReservationPreferredDateInfo;
+import one.dfy.bily.api.space.model.SavedSpace;
 import one.dfy.bily.api.space.service.SpaceService;
-import one.dfy.bily.api.user.dto.InquiryActivity;
-import one.dfy.bily.api.user.dto.ReservationActivity;
-import one.dfy.bily.api.user.dto.UserActivity;
-import one.dfy.bily.api.user.dto.UserActivityList;
+import one.dfy.bily.api.user.dto.*;
 import one.dfy.bily.api.reservation.service.ReservationService;
 import one.dfy.bily.api.user.service.UserActivityService;
 import org.springframework.data.domain.Page;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -33,12 +30,12 @@ public class UserActivityFacade {
         List<Integer> contentIds = reservationService.getInquiryIds(reservationAndInquiryRow);
         long totalCount = reservationService.countReservationAndInquiryRow(userId);
 
-        Map<Integer, List<String>> fileNameListMap = spaceService.findByContentIds(contentIds);
+        Map<Integer, String> fileNameListMap = spaceService.findSpaceFileByContentIds(contentIds);
 
-        Map<Long, List<InquiryPreferredDateInfo>> preferredDateMap = inquiryService.findInquiryPreferredDateByInquiryIds(reservationAndInquiryRow, fileNameListMap);
+        Map<Long, List<InquiryPreferredDateInfo>> preferredDateMap = inquiryService.findInquiryPreferredDateByObject(reservationAndInquiryRow);
         List<UserActivity> userActivityList = userActivityService.mappingToReservationAndInquiryInfo(reservationAndInquiryRow, fileNameListMap, preferredDateMap);
 
-        Pagination pagination = new Pagination(page, pageSize, totalCount, (int) Math.ceil((double) totalCount / pageSize));
+        Pagination pagination = new Pagination(page + 1, pageSize, totalCount, (int) Math.ceil((double) totalCount / pageSize));
 
         return new UserActivityList(userActivityList, pagination);
     }
@@ -47,10 +44,10 @@ public class UserActivityFacade {
         Page<ReservationActivity> reservationActivityPage = reservationService.findReservationListByUserId(userId, page, pageSize);
         List<Integer> contentIds = reservationService.getReservationActivityInquiryIds(reservationActivityPage.getContent());
 
-        Map<Integer, List<String>> fileNameListMap = spaceService.findByContentIds(contentIds);
+        Map<Integer, String> fileNameListMap = spaceService.findSpaceFileByContentIds(contentIds);
 
         List<UserActivity> userActivityList = userActivityService.reservationActivityToUserActivityList(reservationActivityPage.getContent(), fileNameListMap);
-        Pagination pagination = new Pagination(page, pageSize, reservationActivityPage.getTotalElements(), reservationActivityPage.getTotalPages());
+        Pagination pagination = PaginationMapper.toPagination(reservationActivityPage.getPageable(), reservationActivityPage.getTotalElements(), reservationActivityPage.getTotalPages());
 
         return new UserActivityList(userActivityList, pagination);
     }
@@ -59,13 +56,24 @@ public class UserActivityFacade {
         Page<InquiryActivity> inquiryActivityPage = inquiryService.findInquiryActivitiesByUserId(userId, page, pageSize);
         List<Integer> contentIds = inquiryService.getInquiryActivityInquiryIds(inquiryActivityPage.getContent());
 
-        Map<Integer, List<String>> fileNameListMap = spaceService.findByContentIds(contentIds);
+        Map<Integer, String> fileNameListMap = spaceService.findSpaceFileByContentIds(contentIds);
 
-        Map<Long, List<InquiryPreferredDateInfo>> preferredDateMap = inquiryService.findInquiryPreferredDateByInquiryIds(inquiryActivityPage.getContent());
+        Map<Long, List<InquiryPreferredDateInfo>> preferredDateMap = inquiryService.findInquiryPreferredDateByInquiryActivity(inquiryActivityPage.getContent());
 
         List<UserActivity> userActivityList = userActivityService.inquiryActivityToUserActivityList(inquiryActivityPage.getContent(), fileNameListMap, preferredDateMap);
-        Pagination pagination = new Pagination(page, pageSize, inquiryActivityPage.getTotalElements(), inquiryActivityPage.getTotalPages());
+        Pagination pagination = PaginationMapper.toPagination(inquiryActivityPage.getPageable(), inquiryActivityPage.getTotalElements(), inquiryActivityPage.getTotalPages());
 
         return new UserActivityList(userActivityList, pagination);
+    }
+
+    public SavedSpaceList findSavedSpaceByUserId(Long userId, int page, int pageSize) {
+        Page<SavedSpace> spacePage = spaceService.findSavedSpaceByUserId(userId, page, pageSize);
+        Map<Integer, String> spaceThumbnail = spaceService.findSpaceFileBySpaceList(spacePage.getContent());
+
+        List<SavedSpaceInfo> savedSpaceInfoList = userActivityService.savedSpaceToSavedSpaceList(spacePage.getContent(), spaceThumbnail);
+
+        Pagination pagination = PaginationMapper.toPagination(spacePage.getPageable(), spacePage.getTotalElements(), spacePage.getTotalPages());
+
+        return new SavedSpaceList(savedSpaceInfoList, pagination);
     }
 }

@@ -11,12 +11,14 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import one.dfy.bily.api.common.dto.*;
 import one.dfy.bily.api.common.service.FileService;
+import one.dfy.bily.api.security.CustomUserDetails;
 import one.dfy.bily.api.space.service.SpaceService;
 import one.dfy.bily.api.common.service.UserService;
 import one.dfy.bily.api.space.dto.*;
 import one.dfy.bily.api.util.S3Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -26,7 +28,7 @@ import java.util.*;
 
 @Slf4j
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/spaces")
 @Tag(name = "공간관리 API", description = "공간관리 관련 API")
 public class SpaceApiController {
 
@@ -41,7 +43,7 @@ public class SpaceApiController {
 
 
 
-    @GetMapping("/spaces/list")
+    @GetMapping("/list")
     @Operation(summary = "공간 목록 조회", description = "페이지네이션된 공간 관리 목록 및 총 개수를 반환합니다.")
     @ApiResponses(value = {
             @ApiResponse(
@@ -63,7 +65,7 @@ public class SpaceApiController {
         return ResponseEntity.ok(spaceService.getSpaces(page, size));
     }
 
-    @GetMapping("/spaces/detail/{contentId}")
+    @GetMapping("/detail/{contentId}")
     @Operation(summary = "공간 상세 조회", description = "contentId를 통해 특정 공간의 세부 정보를 반환합니다.")
     @ApiResponses(value = {
             @ApiResponse(
@@ -98,7 +100,7 @@ public class SpaceApiController {
     }
 
 
-    @PostMapping(value = "/spaces/insert", consumes = "multipart/form-data")
+    @PostMapping(value = "/insert", consumes = "multipart/form-data")
     @Operation(
             summary = "공간 정보를 삽입합니다.",
             description = "공간 정보 입력과 관련된 API. 공간 기본 정보, 태그, 이미지 및 도면 파일을 함께 업로드할 수 있습니다."
@@ -253,7 +255,7 @@ public class SpaceApiController {
             ))
     })
 
-    @PostMapping(value = "/spaces/update/{contentId}", consumes = "multipart/form-data")
+    @PostMapping(value = "/update/{contentId}", consumes = "multipart/form-data")
     public ResponseEntity<Map<String, Object>> updateSpaceManager(
             @PathVariable Long contentId,
             @RequestParam(value = "displayStatus", required = false) boolean displayStatus,
@@ -398,7 +400,52 @@ public class SpaceApiController {
         }
     }
 
+    @PostMapping("/save")
+    @Operation(summary = "공간 저장", description = "사용자가 공간을 저장합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = SpaceListResponse.class),
+                            examples = @ExampleObject(
+                                    name = "성공 응답 예시",
+                                    externalValue = "/swagger/json/space/getSpaces.json"
+                            )
+                    )
+            )
+    })
+    public ResponseEntity<SpaceCommonResponse> createSavedSpace(
+            @RequestBody ContentId contentId,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+            ) {
+        Long userId = userDetails.getUserId();
+        return ResponseEntity.ok(spaceService.createSavedSpace(contentId.contentId(), userId));
+    }
 
-
+    @PatchMapping("/save")
+    @Operation(summary = "공간 저장 취소", description = "사용자가 공간을 저장을 취소합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = SpaceListResponse.class),
+                            examples = @ExampleObject(
+                                    name = "성공 응답 예시",
+                                    externalValue = "/swagger/json/space/getSpaces.json"
+                            )
+                    )
+            )
+    })
+    public ResponseEntity<SpaceCommonResponse> cancelSavedSpace(
+            @RequestBody ContentId contentId,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        Long userId = userDetails.getUserId();
+        return ResponseEntity.ok(spaceService.cancelSavedSpace(contentId.contentId(), userId));
+    }
 
 }

@@ -1,0 +1,36 @@
+package one.dfy.bily.api.space.model;
+
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import one.dfy.bily.api.common.model.BaseEntity;
+
+@Getter
+@NoArgsConstructor
+@Entity
+@Table(name = "TBL_SAVED_SPACE")
+public class SavedSpace extends BaseEntity{
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "CONTENT_ID", referencedColumnName = "CONTENT_ID", nullable = false)
+    private Space space;
+
+    @Column(name = "USER_ID")
+    private Long userId;
+
+    @Column(name = "IS_USED")
+    private boolean isUsed;
+
+    public SavedSpace(Space space, Long userId) {
+        this.space = space;
+        this.userId = userId;
+        this.isUsed = true;
+    }
+
+    public void updateUsed(boolean used) {
+        this.isUsed = used;
+    }
+}

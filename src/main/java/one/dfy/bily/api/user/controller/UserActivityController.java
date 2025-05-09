@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import one.dfy.bily.api.security.CustomUserDetails;
+import one.dfy.bily.api.user.dto.SavedSpaceList;
 import one.dfy.bily.api.user.dto.UserActivityList;
 import one.dfy.bily.api.user.facade.UserActivityFacade;
 import org.springframework.http.ResponseEntity;
@@ -98,5 +99,30 @@ public class UserActivityController {
     ) {
         Long userId = userDetails.getUserId();
         return ResponseEntity.ok(userActivityFacade.findReservationListByUserId(userId,page,pageSize));
+    }
+
+    @GetMapping("/saved-space")
+    @Operation(summary = "나의 공간 저장 리스트 조회", description = "나의 공간 저장 리스트정보를 반환합니다.")
+    @ApiResponse(
+            responseCode = "200",
+            description = "성공",
+            content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = UserActivityList.class),
+                    examples = @ExampleObject(
+                            name = "성공 응답 예시",
+                            externalValue = "/swagger/json/user/activity/findSavedSpace.json"
+                    )
+            )
+    )
+    public ResponseEntity<SavedSpaceList> findSavedSpaceByUserId(
+            @Parameter(description = "유저 번호", required = false) @RequestParam(defaultValue = "1") Long userId,
+            @Parameter(description = "예약 검색 페이지", required = false) @RequestParam(defaultValue = "1") int page,
+            @Parameter(description = "예약 검색 페이지 사이즈", required = false)
+            @RequestParam(value = "page_size", defaultValue = "20") int pageSize
+//            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+//        Long userId = userDetails.getUserId();
+        return ResponseEntity.ok(userActivityFacade.findSavedSpaceByUserId(userId,page,pageSize));
     }
 }
