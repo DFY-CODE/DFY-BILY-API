@@ -6,7 +6,7 @@ import org.springframework.data.domain.Pageable;
 public class PaginationMapper {
 
     public static Pagination toPagination(Pageable pageable, Long total, int totalPage) {
-        return new Pagination(pageable.getPageNumber(), pageable.getPageSize(), total, totalPage);
+        return new Pagination(pageable.getPageNumber() + 1, pageable.getPageSize(), total, totalPage);
     }
 
 }

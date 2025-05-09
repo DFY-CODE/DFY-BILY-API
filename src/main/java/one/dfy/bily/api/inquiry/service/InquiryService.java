@@ -9,14 +9,9 @@ import one.dfy.bily.api.inquiry.model.PreferredDate;
 import one.dfy.bily.api.inquiry.model.repository.InquiryFileRepository;
 import one.dfy.bily.api.inquiry.model.repository.PreferredDateRepository;
 import one.dfy.bily.api.inquiry.model.repository.InquiryRepository;
-import one.dfy.bily.api.reservation.mapper.ReservationMapper;
 import one.dfy.bily.api.user.dto.InquiryActivity;
-import one.dfy.bily.api.user.dto.ReservationActivity;
-import one.dfy.bily.api.user.dto.UserActivity;
 import one.dfy.bily.api.space.model.Space;
 import one.dfy.bily.api.inquiry.dto.*;
-import one.dfy.bily.api.user.facade.UserActivityFacade;
-import one.dfy.bily.api.user.mapper.UserActivityMapper;
 import one.dfy.bily.api.util.S3Util;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -150,7 +145,7 @@ public class InquiryService {
     }
 
     @Transactional(readOnly = true)
-    public Map<Long, List<InquiryPreferredDateInfo>> findInquiryPreferredDateByInquiryIds(List<InquiryActivity> inquiryActivities){
+    public Map<Long, List<InquiryPreferredDateInfo>> findInquiryPreferredDateByInquiryActivity(List<InquiryActivity> inquiryActivities){
 
         List<Long> inquiryIds = inquiryActivities.stream()
                 .map(InquiryActivity::id)
@@ -161,7 +156,7 @@ public class InquiryService {
     }
 
     @Transactional(readOnly = true)
-    public Map<Long, List<InquiryPreferredDateInfo>> findInquiryPreferredDateByInquiryIds(List<Object[]> rawResults, Map<Integer, List<String>> fileNameListMap){
+    public Map<Long, List<InquiryPreferredDateInfo>> findInquiryPreferredDateByObject(List<Object[]> rawResults){
         List<Long> inquiryIds = rawResults.stream()
                 .filter(r -> "INQUIRY".equals(r[2]))
                 .map(r -> ((Number) r[0]).longValue())
