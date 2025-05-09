@@ -5,20 +5,15 @@ import one.dfy.bily.api.common.mapper.PaginationMapper;
 import one.dfy.bily.api.reservation.constant.PaymentType;
 import one.dfy.bily.api.inquiry.dto.InquiryFileName;
 import one.dfy.bily.api.inquiry.dto.InquiryPreferredDateInfo;
-import one.dfy.bily.api.space.dto.SpaceId;
 import one.dfy.bily.api.inquiry.model.Inquiry;
 import one.dfy.bily.api.reservation.model.Payment;
 import one.dfy.bily.api.reservation.model.Reservation;
 import one.dfy.bily.api.reservation.dto.*;
-import one.dfy.bily.api.user.dto.ReservationActivity;
-import one.dfy.bily.api.user.dto.UserActivity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 public class ReservationMapper {
 
@@ -72,7 +67,7 @@ public class ReservationMapper {
                         reservations.getStatus().getDescription(),
                         new ReservationPreferredDateInfo(reservations.getStartDate(), reservations.getEndDate())
                 ),
-                new SpaceId(reservations.getInquiry().getSpace().getSpaceId())
+                reservations.getInquiry().getSpace().getSpaceId()
         );
     }
 
@@ -100,7 +95,6 @@ public class ReservationMapper {
                 reservation.getInquiry().getStatus(),
                 reservation.getInquiry().getSpace().getSpaceId(),
                 reservation.getInquiry().getHostCompany(),
-                new SpaceId(reservation.getInquiry().getSpace().getSpaceId()),
                 new ReservationInfo(reservation.getStatus().getDescription(), new ReservationPreferredDateInfo(reservation.getStartDate(), reservation.getEndDate()))
         );
     }
