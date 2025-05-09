@@ -1,14 +1,11 @@
 package one.dfy.bily.api.inquiry.dto;
 
-import com.fasterxml.jackson.databind.PropertyNamingStrategies;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import one.dfy.bily.api.inquiry.constant.InquiryStatus;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public record InquiryCreateRequest(
         String contactPerson,
         String phoneNumber,

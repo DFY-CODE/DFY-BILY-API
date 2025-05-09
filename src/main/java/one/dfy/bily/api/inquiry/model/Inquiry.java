@@ -100,6 +100,7 @@ public class Inquiry extends BaseEntity {
 
     public void updateFrom(InquiryUpdateRequest request, Space space) {
         if (request.companyName() != null) this.companyName = request.companyName();
+        if (request.companyWebsite() != null) this.companyWebsite = request.companyWebsite();
         if (request.contactPerson() != null) this.contactPerson = request.contactPerson();
         if (request.phoneNumber() != null) this.phoneNumber = request.phoneNumber();
         if (request.email() != null) this.email = request.email();
