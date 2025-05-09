@@ -9,7 +9,7 @@ public record ReservationResponse (
         String eventCategory,
         String contactPerson,
         String position,
-        ReservationInfo reservations,
+        ReservationInfo reservation,
         String spaceIdName
 ){
 }
