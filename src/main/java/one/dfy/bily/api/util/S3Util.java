@@ -10,7 +10,7 @@ import one.dfy.bily.api.space.dto.SpaceFileDto;
 import one.dfy.bily.api.space.dto.SpaceUseFileDto;
 import one.dfy.bily.api.common.dto.*;
 import one.dfy.bily.api.common.service.FileService;
-import one.dfy.bily.api.common.service.UserService;
+import one.dfy.bily.api.user.service.UserService;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;

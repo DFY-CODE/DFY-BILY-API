@@ -8,7 +8,7 @@ import one.dfy.bily.api.common.dto.FileUploadResponse;
 import one.dfy.bily.api.common.dto.User;
 import one.dfy.bily.api.common.service.FileService;
 import one.dfy.bily.api.space.service.SpaceService;
-import one.dfy.bily.api.common.service.UserService;
+import one.dfy.bily.api.user.service.UserService;
 import one.dfy.bily.api.util.S3Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

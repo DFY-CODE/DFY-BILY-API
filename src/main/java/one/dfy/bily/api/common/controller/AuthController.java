@@ -15,7 +15,7 @@ import one.dfy.bily.api.common.dto.AdminUser;
 import one.dfy.bily.api.common.dto.AuthRequest;
 import one.dfy.bily.api.common.request.EmailVerificationRequest;
 import one.dfy.bily.api.common.mapper.EmailVerificationMapper;
-import one.dfy.bily.api.common.service.UserService;
+import one.dfy.bily.api.user.service.UserService;
 import one.dfy.bily.api.common.service.EmailService;
 import one.dfy.bily.api.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;

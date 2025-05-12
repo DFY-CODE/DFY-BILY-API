@@ -1,9 +1,10 @@
-package one.dfy.bily.api.common.service;
+package one.dfy.bily.api.user.service;
 
+import lombok.RequiredArgsConstructor;
 import one.dfy.bily.api.common.dto.AdminUser;
 import one.dfy.bily.api.common.dto.User;
 import one.dfy.bily.api.common.mapper.UserMapper;
-import org.springframework.beans.factory.annotation.Autowired;
+import one.dfy.bily.api.user.model.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -11,13 +12,12 @@ import java.util.Optional;
 
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
 
-    @Autowired
-    private UserMapper userMapper;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
 
 
     public AdminUser findByEmail(String email) {
@@ -46,7 +46,9 @@ public class UserService {
         userMapper.updateUser(user);
     }
 
-
+    public one.dfy.bily.api.user.model.User findUserById(Long userId) {
+        return userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("올바르지 않은 회원 정보입니다."));
+    }
 
 
 }
