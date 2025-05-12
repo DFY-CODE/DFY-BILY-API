@@ -1,7 +1,6 @@
 package one.dfy.bily.api.inquiry.dto;
 
 import one.dfy.bily.api.inquiry.constant.InquiryStatus;
-import one.dfy.bily.api.space.dto.SpaceId;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -24,6 +23,5 @@ public record InquiryResponse(
         String author,
         Integer spaceId,
         String hostCompany,
-        String spaceIdName,
-        SpaceId spaces
+        String spaceIdName
 ) {}

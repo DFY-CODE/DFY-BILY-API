@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import one.dfy.bily.api.reservation.constant.ReservationStatus;
 import one.dfy.bily.api.inquiry.model.Inquiry;
-import one.dfy.bily.api.common.constant.YesNo;
 import one.dfy.bily.api.common.model.BaseEntity;
 
 import java.time.LocalDateTime;
@@ -36,7 +35,7 @@ public class Reservation extends BaseEntity {
     private LocalDateTime endDate;
 
     @Column(name = "IS_USED", nullable = false)
-    private boolean isUsed;
+    private boolean used;
 
     @Column(name = "USER_ID")
     private Long userId;
@@ -52,7 +51,7 @@ public class Reservation extends BaseEntity {
         this.status = status;
         this.startDate = startDate;
         this.endDate = endDate;
-        this.isUsed = true;
+        this.used = true;
         this.userId = userId;
         this.creator = creator;
         this.updater = updater;
@@ -72,6 +71,6 @@ public class Reservation extends BaseEntity {
     }
 
     public void deleteReservation() {
-        this.isUsed = true;
+        this.used = true;
     }
 }

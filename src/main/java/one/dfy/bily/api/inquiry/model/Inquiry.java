@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 import one.dfy.bily.api.inquiry.constant.InquiryStatus;
 import one.dfy.bily.api.inquiry.dto.InquiryUpdateRequest;
 import one.dfy.bily.api.space.model.Space;
-import one.dfy.bily.api.common.constant.YesNo;
 import one.dfy.bily.api.common.model.BaseEntity;
 
 @Getter
@@ -60,7 +59,7 @@ public class Inquiry extends BaseEntity {
     private String hostCompany;
 
     @Column(name = "IS_USED", nullable = false)
-    private boolean isUsed;
+    private boolean used;
 
     @Column(name = "USER_ID")
     private Long userId;
@@ -94,7 +93,7 @@ public class Inquiry extends BaseEntity {
         this.author = author;
         this.space = space;
         this.hostCompany = hostCompany;
-        this.isUsed = true;
+        this.used = true;
         this.userId = userId;
     }
 
@@ -112,7 +111,7 @@ public class Inquiry extends BaseEntity {
     }
 
     public void deleteInquiry() {
-        isUsed = false;
+        used = false;
     }
 
     public void updateStatus(InquiryStatus status) {

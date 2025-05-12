@@ -13,7 +13,7 @@ import one.dfy.bily.api.common.dto.*;
 import one.dfy.bily.api.common.service.FileService;
 import one.dfy.bily.api.security.CustomUserDetails;
 import one.dfy.bily.api.space.service.SpaceService;
-import one.dfy.bily.api.common.service.UserService;
+import one.dfy.bily.api.user.service.UserService;
 import one.dfy.bily.api.space.dto.*;
 import one.dfy.bily.api.util.S3Util;
 import org.springframework.beans.factory.annotation.Autowired;

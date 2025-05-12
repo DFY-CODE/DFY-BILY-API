@@ -3,10 +3,6 @@ package one.dfy.bily.api.inquiry.mapper;
 import one.dfy.bily.api.common.dto.Pagination;
 import one.dfy.bily.api.common.mapper.PaginationMapper;
 import one.dfy.bily.api.inquiry.constant.InquirySearchType;
-import one.dfy.bily.api.user.dto.ReservationActivity;
-import one.dfy.bily.api.user.dto.UserActivity;
-import one.dfy.bily.api.reservation.dto.ReservationPreferredDateInfo;
-import one.dfy.bily.api.space.dto.SpaceId;
 import one.dfy.bily.api.inquiry.model.Inquiry;
 import one.dfy.bily.api.inquiry.model.InquiryFile;
 import one.dfy.bily.api.inquiry.model.PreferredDate;
@@ -15,10 +11,6 @@ import one.dfy.bily.api.inquiry.dto.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.math.BigDecimal;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -104,8 +96,7 @@ public class InquiryMapper {
                 inquiry.getAuthor(),
                 inquiry.getSpace().getContentId(),
                 inquiry.getHostCompany(),
-                inquiry.getSpace().getSpaceId(),
-                new SpaceId(inquiry.getSpace().getSpaceId())
+                inquiry.getSpace().getSpaceId()
         );
     }
 

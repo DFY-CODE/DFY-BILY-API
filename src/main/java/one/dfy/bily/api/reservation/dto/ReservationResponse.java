@@ -1,7 +1,5 @@
 package one.dfy.bily.api.reservation.dto;
 
-import one.dfy.bily.api.space.dto.SpaceId;
-
 public record ReservationResponse (
         Long id,
         Long inquiryId,
@@ -11,8 +9,7 @@ public record ReservationResponse (
         String eventCategory,
         String contactPerson,
         String position,
-        ReservationInfo reservations,
-        SpaceId spaces
-
+        ReservationInfo reservation,
+        String spaceIdName
 ){
 }
