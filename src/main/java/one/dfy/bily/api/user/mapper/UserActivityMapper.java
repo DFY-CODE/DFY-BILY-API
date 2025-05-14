@@ -1,13 +1,16 @@
 package one.dfy.bily.api.user.mapper;
 
+import one.dfy.bily.api.auth.dto.SignUpRequest;
 import one.dfy.bily.api.inquiry.dto.InquiryPreferredDateInfo;
 import one.dfy.bily.api.reservation.dto.ReservationPreferredDateInfo;
 import one.dfy.bily.api.space.model.SavedSpace;
 import one.dfy.bily.api.space.model.Space;
+import one.dfy.bily.api.user.constant.Role;
 import one.dfy.bily.api.user.dto.InquiryActivity;
 import one.dfy.bily.api.user.dto.ReservationActivity;
 import one.dfy.bily.api.user.dto.SavedSpaceInfo;
 import one.dfy.bily.api.user.dto.UserActivity;
+import one.dfy.bily.api.user.model.User;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;

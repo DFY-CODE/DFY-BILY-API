@@ -30,7 +30,6 @@ spring:
       active: dev
 
   autoconfigure:
-    exclude: org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
     application:
       name: one-dfy-bily-api
     h2:
@@ -123,6 +122,7 @@ s3:
   path:
     inquiry: images/inquiry/
     space: images/space/
+    business_card: images/business_card/
 
 cors:
   allowed-origins: "http://localhost:3000,https://bily.pages.dev,http://localhost:8081"

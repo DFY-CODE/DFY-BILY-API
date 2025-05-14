@@ -19,7 +19,7 @@ public class MemoMapper {
         return new MemoInfo(
                 memo.getId(),
                 memo.getContent(),
-                memo.getUser().getUserName(),
+                memo.getUser().getName(),
                 memo.getCreatedAt()
         );
     }

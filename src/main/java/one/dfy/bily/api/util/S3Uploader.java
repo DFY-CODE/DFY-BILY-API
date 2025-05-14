@@ -4,13 +4,12 @@ import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import one.dfy.bily.api.inquiry.dto.InquiryFileDetail;
+import one.dfy.bily.api.common.dto.FileUploadInfo;
 import one.dfy.bily.api.space.dto.SpaceBulePrintFileDto;
 import one.dfy.bily.api.space.dto.SpaceFileDto;
 import one.dfy.bily.api.space.dto.SpaceUseFileDto;
 import one.dfy.bily.api.common.dto.*;
 import one.dfy.bily.api.common.service.FileService;
-import one.dfy.bily.api.user.service.UserService;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -25,11 +24,10 @@ import java.util.*;
 @Slf4j
 @RequiredArgsConstructor
 @Component
-public class S3Util {
+public class S3Uploader {
 
     private final AmazonS3Client amazonS3Client;
     private final FileService fileService;
-    private final UserService userService;
     private static final ThreadLocal<String> usernameThreadLocal = new ThreadLocal<>();
 
     @Value("${cloud.aws.s3.bucket}")
@@ -44,15 +42,22 @@ public class S3Util {
     @Value("${s3.path.space}")
     private String spacePath;
 
-    public InquiryFileDetail inquiryFileUpload(MultipartFile file) {
+    @Value("${s3.path.business_card}")
+    private String businessCardPath;
+
+    public FileUploadInfo inquiryFileUpload(MultipartFile file) {
         return uploadFileToS3(file, inquiryPath);
     }
 
-    public InquiryFileDetail spaceFileUpload(MultipartFile file) {
+    public FileUploadInfo businessCardUpload(MultipartFile file) {
+        return uploadFileToS3(file, businessCardPath);
+    }
+
+    public FileUploadInfo spaceFileUpload(MultipartFile file) {
         return uploadFileToS3(file, spacePath);
     }
 
-    public InquiryFileDetail uploadFileToS3(MultipartFile file, String path) {
+    public FileUploadInfo uploadFileToS3(MultipartFile file, String path) {
         String extension = "." + FilenameUtils.getExtension(file.getOriginalFilename());
         String newFileName = UUID.randomUUID() + extension;
         String saveLocation = path + newFileName;
@@ -66,7 +71,7 @@ public class S3Util {
             throw new RuntimeException("파일 업로드 실패", e);
         }
 
-        return new InquiryFileDetail(
+        return new FileUploadInfo(
                 file.getOriginalFilename(),
                 newFileName,
                 extension,

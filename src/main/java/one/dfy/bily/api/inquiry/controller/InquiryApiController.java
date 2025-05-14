@@ -16,6 +16,7 @@ import one.dfy.bily.api.inquiry.facade.InquiryFacade;
 import one.dfy.bily.api.inquiry.service.InquiryService;
 import one.dfy.bily.api.security.CustomUserDetails;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,6 +34,7 @@ public class InquiryApiController {
     private final InquiryFacade inquiryFacade;
 
     @GetMapping()
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "문의 리스트 조회", description = "검색 타입과 키워드를 통해 문의 리스트를 반환합니다.")
     @ApiResponse(
             responseCode = "200",
@@ -77,6 +79,7 @@ public class InquiryApiController {
     }
 
     @GetMapping("/{inquiry-id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @Operation(summary = "문의 상세 조회", description = "문의 아이디로 상세 데이터를 반환합니다.")
     @ApiResponse(
             responseCode = "200",
@@ -90,11 +93,13 @@ public class InquiryApiController {
                     )
             )
     )
-    public ResponseEntity<InquiryResponse> findInquiryByInquiryId(@PathVariable(name = "inquiry-id") Long inquiryId) {
-        return ResponseEntity.ok(inquiryService.findInquiryByInquiryId(inquiryId));
+    public ResponseEntity<InquiryResponse> findInquiryByInquiryId(@PathVariable(name = "inquiry-id") Long inquiryId, @AuthenticationPrincipal CustomUserDetails userDetails) {
+        Long userId = userDetails.getUserId();
+        return ResponseEntity.ok(inquiryService.findInquiryByInquiryIdAndUserId(inquiryId, userId));
     }
 
     @PostMapping(consumes = "multipart/form-data")
+    @PreAuthorize("hasRole('USER')")
     @Operation(summary = "문의 생성", description = "문의 생성 후 데이터를 반환합니다.")
     @ApiResponse(
             responseCode = "200",
@@ -114,6 +119,7 @@ public class InquiryApiController {
     }
 
     @PatchMapping("/{inquiry-id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @Operation(summary = "문의 수정", description = "문의 내용을 수정합니다.")
     @ApiResponse(
             responseCode = "200",
