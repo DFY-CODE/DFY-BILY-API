@@ -144,7 +144,7 @@ public interface SpaceMapper {
     @Insert("INSERT INTO TBL_SPACE_USE_FILE_INFO (CONTENT_ID, FILE_NAME, SAVE_FILE_NAME, SAVE_LOCATION, SAVE_SIZE, CREATOR, CREATE_DATE, FILE_TYPE, FILE_ORDER, IS_REPRESENTATIVE) VALUES (#{contentId}, #{fileName}, #{fileName}, #{saveLocation}, #{fileSize}, #{creator}, NOW(), #{fileType}, #{fileOrder}, #{isRepresentative})")
     void insertSpaceUseFile(SpaceUseFileDto spaceUseFileInfoDto);
 
-    @Update("UPDATE TBL_SPACE_USE_FILE_INFO SET FILE_NAME = #{fileName}, SAVE_FILE_NAME = #{saveFileName}, SAVE_LOCATION = #{saveLocation}, SAVE_SIZE = #{fileSize}, UPDATER = #{updater}, UPDATE_DATE = NOW(), FILE_TYPE = #{fileType}, FILE_ORDER = #{fileOrder}, IS_REPRESENTATIVE = #{isRepresentative} WHERE ATTACH_FILE_ID = #{attachFileId}")
+    @Update("UPDATE TBL_SPACE_USE_FILE_INFO SET FILE_NAME = #{fileName}, SAVE_FILE_NAME = #{saveFileName}, SAVE_LOCATION = #{saveLocation}, SAVE_SIZE = #{fileSize}, UPDATER = #{updater}, UPDATE_DATE = NOW(), FILE_TYPE = #{fileType}, FILE_ORDER = #{fileOrder}, IS_REPRESENTATIVE = #{isRepresentative}, FILE_TITLE = #{title} WHERE ATTACH_FILE_ID = #{attachFileId}")
     void updateSpaceUseFile(SpaceUseFileDto spaceUseFileInfoDto);
 
     @Update("UPDATE TBL_SPACE_FILE_INFO " +
