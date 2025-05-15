@@ -74,7 +74,7 @@ public class ReservationService {
     }
 
     @Transactional
-    public ReservationPaymentInfo createReservationPayment(ReservationPaymentInfo request, Inquiry inquiry, Long adminId) {
+    public ReservationPaymentInfo createReservationPayment(CreateReservation request, Inquiry inquiry, Long adminId) {
         Reservation reservation = ReservationMapper.toReservationEntity(request, inquiry, adminId);
         reservation = reservationRepository.save(reservation);
 

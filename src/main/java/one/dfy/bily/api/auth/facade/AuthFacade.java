@@ -12,6 +12,7 @@ import one.dfy.bily.api.user.constant.LoginStatus;
 import one.dfy.bily.api.user.model.User;
 import one.dfy.bily.api.user.service.UserService;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Facade
 @RequiredArgsConstructor
@@ -28,10 +29,10 @@ public class AuthFacade {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public TokenResponse signUp(SignUpRequest signUpRequest, String clientIp) {
+    public TokenResponse signUp(SignUpRequest signUpRequest, MultipartFile businessCard, String clientIp) {
         User user = userService.createUser(signUpRequest);
 
-        authService.createBusinessCard(signUpRequest.businessCard(), user.getId());
+        authService.createBusinessCard(businessCard, user.getId());
 
         termsService.createUserTermAgreement(signUpRequest.termsCodeList(), user.getId());
 

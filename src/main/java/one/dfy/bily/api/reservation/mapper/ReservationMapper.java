@@ -30,6 +30,19 @@ public class ReservationMapper {
         );
     }
 
+    public static Reservation toReservationEntity(CreateReservation dto, Inquiry inquiry, Long adminId) {
+
+        return new Reservation(
+                inquiry,
+                dto.status(),
+                dto.fixedDate().from(),
+                dto.fixedDate().to(),
+                inquiry.getUserId(),
+                adminId,
+                adminId
+        );
+    }
+
     public static List<Payment> toPaymentEntities(ReservationPaymentInfo dto, Reservation reservation) {
         List<Payment> payments = new ArrayList<>();
 
@@ -41,7 +54,28 @@ public class ReservationMapper {
         return payments;
     }
 
+    public static List<Payment> toPaymentEntities(CreateReservation dto, Reservation reservation) {
+        List<Payment> payments = new ArrayList<>();
+
+        payments.add(toPayment(dto.deposit(), PaymentType.DEPOSIT, reservation));
+        payments.add(toPayment(dto.interimPayment1(), PaymentType.INTERIM_PAYMENT1, reservation));
+        payments.add(toPayment(dto.interimPayment2(), PaymentType.INTERIM_PAYMENT2, reservation));
+        payments.add(toPayment(dto.finalPayment(), PaymentType.FINAL_PAYMENT, reservation));
+
+        return payments;
+    }
+
     private static Payment toPayment(PaymentRequest request, PaymentType type, Reservation reservation) {
+
+        return new Payment(
+                reservation,
+                type,
+                request.payment(),
+                request.date()
+        );
+    }
+
+    private static Payment toPayment(CreatePaymentRequest request, PaymentType type, Reservation reservation) {
 
         return new Payment(
                 reservation,

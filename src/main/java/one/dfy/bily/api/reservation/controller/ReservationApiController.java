@@ -125,9 +125,9 @@ public class ReservationApiController {
                     )
             )
     )
-    public ResponseEntity<ReservationPaymentInfo> createReservationPayment(@RequestBody ReservationPaymentInfo reservationPaymentInfo, @AuthenticationPrincipal CustomUserDetails userDetails) {
+    public ResponseEntity<ReservationPaymentInfo> createReservationPayment(@RequestBody CreateReservation createReservation, @AuthenticationPrincipal CustomUserDetails userDetails) {
         Long adminId = userDetails.getUserId();
-        return ResponseEntity.ok(reservationFacade.createReservationPayment(reservationPaymentInfo, adminId));
+        return ResponseEntity.ok(reservationFacade.createReservationPayment(createReservation, adminId));
     }
 
     @PatchMapping("/{reservation-id}")
