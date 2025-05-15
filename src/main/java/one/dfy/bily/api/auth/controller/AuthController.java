@@ -15,6 +15,7 @@ import one.dfy.bily.api.auth.service.AuthService;
 import one.dfy.bily.api.util.IpUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
 @RestController
@@ -65,9 +66,12 @@ public class AuthController {
                     )
             )
     )
-    public ResponseEntity<TokenResponse> signUp(@RequestBody SignUpRequest request, HttpServletRequest httpRequest) {
+    public ResponseEntity<TokenResponse> signUp(
+            @RequestPart("data") SignUpRequest request,
+            @RequestPart("businessCard") MultipartFile businessCard,
+            HttpServletRequest httpRequest) {
         String clientIp = IpUtils.getClientIp(httpRequest);
-        return ResponseEntity.ok(authFacade.signUp(request, clientIp));
+        return ResponseEntity.ok(authFacade.signUp(request, businessCard, clientIp));
     }
 
     @PostMapping(value = "/sign-in")

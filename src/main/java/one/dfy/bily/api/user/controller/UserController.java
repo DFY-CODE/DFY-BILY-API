@@ -150,11 +150,9 @@ public class UserController {
             )
     )
     public ResponseEntity<MaskingUserEmail> updatePhoneNumber(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
             @Parameter(description = "이름", required = false) @RequestParam(required = false) String name,
             @Parameter(description = "휴대폰 번호", required = false) @RequestParam(required = false) String phoneNumber
     ) {
-        Long userId = userDetails.getUserId();
         return ResponseEntity.ok(userService.findMaskingUserEmail(name, phoneNumber));
     }
 }
