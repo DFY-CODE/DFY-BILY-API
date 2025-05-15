@@ -95,7 +95,9 @@ public class InquiryApiController {
     )
     public ResponseEntity<InquiryResponse> findInquiryByInquiryId(@PathVariable(name = "inquiry-id") Long inquiryId, @AuthenticationPrincipal CustomUserDetails userDetails) {
         Long userId = userDetails.getUserId();
-        return ResponseEntity.ok(inquiryService.findInquiryByInquiryIdAndUserId(inquiryId, userId));
+        boolean isAdmin = userDetails.getAuthorities().stream()
+                .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
+        return ResponseEntity.ok(inquiryService.findInquiryByInquiryIdAndUserId(inquiryId, userId, isAdmin));
     }
 
     @PostMapping(consumes = "multipart/form-data")

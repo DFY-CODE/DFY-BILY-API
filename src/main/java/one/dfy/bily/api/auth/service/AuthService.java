@@ -82,7 +82,6 @@ public class AuthService {
         emailVerificationEntity.updateVerified(true);
     }
 
-    @Transactional
     public void createBusinessCard(MultipartFile file, Long userId) {
         FileUploadInfo fileUploadInfo = s3Uploader.businessCardUpload(file);
         businessCardRepository.save(AuthMapper.toBusinessCard(fileUploadInfo, userId));

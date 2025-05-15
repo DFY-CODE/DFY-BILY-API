@@ -6,11 +6,13 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import one.dfy.bily.api.auth.dto.*;
 import one.dfy.bily.api.auth.facade.AuthFacade;
 import one.dfy.bily.api.auth.service.AuthService;
+import one.dfy.bily.api.util.IpUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -64,8 +66,9 @@ public class AuthController {
                     )
             )
     )
-    public ResponseEntity<TokenResponse> signUp(@RequestBody SignUpRequest request) {
-        return ResponseEntity.ok(authFacade.signUp(request));
+    public ResponseEntity<TokenResponse> signUp(@RequestBody SignUpRequest request, HttpServletRequest httpRequest) {
+        String clientIp = IpUtils.getClientIp(httpRequest);
+        return ResponseEntity.ok(authFacade.signUp(request, clientIp));
     }
 
     @PostMapping(value = "/sign-in")
@@ -82,8 +85,9 @@ public class AuthController {
                     )
             )
     )
-    public ResponseEntity<TokenResponse> signIn(@RequestBody SignInRequest request) {
-        return ResponseEntity.ok(authFacade.signIn(request));
+    public ResponseEntity<TokenResponse> signIn(@RequestBody SignInRequest request, HttpServletRequest httpRequest) {
+        String clientIp = IpUtils.getClientIp(httpRequest);
+        return ResponseEntity.ok(authFacade.signIn(request, clientIp));
     }
 
 

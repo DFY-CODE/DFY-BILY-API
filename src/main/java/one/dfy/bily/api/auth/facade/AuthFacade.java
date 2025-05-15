@@ -8,8 +8,10 @@ import one.dfy.bily.api.auth.dto.TokenResponse;
 import one.dfy.bily.api.auth.service.AuthService;
 import one.dfy.bily.api.common.annotation.Facade;
 import one.dfy.bily.api.terms.service.TermsService;
+import one.dfy.bily.api.user.constant.LoginStatus;
 import one.dfy.bily.api.user.model.User;
 import one.dfy.bily.api.user.service.UserService;
+import org.springframework.transaction.annotation.Transactional;
 
 @Facade
 @RequiredArgsConstructor
@@ -25,18 +27,21 @@ public class AuthFacade {
         return new AuthCommonResponse(true, "인증에 성공했습니다.");
     }
 
-    public TokenResponse signUp(SignUpRequest signUpRequest) {
+    @Transactional(rollbackFor = Exception.class)
+    public TokenResponse signUp(SignUpRequest signUpRequest, String clientIp) {
         User user = userService.createUser(signUpRequest);
 
         authService.createBusinessCard(signUpRequest.businessCard(), user.getId());
 
         termsService.createUserTermAgreement(signUpRequest.termsCodeList(), user.getId());
 
+        userService.createLoginHistory(user.getId(), clientIp, LoginStatus.SUCCESS);
+
         return authService.createRefreshToken(user);
     }
 
-    public TokenResponse signIn(SignInRequest request) {
-        User user = userService.findByEmail(request.email(), request.password());
+    public TokenResponse signIn(SignInRequest request, String clientIp) {
+        User user = userService.findByEmail(request.email(), request.password(), clientIp);
 
         return authService.createRefreshToken(user);
     }

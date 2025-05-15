@@ -2,6 +2,7 @@ package one.dfy.bily.api.user.mapper;
 
 import one.dfy.bily.api.auth.dto.SignUpRequest;
 import one.dfy.bily.api.user.constant.Role;
+import one.dfy.bily.api.user.dto.Profile;
 import one.dfy.bily.api.user.model.User;
 
 public class UserMapper {
@@ -13,6 +14,13 @@ public class UserMapper {
                 request.phoneNumber(),
                 Role.USER
         );
+    }
 
+    public static Profile toUserInfo(User user) {
+        return new Profile(
+                user.getName(),
+                user.getEmail(),
+                user.getPhoneNumber()
+        );
     }
 }

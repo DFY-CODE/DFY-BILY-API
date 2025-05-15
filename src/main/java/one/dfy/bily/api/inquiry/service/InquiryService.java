@@ -56,7 +56,18 @@ public class InquiryService {
     }
 
     @Transactional(readOnly = true)
-    public InquiryResponse findInquiryByInquiryIdAndUserId(Long inquiryId, Long userId) {
+    public InquiryResponse findInquiryByInquiryIdAndUserId(Long inquiryId, Long userId, boolean isAdmin) {
+
+        if(isAdmin){
+            return inquiryRepository.findById(inquiryId)
+                    .map(inquiry -> {
+                        List<InquiryFile> files = inquiryFileRepository.findByInquiry(inquiry);
+                        List<PreferredDate> preferredDates = preferredDateRepository.findByInquiry(inquiry);
+
+                        return InquiryMapper.toInquiryResponse(inquiry, files, preferredDates);
+                    })
+                    .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 문의 정보입니다."));
+        }
 
         return inquiryRepository.findByIdAndUserId(inquiryId, userId)
                 .map(inquiry -> {
