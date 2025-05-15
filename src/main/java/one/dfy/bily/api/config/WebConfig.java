@@ -22,7 +22,7 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowedOrigins(domains.toArray(new String[0]))
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH")
                 .allowCredentials(true) // 중요: 인증 정보 포함
-                .allowedHeaders("Authorization", "Content-Type");
+                .allowedHeaders("*");
     }
 
     @Override
