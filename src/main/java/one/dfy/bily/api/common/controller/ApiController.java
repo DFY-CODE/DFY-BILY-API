@@ -8,8 +8,7 @@ import one.dfy.bily.api.common.dto.FileUploadResponse;
 import one.dfy.bily.api.common.dto.User;
 import one.dfy.bily.api.common.service.FileService;
 import one.dfy.bily.api.space.service.SpaceService;
-import one.dfy.bily.api.user.service.UserService;
-import one.dfy.bily.api.util.S3Util;
+import one.dfy.bily.api.util.S3Uploader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,11 +24,9 @@ import java.util.*;
 public class ApiController {
 
     @Autowired
-    private S3Util s3Util;
+    private S3Uploader s3Uploader;
     @Autowired
     private FileService fileService;
-    @Autowired
-    private UserService userService;
     @Autowired
     private SpaceService spaceService;
 
@@ -66,7 +63,7 @@ public class ApiController {
                 String fileName = file.getOriginalFilename();
                 long fileSize = file.getSize();
 
-                s3Util.upload(contentId, fileSize, fileName, file, title);
+                s3Uploader.upload(contentId, fileSize, fileName, file, title);
             }
 
             return ResponseEntity.ok(Map.of("message", "업로드 성공"));
@@ -95,20 +92,20 @@ public class ApiController {
         String dirName = "business-card";  // 명함 이미지 저장 디렉토리
         long fileSize = multipartFile.getSize();
 
-        FileUploadResponse response = s3Util.uploadBusinessCard(userId, fileSize, fileName, multipartFile, dirName);
+        FileUploadResponse response = s3Uploader.uploadBusinessCard(userId, fileSize, fileName, multipartFile, dirName);
 
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/profile")
-    public ResponseEntity<User> getProfile(@RequestParam("userId") Long userId) {
-        if (userId == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-
-        Optional<User> user = userService.getUserById(userId);
-        return user.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
-    }
+//    @GetMapping("/profile")
+//    public ResponseEntity<User> getProfile(@RequestParam("userId") Long userId) {
+//        if (userId == null) {
+//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+//        }
+//
+//        Optional<User> user = userServiceTrash.getUserById(userId);
+//        return user.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+//    }
 
 
 /*    @PutMapping("/profile")

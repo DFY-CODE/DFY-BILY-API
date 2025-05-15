@@ -122,7 +122,7 @@ public class ReservationCustomRepositoryImpl implements ReservationCustomReposit
                 .where(reservation.userId.eq(userId), reservation.used.eq(true))
                 .fetchOne();
 
-        return new PageImpl<>(contents, pageable, total);
+        return new PageImpl<>(contents, pageable, total != null ? total : 0L);
     }
 
 }

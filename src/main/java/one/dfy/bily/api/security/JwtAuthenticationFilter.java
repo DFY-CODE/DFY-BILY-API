@@ -8,8 +8,10 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import one.dfy.bily.api.user.constant.Role;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
@@ -19,6 +21,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Collections;
+import java.util.List;
 
 @Slf4j
 @Component
@@ -50,11 +53,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 Long userId = claims.get("userId", Long.class);
                 log.info("Extracted userId: {}", userId);
+                String roleName = claims.get("role", String.class);
 
-                if (userId != null) {
+                if (userId != null && roleName != null) {
+                    List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(roleName));
+
                     CustomUserDetails userDetails = new CustomUserDetails(userId); // 사용자 정의 객체
                     UsernamePasswordAuthenticationToken authToken =
-                            new UsernamePasswordAuthenticationToken(userDetails, null, Collections.emptyList());
+                            new UsernamePasswordAuthenticationToken(userDetails, null, authorities);
+
 
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authToken);

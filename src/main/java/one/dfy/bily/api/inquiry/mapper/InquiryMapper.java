@@ -1,5 +1,6 @@
 package one.dfy.bily.api.inquiry.mapper;
 
+import one.dfy.bily.api.common.dto.FileUploadInfo;
 import one.dfy.bily.api.common.dto.Pagination;
 import one.dfy.bily.api.common.mapper.PaginationMapper;
 import one.dfy.bily.api.inquiry.constant.InquirySearchType;
@@ -36,7 +37,7 @@ public class InquiryMapper {
         );
     }
 
-    public static InquiryFile inquiryFileToEntity(InquiryFileDetail file, Inquiry inquiry, Long userId) {
+    public static InquiryFile inquiryFileToEntity(FileUploadInfo file, Inquiry inquiry, Long userId) {
         return new InquiryFile(
                 inquiry,
                 file.originalFileName(),

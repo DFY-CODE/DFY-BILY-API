@@ -13,7 +13,7 @@ import one.dfy.bily.api.common.dto.*;
 import one.dfy.bily.api.space.mapper.SpaceMapper;
 import one.dfy.bily.api.space.dto.*;
 import one.dfy.bily.api.space.model.repository.SavedSpaceRepository;
-import one.dfy.bily.api.util.S3Util;
+import one.dfy.bily.api.util.S3Uploader;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 public class SpaceService {
     private final SpaceMapper spaceMapper;
     private final ObjectMapper objectMapper;
-    private final S3Util s3Util;
+    private final S3Uploader s3Uploader;
     private final SpaceRepository spaceRepository;
     private final SpaceFileInfoRepository spaceFileInfoRepository;
     private final SavedSpaceRepository savedSpaceRepository;
@@ -283,7 +283,7 @@ public class SpaceService {
 
     @Transactional
     public Map<Integer, String> findSpaceFileByContentIds(List<Integer> contentIds) {
-        String s3Url = s3Util.getSpaceS3Url();
+        String s3Url = s3Uploader.getSpaceS3Url();
 
         if (contentIds == null || contentIds.isEmpty()) {
             return Map.of();

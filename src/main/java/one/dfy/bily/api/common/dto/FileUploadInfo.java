@@ -1,6 +1,6 @@
-package one.dfy.bily.api.inquiry.dto;
+package one.dfy.bily.api.common.dto;
 
-public record InquiryFileDetail(
+public record FileUploadInfo(
         String originalFileName,
         String newFileName,
         String extension,

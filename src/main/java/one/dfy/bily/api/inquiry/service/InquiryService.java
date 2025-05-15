@@ -12,7 +12,7 @@ import one.dfy.bily.api.inquiry.model.repository.InquiryRepository;
 import one.dfy.bily.api.user.dto.InquiryActivity;
 import one.dfy.bily.api.space.model.Space;
 import one.dfy.bily.api.inquiry.dto.*;
-import one.dfy.bily.api.util.S3Util;
+import one.dfy.bily.api.util.S3Uploader;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -31,7 +31,7 @@ public class InquiryService {
     private final InquiryRepository inquiryRepository;
     private final InquiryFileRepository inquiryFileRepository;
     private final PreferredDateRepository preferredDateRepository;
-    private final S3Util s3Util;
+    private final S3Uploader s3Uploader;
 
     @Transactional(readOnly = true)
     public InquiryListResponse findInquiryListByKeywordAndDate(
@@ -56,9 +56,20 @@ public class InquiryService {
     }
 
     @Transactional(readOnly = true)
-    public InquiryResponse findInquiryByInquiryId(Long inquiryId){
+    public InquiryResponse findInquiryByInquiryIdAndUserId(Long inquiryId, Long userId, boolean isAdmin) {
 
-        return inquiryRepository.findById(inquiryId)
+        if(isAdmin){
+            return inquiryRepository.findById(inquiryId)
+                    .map(inquiry -> {
+                        List<InquiryFile> files = inquiryFileRepository.findByInquiry(inquiry);
+                        List<PreferredDate> preferredDates = preferredDateRepository.findByInquiry(inquiry);
+
+                        return InquiryMapper.toInquiryResponse(inquiry, files, preferredDates);
+                    })
+                    .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 문의 정보입니다."));
+        }
+
+        return inquiryRepository.findByIdAndUserId(inquiryId, userId)
                 .map(inquiry -> {
                     List<InquiryFile> files = inquiryFileRepository.findByInquiry(inquiry);
                     List<PreferredDate> preferredDates = preferredDateRepository.findByInquiry(inquiry);
@@ -88,7 +99,7 @@ public class InquiryService {
         preferredDateRepository.saveAll(preferredDates);
 
         List<InquiryFile> inquiryFiles = request.fileAttachments().stream()
-                .map(s3Util::inquiryFileUpload)
+                .map(s3Uploader::inquiryFileUpload)
                 .toList()
                 .stream()
                 .map(file -> InquiryMapper.inquiryFileToEntity(file, inquiry, userId))

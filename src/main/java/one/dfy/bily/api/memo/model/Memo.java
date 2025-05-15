@@ -26,7 +26,7 @@ public class Memo extends BaseEntity {
     private String content;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "USER_ID", referencedColumnName = "USER_ID", nullable = false)
+    @JoinColumn(name = "USER_ID", referencedColumnName = "ID", nullable = false)
     private User user;
 
     @Column(name = "INQUIRY_ID")
