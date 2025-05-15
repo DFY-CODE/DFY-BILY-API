@@ -39,8 +39,10 @@ public class AuthService {
 
     @Transactional
     public void sendEmailVerification(SendEmail request) {
+        // 인증 코드 생성
         String verificationCode = generateVerificationCode(6);
 
+        // HTML 본문 생성
         StringBuilder html = new StringBuilder();
         html.append("<html><body>")
                 .append("<h1>BILY SEOUL</h1>")
@@ -56,24 +58,25 @@ public class AuthService {
 
         html.append("</div></body></html>");
 
-        emailService.sendEmail(request.email(), "BILY SEOUL 이메일 인증", html.toString());
+        // 이메일 제목에 인증 코드 추가
+        String emailSubject = String.format("BILY SEOUL 이메일 인증 [%s]", verificationCode);
 
+        // 이메일 전송
+        emailService.sendEmail(request.email(), emailSubject, html.toString());
+
+        // 인증 코드 저장
         emailVerificationRepository.save(new EmailVerification(request.email(), verificationCode));
     }
 
+
     private String generateVerificationCode(int length) {
-        String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789";
-        SecureRandom random = new SecureRandom();
-        StringBuilder sb = new StringBuilder(length);
-
+        StringBuilder code = new StringBuilder();
         for (int i = 0; i < length; i++) {
-            int randomIndex = random.nextInt(characters.length());
-            sb.append(characters.charAt(randomIndex));
+            int digit = (int) (Math.random() * 10); // 0에서 9까지의 랜덤 숫자 생성
+            code.append(digit);
         }
-
-        return sb.toString();
+        return code.toString();
     }
-
 
     @Transactional
     public AuthCommonResponse emailVerification(String email, String code) {
