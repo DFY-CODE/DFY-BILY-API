@@ -1,6 +1,7 @@
 package one.dfy.bily.api.auth.service;
 
 import lombok.RequiredArgsConstructor;
+import one.dfy.bily.api.auth.dto.AuthCommonResponse;
 import one.dfy.bily.api.auth.dto.SendEmail;
 import one.dfy.bily.api.auth.dto.TokenResponse;
 import one.dfy.bily.api.auth.mapper.AuthMapper;
@@ -75,11 +76,13 @@ public class AuthService {
 
 
     @Transactional
-    public void emailVerification(String email, String code) {
+    public AuthCommonResponse emailVerification(String email, String code) {
         EmailVerification emailVerificationEntity = emailVerificationRepository.findByEmailAndCode(email, code)
                 .orElseThrow(() -> new IllegalArgumentException("잘못된 인증 코드입니다."));
 
         emailVerificationEntity.updateVerified(true);
+
+        return new AuthCommonResponse(true, "이메일 전송이 완료되었습니다.");
     }
 
     public void createBusinessCard(MultipartFile file, Long userId) {
@@ -104,6 +107,13 @@ public class AuthService {
         authTokenRepository.save(authToken);
 
         return new TokenResponse(user.getName(), accessToken, refreshToken);
+    }
+
+    @Transactional
+    public void updateEmailUserId(Long userId, String email) {
+        EmailVerification emailVerificationEntity = emailVerificationRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("잘못된 이메일입니다."));
+        emailVerificationEntity.updateUserId(userId);
     }
 
 }

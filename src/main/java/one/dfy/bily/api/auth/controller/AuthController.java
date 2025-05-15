@@ -40,9 +40,8 @@ public class AuthController {
     @Operation(summary = "이메일 인증 코드 확인", description = "인증 코드를 확인합니다.")
     @ApiResponse(responseCode = "200", description = "이메일 인증 성공")
     public ResponseEntity<AuthCommonResponse> emailVerification(@RequestParam String email, @RequestParam String code) {
-        authService.emailVerification(email, code);
 
-        return ResponseEntity.ok(new AuthCommonResponse(true, "이메일 전송이 완료되었습니다."));
+        return ResponseEntity.ok(authService.emailVerification(email, code));
     }
 
     @GetMapping(value = "/phone-number")
@@ -59,7 +58,7 @@ public class AuthController {
             description = "성공",
             content = @Content(
                     mediaType = "application/json",
-                    schema = @Schema(implementation = SignUpRequest.class),
+                    schema = @Schema(implementation = TokenResponse.class),
                     examples = @ExampleObject(
                             name = "성공 응답 예시",
                             externalValue = "/swagger/json/inquiry/findInquiryByInquiryId.json"

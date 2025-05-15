@@ -5,6 +5,7 @@ import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import one.dfy.bily.api.user.constant.UserSearchDateType;
+import one.dfy.bily.api.user.constant.UserStatus;
 import one.dfy.bily.api.user.dto.UserInfo;
 import one.dfy.bily.api.user.model.QUser;
 import one.dfy.bily.api.user.model.QLoginHistory;
@@ -46,7 +47,7 @@ public class UserCustomRepositoryImpl implements UserCustomRepository {
                 .where(
                         email != null ? user.email.eq(email) : null,
                         userSearchDateType == UserSearchDateType.SIGNUP ? user.createdAt.goe(date.atStartOfDay()) : null,
-                        isUsed != null ? user.used.eq(isUsed) : null
+                        isUsed != null ? user.status.eq(UserStatus.ACTIVE) : null
                 )
                 .groupBy(user.id)
                 .having(
@@ -67,7 +68,7 @@ public class UserCustomRepositoryImpl implements UserCustomRepository {
                 .where(
                         email != null ? user.email.eq(email) : null,
                         userSearchDateType == UserSearchDateType.SIGNUP ? user.createdAt.goe(date.atStartOfDay()) : null,
-                        isUsed != null ? user.used.eq(isUsed) : null
+                        isUsed != null ? user.status.eq(UserStatus.ACTIVE) : null
                 )
                 .groupBy(user.id)
                 .having(

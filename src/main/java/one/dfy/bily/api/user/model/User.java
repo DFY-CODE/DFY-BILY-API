@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import one.dfy.bily.api.common.model.BaseEntity;
 import one.dfy.bily.api.user.constant.Role;
+import one.dfy.bily.api.user.constant.UserStatus;
 
 import java.time.LocalDate;
 
@@ -30,8 +31,9 @@ public class User extends BaseEntity {
     @Column(name = "PHONE_NUMBER", length = 20)
     private String phoneNumber;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "IS_USED")
-    private Boolean used = true;
+    private UserStatus status = UserStatus.ACTIVE;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "ROLE")
@@ -43,5 +45,17 @@ public class User extends BaseEntity {
         this.email = email;
         this.phoneNumber = phoneNumber;
         this.role = role;
+    }
+
+    public void updateStatus(UserStatus status) {
+        this.status = status;
+    }
+
+    public void updatePassword(String password) {
+        this.password = password;
+    }
+
+    public void updatePhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 }

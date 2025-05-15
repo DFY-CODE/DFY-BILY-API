@@ -10,7 +10,7 @@ import java.util.List;
 public record ReservationDetailResponse(
         Long id,
         Long inquiryId,
-        String contact_person,
+        String contactPerson,
         String phoneNumber,
         String email,
         String companyName,

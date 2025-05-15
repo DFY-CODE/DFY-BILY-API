@@ -36,4 +36,8 @@ public class EmailVerification extends BaseEntity {
     public void updateVerified(boolean isVerified){
         this.verified = isVerified;
     }
+
+    public void updateUserId(Long userId){
+        this.userId = userId;
+    }
 }

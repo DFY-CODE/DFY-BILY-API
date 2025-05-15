@@ -11,16 +11,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import one.dfy.bily.api.security.CustomUserDetails;
 import one.dfy.bily.api.user.constant.UserSearchDateType;
-import one.dfy.bily.api.user.dto.UserActivityList;
-import one.dfy.bily.api.user.dto.Profile;
-import one.dfy.bily.api.user.dto.UserInfoList;
+import one.dfy.bily.api.user.dto.*;
 import one.dfy.bily.api.user.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 
@@ -33,7 +28,7 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/profile")
-    @Operation(summary = "사용자 프로필 조회", description = "사용자 프로필정보를 반환합니다.")
+    @Operation(summary = "회원 프로필 조회", description = "회원 프로필정보를 반환합니다.")
     @ApiResponse(
             responseCode = "200",
             description = "성공",
@@ -74,5 +69,92 @@ public class UserController {
             @RequestParam(value = "page_size", defaultValue = "20") int pageSize
     ) {
         return ResponseEntity.ok(userService.findUserInfoList(email, userSearchDateType, recentLoginDate, page, pageSize));
+    }
+
+    @PatchMapping("")
+    @Operation(summary = "회원 삭제", description = "사용자 정보 리스트를 반환합니다.")
+    @ApiResponse(
+            responseCode = "200",
+            description = "성공",
+            content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = UserInfoList.class),
+                    examples = @ExampleObject(
+                            name = "성공 응답 예시",
+                            externalValue = "/swagger/json/user/activity/findReservation.json"
+                    )
+            )
+    )
+    public ResponseEntity<UserCommonResponse> deleteUser(@AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        Long userId = userDetails.getUserId();
+        return ResponseEntity.ok(userService.deleteUserById(userId));
+    }
+
+    @PatchMapping("/password")
+    @Operation(summary = "회원 비밀번호 수정", description = "회원 비밀번호를 수정합니다.")
+    @ApiResponse(
+            responseCode = "200",
+            description = "성공",
+            content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = UserInfoList.class),
+                    examples = @ExampleObject(
+                            name = "성공 응답 예시",
+                            externalValue = "/swagger/json/user/activity/findReservation.json"
+                    )
+            )
+    )
+    public ResponseEntity<UserCommonResponse> updateUserPassword(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @Parameter(description = "휴대폰 번호", required = false) @RequestParam(required = false) String password
+    ) {
+        Long userId = userDetails.getUserId();
+        return ResponseEntity.ok(userService.updateUserPassword(userId, password));
+    }
+
+    @PatchMapping("/phone-number")
+    @Operation(summary = "회원 휴대폰 번호 수정", description = "회원 휴대폰 번호를 수정합니다.")
+    @ApiResponse(
+            responseCode = "200",
+            description = "성공",
+            content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = UserInfoList.class),
+                    examples = @ExampleObject(
+                            name = "성공 응답 예시",
+                            externalValue = "/swagger/json/user/activity/findReservation.json"
+                    )
+            )
+    )
+    public ResponseEntity<UserCommonResponse> updatePhoneNumber(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @Parameter(description = "휴대폰 번호", required = false) @RequestParam(required = false) String phoneNumber
+    ) {
+        Long userId = userDetails.getUserId();
+        return ResponseEntity.ok(userService.updatePhoneNumber(userId, phoneNumber));
+    }
+
+    @PostMapping("/id")
+    @Operation(summary = "아이디 찾기", description = "마스킹된 회원 이메일 정보를 반환합니다.")
+    @ApiResponse(
+            responseCode = "200",
+            description = "성공",
+            content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = UserInfoList.class),
+                    examples = @ExampleObject(
+                            name = "성공 응답 예시",
+                            externalValue = "/swagger/json/user/activity/findReservation.json"
+                    )
+            )
+    )
+    public ResponseEntity<MaskingUserEmail> updatePhoneNumber(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @Parameter(description = "이름", required = false) @RequestParam(required = false) String name,
+            @Parameter(description = "휴대폰 번호", required = false) @RequestParam(required = false) String phoneNumber
+    ) {
+        Long userId = userDetails.getUserId();
+        return ResponseEntity.ok(userService.findMaskingUserEmail(name, phoneNumber));
     }
 }

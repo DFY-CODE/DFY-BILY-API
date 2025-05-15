@@ -36,12 +36,13 @@ public class AuthFacade {
         termsService.createUserTermAgreement(signUpRequest.termsCodeList(), user.getId());
 
         userService.createLoginHistory(user.getId(), clientIp, LoginStatus.SUCCESS);
+        authService.updateEmailUserId(user.getId(), signUpRequest.email());
 
         return authService.createRefreshToken(user);
     }
 
     public TokenResponse signIn(SignInRequest request, String clientIp) {
-        User user = userService.findByEmail(request.email(), request.password(), clientIp);
+        User user = userService.signIn(request.email(), request.password(), clientIp);
 
         return authService.createRefreshToken(user);
     }
