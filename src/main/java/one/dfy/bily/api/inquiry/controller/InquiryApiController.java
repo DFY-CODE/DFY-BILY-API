@@ -34,7 +34,7 @@ public class InquiryApiController {
     private final InquiryFacade inquiryFacade;
 
     @GetMapping()
-    @PreAuthorize("hasRole('ADMIN')")
+//    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "문의 리스트 조회", description = "검색 타입과 키워드를 통해 문의 리스트를 반환합니다.")
     @ApiResponse(
             responseCode = "200",
@@ -79,7 +79,7 @@ public class InquiryApiController {
     }
 
     @GetMapping("/{inquiry-id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+//    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @Operation(summary = "문의 상세 조회", description = "문의 아이디로 상세 데이터를 반환합니다.")
     @ApiResponse(
             responseCode = "200",
@@ -101,7 +101,7 @@ public class InquiryApiController {
     }
 
     @PostMapping(consumes = "multipart/form-data")
-    @PreAuthorize("hasRole('USER')")
+//    @PreAuthorize("hasRole('USER')")
     @Operation(summary = "문의 생성", description = "문의 생성 후 데이터를 반환합니다.")
     @ApiResponse(
             responseCode = "200",
@@ -121,7 +121,7 @@ public class InquiryApiController {
     }
 
     @PatchMapping("/{inquiry-id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+//    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @Operation(summary = "문의 수정", description = "문의 내용을 수정합니다.")
     @ApiResponse(
             responseCode = "200",

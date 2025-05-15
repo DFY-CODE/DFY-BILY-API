@@ -3,6 +3,7 @@ package one.dfy.bily.api.reservation.facade;
 import lombok.RequiredArgsConstructor;
 import one.dfy.bily.api.inquiry.dto.InquiryFileName;
 import one.dfy.bily.api.inquiry.dto.InquiryPreferredDateInfo;
+import one.dfy.bily.api.reservation.dto.CreateReservation;
 import one.dfy.bily.api.reservation.dto.ReservationDetailResponse;
 import one.dfy.bily.api.reservation.dto.ReservationPaymentInfo;
 import one.dfy.bily.api.inquiry.model.Inquiry;
@@ -27,7 +28,7 @@ public class ReservationFacade {
         return reservationService.reservationMappingToReservationDetailResponse(reservation, inquiryFileNameList, preferredDateInfos);
     }
 
-    public ReservationPaymentInfo createReservationPayment(ReservationPaymentInfo request, Long adminId) {
+    public ReservationPaymentInfo createReservationPayment(CreateReservation request, Long adminId) {
         Inquiry inquiry = inquiryService.findInquiryById(request.inquiryId());
 
         return reservationService.createReservationPayment(request, inquiry, adminId);
