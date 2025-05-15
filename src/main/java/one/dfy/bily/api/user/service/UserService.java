@@ -6,14 +6,14 @@ import one.dfy.bily.api.common.dto.Pagination;
 import one.dfy.bily.api.common.mapper.PaginationMapper;
 import one.dfy.bily.api.user.constant.LoginStatus;
 import one.dfy.bily.api.user.constant.UserSearchDateType;
-import one.dfy.bily.api.user.dto.Profile;
-import one.dfy.bily.api.user.dto.UserInfo;
-import one.dfy.bily.api.user.dto.UserInfoList;
+import one.dfy.bily.api.user.constant.UserStatus;
+import one.dfy.bily.api.user.dto.*;
 import one.dfy.bily.api.user.mapper.UserMapper;
 import one.dfy.bily.api.user.model.LoginHistory;
 import one.dfy.bily.api.user.model.User;
 import one.dfy.bily.api.user.model.repository.LoginHistoryRepository;
 import one.dfy.bily.api.user.model.repository.UserRepository;
+import one.dfy.bily.api.util.EmailMaskingUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -49,8 +49,8 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public User findByEmail(String email, String password, String clientIp) {
-         User userEntity = userRepository.findByEmail(email)
+    public User signIn(String email, String password, String clientIp) {
+         User userEntity = userRepository.findByEmailAndStatus(email, UserStatus.ACTIVE)
                  .orElseThrow(() -> new IllegalArgumentException("올바르지 않은 회원 정보입니다."));
         LoginHistory loginHistory = createLoginHistory(userEntity.getId(), clientIp, LoginStatus.FAIL);
 
@@ -65,8 +65,7 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public Profile findProfileById(Long id){
-        User userEntity = userRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("올바르지 않은 회원 정보입니다."));
+        User userEntity = findUserById(id);
 
         return UserMapper.toUserInfo(userEntity);
     }
@@ -89,6 +88,40 @@ public class UserService {
 
         Pagination pagination = PaginationMapper.toPagination(pageable, userInfoPage.getTotalElements(), userInfoPage.getTotalPages());
         return new UserInfoList(userInfoPage.getContent(), pagination);
+    }
+
+    @Transactional
+    public UserCommonResponse deleteUserById(Long userId) {
+        User userEntity = findUserById(userId);
+        userEntity.updateStatus(UserStatus.DELETED);
+        return new UserCommonResponse(true, "회원 삭제가 완료되었습니다.");
+    }
+
+    @Transactional
+    public UserCommonResponse updateUserPassword(Long userId, String password) {
+        User userEntity = findUserById(userId);
+        String encodePassword = passwordEncoder.encode(password);
+        userEntity.updatePassword(encodePassword);
+
+        return new UserCommonResponse(true, "비밀번호 변경이 완료되었습니다.");
+    }
+
+    @Transactional
+    public UserCommonResponse updatePhoneNumber(Long userId, String phoneNumber) {
+        User userEntity = findUserById(userId);
+        userEntity.updatePhoneNumber(phoneNumber);
+
+        return new UserCommonResponse(true, "휴대폰 번호 변경이 완료되었습니다.");
+    }
+
+    @Transactional(readOnly = true)
+    public MaskingUserEmail findMaskingUserEmail(String name, String phoneNumber) {
+        User user = userRepository.findByNameAndPhoneNumber(name, phoneNumber)
+                .orElseThrow(() -> new IllegalArgumentException("올바르지 않은 회원 정보입니다."));
+
+        String maskingEmail = EmailMaskingUtil.maskEmail(user.getEmail());
+
+        return new MaskingUserEmail(maskingEmail);
     }
 
 }
