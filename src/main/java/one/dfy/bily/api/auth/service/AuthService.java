@@ -129,6 +129,9 @@ public class AuthService {
     }
 
     public void createBusinessCard(MultipartFile file, Long userId) {
+        if(file ==  null || file.isEmpty()) {
+            return;
+        }
         FileUploadInfo fileUploadInfo = s3Uploader.businessCardUpload(file);
         businessCardRepository.save(AuthMapper.toBusinessCard(fileUploadInfo, userId));
     }
@@ -153,8 +156,8 @@ public class AuthService {
     }
 
     @Transactional
-    public void updateEmailUserId(String code, String email) {
-        if(!signUpEmailVerificationRepository.findByEmailAndCodeAndVerified(email, code, true)){
+    public void updateEmailUserId(String email, String code) {
+        if(!signUpEmailVerificationRepository.existsByEmailAndCodeAndVerified(email, code, true)){
             throw new IllegalArgumentException("인증되지 않은 이메일 입니다.");
         }
     }

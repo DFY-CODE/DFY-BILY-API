@@ -7,5 +7,5 @@ import java.util.Optional;
 
 public interface SignUpEmailVerificationRepository extends JpaRepository<SignUpEmailVerification, Long> {
     Optional<SignUpEmailVerification> findByEmailAndCode(String email, String code);
-    boolean findByEmailAndCodeAndVerified(String email, String code, boolean verified);
+    boolean existsByEmailAndCodeAndVerified(String email, String code, boolean verified);
 }
