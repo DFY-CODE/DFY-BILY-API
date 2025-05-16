@@ -124,4 +124,26 @@ public class UserService {
         return new MaskingUserEmail(maskingEmail);
     }
 
+    @Transactional(readOnly = true)
+    public User findUserByEmail(String email) {
+        return userRepository.findByEmailAndStatus(email, UserStatus.ACTIVE)
+                .orElseThrow(() -> new IllegalArgumentException("이메일이 존재하지 않습니다."));
+    }
+
+    @Transactional
+    public void existUserByEmail(String email) {
+         if(!userRepository.existsByEmailAndStatus(email, UserStatus.ACTIVE)) {
+            throw new IllegalArgumentException("존재하지 않는 회원입니다.");
+         }
+    }
+
+    @Transactional
+    public UserCommonResponse updateUserPassword(String email, String password) {
+        User userEntity = findUserByEmail(email);
+        String encodePassword = passwordEncoder.encode(password);
+        userEntity.updatePassword(encodePassword);
+
+        return new UserCommonResponse(true, "비밀번호 변경이 완료되었습니다.");
+    }
+
 }

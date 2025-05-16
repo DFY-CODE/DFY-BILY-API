@@ -7,37 +7,31 @@ import lombok.NoArgsConstructor;
 import one.dfy.bily.api.common.model.BaseEntity;
 
 @Entity
-@Table(name = "TBL_EMAIL_VERIFICATION")
+@Table(name = "TBL_PASSWORD_RESET_EMAIL_VERIFICATION")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class EmailVerification extends BaseEntity {
+public class PasswordEmailVerification extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "USER_ID")
-    private Long userId;
-
     @Column(name = "CODE")
     private String code;
 
-    @Column(name = "IS_VERIFIED")
-    private Boolean verified;
+    @Column(name = "IS_USED")
+    private Boolean used;
 
     @Column(name = "EMAIL", length = 100, nullable = false)
     private String email;
 
-    public EmailVerification(String code, String email) {
+    public PasswordEmailVerification(String code, String email) {
         this.code = code;
-        this.verified = false;
+        this.used = true;
         this.email = email;
     }
 
-    public void updateVerified(boolean isVerified){
-        this.verified = isVerified;
+    public void updateUsed(boolean used){
+        this.used = used;
     }
 
-    public void updateUserId(Long userId){
-        this.userId = userId;
-    }
 }

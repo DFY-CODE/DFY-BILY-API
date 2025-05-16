@@ -32,7 +32,7 @@ public class User extends BaseEntity {
     private String phoneNumber;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "IS_USED")
+    @Column(name = "STATUS")
     private UserStatus status = UserStatus.ACTIVE;
 
     @Enumerated(EnumType.STRING)

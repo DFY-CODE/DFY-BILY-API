@@ -1,14 +1,13 @@
 package one.dfy.bily.api.auth.facade;
 
 import lombok.RequiredArgsConstructor;
-import one.dfy.bily.api.auth.dto.AuthCommonResponse;
-import one.dfy.bily.api.auth.dto.SignInRequest;
-import one.dfy.bily.api.auth.dto.SignUpRequest;
-import one.dfy.bily.api.auth.dto.TokenResponse;
+import one.dfy.bily.api.auth.dto.*;
+import one.dfy.bily.api.auth.model.PasswordResetToken;
 import one.dfy.bily.api.auth.service.AuthService;
 import one.dfy.bily.api.common.annotation.Facade;
 import one.dfy.bily.api.terms.service.TermsService;
 import one.dfy.bily.api.user.constant.LoginStatus;
+import one.dfy.bily.api.user.dto.UserCommonResponse;
 import one.dfy.bily.api.user.model.User;
 import one.dfy.bily.api.user.service.UserService;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,7 +28,9 @@ public class AuthFacade {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public TokenResponse signUp(SignUpRequest signUpRequest, MultipartFile businessCard, String clientIp) {
+    public JWTResponse signUp(SignUpRequest signUpRequest, MultipartFile businessCard, String clientIp) {
+        authService.updateEmailUserId(signUpRequest.email(), signUpRequest.code());
+
         User user = userService.createUser(signUpRequest);
 
         authService.createBusinessCard(businessCard, user.getId());
@@ -37,15 +38,26 @@ public class AuthFacade {
         termsService.createUserTermAgreement(signUpRequest.termsCodeList(), user.getId());
 
         userService.createLoginHistory(user.getId(), clientIp, LoginStatus.SUCCESS);
-        authService.updateEmailUserId(user.getId(), signUpRequest.email());
 
         return authService.createRefreshToken(user);
     }
 
-    public TokenResponse signIn(SignInRequest request, String clientIp) {
+    public JWTResponse signIn(SignInRequest request, String clientIp) {
         User user = userService.signIn(request.email(), request.password(), clientIp);
 
         return authService.createRefreshToken(user);
+    }
+
+    public AuthCommonResponse sendPasswordResetVerification(SendEmail request){
+        userService.existUserByEmail(request.email());
+        return authService.sendPasswordResetVerification(request);
+    }
+
+
+    @Transactional
+    public UserCommonResponse resetPassword(PasswordResetRequest passwordResetRequest) {
+        PasswordResetToken passwordResetToken = authService.checkPasswordResetToken(passwordResetRequest.token());
+        return userService.updateUserPassword(passwordResetToken.getEmail(), passwordResetRequest.password());
     }
 
 }

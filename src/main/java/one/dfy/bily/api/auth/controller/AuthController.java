@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import one.dfy.bily.api.auth.dto.*;
 import one.dfy.bily.api.auth.facade.AuthFacade;
 import one.dfy.bily.api.auth.service.AuthService;
+import one.dfy.bily.api.user.dto.UserCommonResponse;
 import one.dfy.bily.api.util.IpUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -31,10 +32,8 @@ public class AuthController {
     @Operation(summary = "이메일 인증 코드 전송", description = "사용자 이메일로 인증 코드를 전송합니다.")
     @ApiResponse(responseCode = "200", description = "이메일 전송 성공")
     @ApiResponse(responseCode = "500", description = "이메일 전송 실패")
-    public ResponseEntity<AuthCommonResponse> sendEmailVerification(@RequestBody SendEmail request) {
-        authService.sendEmailVerification(request);
-
-        return ResponseEntity.ok(new AuthCommonResponse(true, "이메일 전송이 완료되었습니다."));
+    public ResponseEntity<AuthCommonResponse> sendSignUpEmailVerification(@RequestBody SendEmail request) {
+        return ResponseEntity.ok(authService.sendSignUpEmailVerification(request));
     }
 
     @GetMapping(value = "/verification-email")
@@ -42,7 +41,7 @@ public class AuthController {
     @ApiResponse(responseCode = "200", description = "이메일 인증 성공")
     public ResponseEntity<AuthCommonResponse> emailVerification(@RequestParam String email, @RequestParam String code) {
 
-        return ResponseEntity.ok(authService.emailVerification(email, code));
+        return ResponseEntity.ok(authService.signUpEmailVerification(email, code));
     }
 
     @GetMapping(value = "/phone-number")
@@ -59,16 +58,16 @@ public class AuthController {
             description = "성공",
             content = @Content(
                     mediaType = "application/json",
-                    schema = @Schema(implementation = TokenResponse.class),
+                    schema = @Schema(implementation = JWTResponse.class),
                     examples = @ExampleObject(
                             name = "성공 응답 예시",
                             externalValue = "/swagger/json/inquiry/findInquiryByInquiryId.json"
                     )
             )
     )
-    public ResponseEntity<TokenResponse> signUp(
+    public ResponseEntity<JWTResponse> signUp(
             @RequestPart("data") SignUpRequest request,
-            @RequestPart("businessCard") MultipartFile businessCard,
+            @RequestPart(name = "businessCard", required = false) MultipartFile businessCard,
             HttpServletRequest httpRequest) {
         String clientIp = IpUtils.getClientIp(httpRequest);
         return ResponseEntity.ok(authFacade.signUp(request, businessCard, clientIp));
@@ -88,10 +87,37 @@ public class AuthController {
                     )
             )
     )
-    public ResponseEntity<TokenResponse> signIn(@RequestBody SignInRequest request, HttpServletRequest httpRequest) {
+    public ResponseEntity<JWTResponse> signIn(@RequestBody SignInRequest request, HttpServletRequest httpRequest) {
         String clientIp = IpUtils.getClientIp(httpRequest);
         return ResponseEntity.ok(authFacade.signIn(request, clientIp));
     }
 
 
+    @PostMapping(value = "/password/send-verification-email")
+    @Operation(summary = "비밀번호 찾기 이메일 인증 코드 전송", description = "회원 이메일로 인증 코드를 전송합니다.")
+    @ApiResponse(responseCode = "200", description = "이메일 전송 성공")
+    @ApiResponse(responseCode = "500", description = "이메일 전송 실패")
+    public ResponseEntity<AuthCommonResponse> sendPasswordResetEmailVerification(@RequestBody SendEmail request) {
+
+        return ResponseEntity.ok(authFacade.sendPasswordResetVerification(request));
+    }
+
+
+    @PostMapping(value = "/password/verification-email")
+    @Operation(summary = "비밀번호 찾기 이메일 인증 확인", description = "회원 이메일로 인증 코드를 확인합니다.")
+    @ApiResponse(responseCode = "200", description = "이메일 인증 확인 성공")
+    @ApiResponse(responseCode = "500", description = "이메일 인증 확인 실패")
+    public ResponseEntity<PasswordResetTokenResponse> passwordResetEmailVerification(@RequestBody EmailVerificationInfo request) {
+
+        return ResponseEntity.ok(authService.passwordResetEmailVerification(request));
+    }
+
+    @PostMapping(value = "/password")
+    @Operation(summary = "비밀번호 초기화", description = "회원 비밀번호를 초기화합니다.")
+    @ApiResponse(responseCode = "200", description = "비밀번호 초기화 성공")
+    @ApiResponse(responseCode = "500", description = "비밀번호 초기화 실패")
+    public ResponseEntity<UserCommonResponse> resetPassword(@RequestBody PasswordResetRequest request) {
+
+        return ResponseEntity.ok(authFacade.resetPassword(request));
+    }
 }
