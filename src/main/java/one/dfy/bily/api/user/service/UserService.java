@@ -48,7 +48,7 @@ public class UserService {
         return userRepository.save(UserMapper.toUserEntity(signUpRequest, encodePassword));
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public User signIn(String email, String password, String clientIp) {
          User userEntity = userRepository.findByEmailAndStatus(email, UserStatus.ACTIVE)
                  .orElseThrow(() -> new IllegalArgumentException("올바르지 않은 회원 정보입니다."));
