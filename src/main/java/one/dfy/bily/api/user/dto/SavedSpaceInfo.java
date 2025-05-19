@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public record SavedSpaceInfo(
-        Integer id,
+        Long id,
         String spaceName,
         String location,
         BigDecimal areaM2,

@@ -5,6 +5,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +21,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
-import java.util.Collections;
 import java.util.List;
 
 @Slf4j
@@ -31,18 +31,24 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private String secret;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-            throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain filterChain) throws ServletException, IOException {
 
-        String authorizationHeader = request.getHeader("Authorization");
-        log.info("Authorization Header: {}", authorizationHeader);
+        String token = null;
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if ("ACCESS_TOKEN".equals(cookie.getName())) {
+                    token = cookie.getValue();
+                    break;
+                }
+            }
+        }
 
-        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            String token = authorizationHeader.substring(7);
-            log.info("JWT Token: {}", token);
+        log.info("Access Token from Cookie: {}", token);
 
+        if (token != null) {
             try {
-                // 최신 방식으로 키 생성
                 Key signingKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
 
                 Claims claims = Jwts.parserBuilder()
@@ -51,24 +57,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         .parseClaimsJws(token)
                         .getBody();
 
-                Long userId = claims.get("userId", Long.class);
-                log.info("Extracted userId: {}", userId);
-                String roleName = claims.get("role", String.class);
+                Long userId = Long.parseLong(claims.getSubject());
+                String roleName = claims.get("roles", String.class);
 
-                if (userId != null && roleName != null) {
-                    List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(roleName));
+                if (roleName != null) {
+                    List<SimpleGrantedAuthority> authorities =
+                            List.of(new SimpleGrantedAuthority(roleName));
 
-                    CustomUserDetails userDetails = new CustomUserDetails(userId); // 사용자 정의 객체
+                    CustomUserDetails userDetails = new CustomUserDetails(userId);
                     UsernamePasswordAuthenticationToken authToken =
                             new UsernamePasswordAuthenticationToken(userDetails, null, authorities);
-
 
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                 }
 
             } catch (Exception e) {
-                log.info("❌ JWT Token validation failed: {}", e.getMessage());
+                log.warn("❌ JWT Token validation failed: {}", e.getMessage());
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 return;
             }

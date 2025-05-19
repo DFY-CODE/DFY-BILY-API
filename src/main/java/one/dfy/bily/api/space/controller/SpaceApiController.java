@@ -8,15 +8,15 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import one.dfy.bily.api.common.dto.*;
-import one.dfy.bily.api.common.service.FileService;
 import one.dfy.bily.api.security.CustomUserDetails;
 import one.dfy.bily.api.space.service.SpaceService;
 import one.dfy.bily.api.space.dto.*;
 import one.dfy.bily.api.util.S3Uploader;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -29,18 +29,56 @@ import java.util.*;
 @RestController
 @RequestMapping("/api/spaces")
 @Tag(name = "공간관리 API", description = "공간관리 관련 API")
+@RequiredArgsConstructor
 public class SpaceApiController {
 
-    @Autowired
-    private S3Uploader s3Uploader;
-    @Autowired
-    private FileService fileService;
-    @Autowired
-    private SpaceService spaceService;
+    private final S3Uploader s3Uploader;
+    private final SpaceService spaceService;
 
+    @GetMapping("/amenity/all")
+    @Operation(summary = "공간 편의시설 목록 조회", description = "공간 편의시설 목록 정보를 반환합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = SpaceListResponse.class),
+                            examples = @ExampleObject(
+                                    name = "성공 응답 예시",
+                                    externalValue = "/swagger/json/space/getSpaces.json"
+                            )
+                    )
+            )
+    })
+    private ResponseEntity<AmenityInfoList> findAmenityInfoList(){
+        return ResponseEntity.ok(spaceService.findAmenityInfoList());
+    }
 
+    @GetMapping("/list/non-user")
+    @Operation(summary = "비회원 공간 목록 조회", description = "페이지네이션된 공간 관리 목록 및 총 개수를 반환합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = SpaceListResponse.class),
+                            examples = @ExampleObject(
+                                    name = "성공 응답 예시",
+                                    externalValue = "/swagger/json/space/getSpaces.json"
+                            )
+                    )
+            )
+    })
+    public ResponseEntity<NonUserSpaceInfoResponse> findNonUserSpaceInfo(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        return ResponseEntity.ok(spaceService.findNonUserSpaceInfoList(page, size));
+    }
 
     @GetMapping("/list")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @Operation(summary = "공간 목록 조회", description = "페이지네이션된 공간 관리 목록 및 총 개수를 반환합니다.")
     @ApiResponses(value = {
             @ApiResponse(
@@ -56,10 +94,10 @@ public class SpaceApiController {
                     )
             )
     })
-    public ResponseEntity<SpaceListResponse> getSpaces(
+    public ResponseEntity<UserSpaceInfoResponse> findUserSpaceInfoList(
             @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        return ResponseEntity.ok(spaceService.getSpaces(page, size));
+            @RequestParam(defaultValue = "20") int size) {
+        return ResponseEntity.ok(spaceService.findUserSpaceInfoList(page, size));
     }
 
     @GetMapping("/detail/{contentId}")
@@ -444,5 +482,7 @@ public class SpaceApiController {
         Long userId = userDetails.getUserId();
         return ResponseEntity.ok(spaceService.cancelSavedSpace(contentId.contentId(), userId));
     }
+
+
 
 }

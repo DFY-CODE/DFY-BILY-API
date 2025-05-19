@@ -3,6 +3,7 @@ package one.dfy.bily.api.space.model;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import one.dfy.bily.api.common.model.BaseEntity;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -11,12 +12,12 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Entity
 @Table(name = "TBL_SPACE")
-public class Space {
+public class Space extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "CONTENT_ID")
-    private Integer contentId;
+    @Column(name = "ID")
+    private Long id;
 
     @Column(name = "DISPLAY_STATUS")
     private Boolean displayStatus;
@@ -24,8 +25,8 @@ public class Space {
     @Column(name = "FIXED_STATUS")
     private Boolean fixedStatus;
 
-    @Column(name = "SPACE_ID")
-    private String spaceId;
+    @Column(name = "ALIAS")
+    private String alias;
 
     @Column(name = "PRICE")
     private Long price;
@@ -42,8 +43,8 @@ public class Space {
     @Column(name = "LOCATION", nullable = false)
     private String location;
 
-    @Column(name = "NAME")
-    private String name;
+    @Column(name = "TITLE")
+    private String title;
 
     @Column(name = "TAGS")
     private String tags;
@@ -69,12 +70,6 @@ public class Space {
     @Column(name = "AUTHOR")
     private String author;
 
-    @Column(name = "AMENITIES")
-    private String amenities;
-
-    @Column(name = "AVAILABLE_USES")
-    private String availableUses;
-
     @Column(name = "AREA_PY")
     private Integer areaPy;
 
@@ -87,15 +82,12 @@ public class Space {
     @Column(name = "VIEWS")
     private String views;
 
+    @Column(name = "IS_USED")
+    private boolean used;
+
     @Column(name = "CREATOR", length = 50)
     private String creator;
 
-    @Column(name = "CREATE_DT")
-    private LocalDateTime createDt;
-
     @Column(name = "UPDATER", length = 50)
     private String updater;
-
-    @Column(name = "UPDATE_DT")
-    private LocalDateTime updateDt;
 }

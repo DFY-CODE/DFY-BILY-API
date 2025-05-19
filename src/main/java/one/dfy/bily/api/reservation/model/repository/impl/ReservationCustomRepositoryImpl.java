@@ -35,7 +35,7 @@ public class ReservationCustomRepositoryImpl implements ReservationCustomReposit
     public Page<ReservationResponse> findReservationListByKeywordAndDate(
             String companyName,
             String contactPerson,
-            String spaceIdKeyword,
+            String alias,
             LocalDateTime startAt,
             LocalDateTime endAt,
             Pageable pageable
@@ -52,7 +52,7 @@ public class ReservationCustomRepositoryImpl implements ReservationCustomReposit
                 .where(
                         companyName != null ? inquiry.companyName.contains(companyName) : null,
                         contactPerson != null ? inquiry.contactPerson.contains(contactPerson) : null,
-                        spaceIdKeyword != null ? space.spaceId.contains(spaceIdKeyword) : null,
+                        alias != null ? space.alias.contains(alias) : null,
                         startAt != null ? inquiry.createdAt.goe(startAt) : null,
                         endAt != null ? inquiry.createdAt.loe(endAt) : null,
                         reservation.used.eq(true)
@@ -71,7 +71,7 @@ public class ReservationCustomRepositoryImpl implements ReservationCustomReposit
                 .where(
                         companyName != null ? inquiry.companyName.contains(companyName) : null,
                         contactPerson != null ? inquiry.contactPerson.contains(contactPerson) : null,
-                        spaceIdKeyword != null ? space.spaceId.contains(spaceIdKeyword) : null,
+                        alias != null ? space.alias.contains(alias) : null,
                         startAt != null ? inquiry.createdAt.goe(startAt) : null,
                         endAt != null ? inquiry.createdAt.loe(endAt) : null
                 )
@@ -93,8 +93,8 @@ public class ReservationCustomRepositoryImpl implements ReservationCustomReposit
         List<ReservationActivity> contents = queryFactory
                 .select(Projections.constructor(ReservationActivity.class,
                         reservation.id,
-                        space.contentId,
-                        space.name,
+                        space.id,
+                        space.title,
                         space.location,
                         space.areaM2,
                         space.areaPy,

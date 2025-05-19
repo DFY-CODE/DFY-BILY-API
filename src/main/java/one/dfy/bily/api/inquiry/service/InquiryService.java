@@ -19,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -96,7 +97,7 @@ public class InquiryService {
     }
 
     @Transactional
-    public InquiryResponse createInquiry(InquiryCreateRequest request, Space space, Long userId) {
+    public InquiryResponse createInquiry(InquiryCreateRequest request, List<MultipartFile> fileAttachments, Space space, Long userId) {
 
         Inquiry inquiry = InquiryMapper.inquiryCreateRequestToEntity(request, space, userId);
         inquiryRepository.save(inquiry);
@@ -106,7 +107,7 @@ public class InquiryService {
                 .toList();
         preferredDateRepository.saveAll(preferredDates);
 
-        List<InquiryFile> inquiryFiles = request.fileAttachments().stream()
+        List<InquiryFile> inquiryFiles = fileAttachments.stream()
                 .map(s3Uploader::inquiryFileUpload)
                 .toList()
                 .stream()
@@ -193,9 +194,9 @@ public class InquiryService {
         return inquiryRepository.findInquiryActivitiesByUserId(userId, pageable);
     }
 
-    public List<Integer> getInquiryActivityInquiryIds(List<InquiryActivity> result) {
+    public List<Long> getInquiryActivityInquiryIds(List<InquiryActivity> result) {
         return result.stream()
-                .map(InquiryActivity::contentId)
+                .map(InquiryActivity::spaceId)
                 .toList();
     }
 }

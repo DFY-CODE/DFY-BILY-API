@@ -1,6 +1,6 @@
 package one.dfy.bily.api.auth.dto;
 
-public record JWTResponse(
+public record JwtResponse(
         String userName,
         String accessToken,
         String refreshToken

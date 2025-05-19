@@ -1,21 +1,17 @@
 package one.dfy.bily.api.user.mapper;
 
-import one.dfy.bily.api.auth.dto.SignUpRequest;
 import one.dfy.bily.api.inquiry.dto.InquiryPreferredDateInfo;
 import one.dfy.bily.api.reservation.dto.ReservationPreferredDateInfo;
 import one.dfy.bily.api.space.model.SavedSpace;
 import one.dfy.bily.api.space.model.Space;
-import one.dfy.bily.api.user.constant.Role;
 import one.dfy.bily.api.user.dto.InquiryActivity;
 import one.dfy.bily.api.user.dto.ReservationActivity;
 import one.dfy.bily.api.user.dto.SavedSpaceInfo;
 import one.dfy.bily.api.user.dto.UserActivity;
-import one.dfy.bily.api.user.model.User;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -24,7 +20,7 @@ public class UserActivityMapper {
     public static UserActivity toReservationAndInquiryInfo(
             Object[] row,
             Map<Long, List<InquiryPreferredDateInfo>> preferredDatesMap,
-            Map<Integer, String> fileNameListMap
+            Map<Long, String> fileNameListMap
     ) {
         Long id = toLong(row[0]);
         Integer contentId = toInt(row[1]);
@@ -84,7 +80,7 @@ public class UserActivityMapper {
 
     public static UserActivity fromInquiryActivity(
             InquiryActivity inquiryActivity,
-            Map<Integer, String> fileNameListMap,
+            Map<Long, String> fileNameListMap,
             Map<Long, List<InquiryPreferredDateInfo>> preferredDatesMap
     ) {
         return new UserActivity(
@@ -100,7 +96,7 @@ public class UserActivityMapper {
                 inquiryActivity.price(),
                 inquiryActivity.status().getDescription(),
                 inquiryActivity.createdAt(),
-                fileNameListMap.getOrDefault(inquiryActivity.contentId(), null)
+                fileNameListMap.getOrDefault(inquiryActivity.spaceId(), null)
         );
     }
 
@@ -108,7 +104,7 @@ public class UserActivityMapper {
 
     public static UserActivity fromReservationActivity(
             ReservationActivity reservation,
-            Map<Integer, String> fileNameListMap
+            Map<Long, String> fileNameListMap
     ) {
         return new UserActivity(
                 reservation.id(),
@@ -126,21 +122,21 @@ public class UserActivityMapper {
                 reservation.price(),
                 reservation.status().getDescription(),
                 reservation.createdAt(),
-                fileNameListMap.getOrDefault(reservation.contentId(), null)
+                fileNameListMap.getOrDefault(reservation.spaceId(), null)
         );
     }
 
-    public static SavedSpaceInfo toSavedSpaceInfo(SavedSpace savedSpace, Map<Integer, String> fileNameListMap) {
+    public static SavedSpaceInfo toSavedSpaceInfo(SavedSpace savedSpace, Map<Long, String> fileNameListMap) {
         Space space = savedSpace.getSpace();
         return new SavedSpaceInfo(
-                space.getContentId(),
-                space.getName(),
+                space.getId(),
+                space.getTitle(),
                 space.getLocation(),
                 space.getAreaM2(),
                 space.getAreaPy(),
                 space.getPrice(),
                 space.getTags(),
-                fileNameListMap.getOrDefault(space.getContentId(), null)
+                fileNameListMap.getOrDefault(space.getId(), null)
         );
     }
 

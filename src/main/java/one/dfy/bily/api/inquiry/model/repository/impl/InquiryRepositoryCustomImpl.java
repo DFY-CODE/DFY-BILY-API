@@ -31,7 +31,7 @@ public class InquiryRepositoryCustomImpl implements InquiryRepositoryCustom {
     public Page<InquiryResponse> searchInquiries(
             String companyName,
             String contactPerson,
-            String spaceIdKeyword,
+            String alias,
             LocalDateTime startAt,
             LocalDateTime endAt,
             Pageable pageable
@@ -48,7 +48,7 @@ public class InquiryRepositoryCustomImpl implements InquiryRepositoryCustom {
                 .where(
                         companyName != null ? inquiry.companyName.contains(companyName) : null,
                         contactPerson != null ? inquiry.contactPerson.contains(contactPerson) : null,
-                        spaceIdKeyword != null ? space.spaceId.contains(spaceIdKeyword) : null,
+                        alias != null ? space.alias.contains(alias) : null,
                         startAt != null ? inquiry.createdAt.goe(startAt) : null,
                         endAt != null ? inquiry.createdAt.loe(endAt) : null,
                         inquiry.used.eq(true)
@@ -95,7 +95,7 @@ public class InquiryRepositoryCustomImpl implements InquiryRepositoryCustom {
                 .where(
                         companyName != null ? inquiry.companyName.eq(companyName) : null,
                         contactPerson != null ? inquiry.contactPerson.eq(contactPerson) : null,
-                        spaceIdKeyword != null ? space.spaceId.containsIgnoreCase(spaceIdKeyword) : null,
+                        alias != null ? space.alias.containsIgnoreCase(alias) : null,
                         startAt != null ? inquiry.createdAt.goe(startAt) : null,
                         endAt != null ? inquiry.createdAt.loe(endAt) : null
                 )
@@ -117,8 +117,8 @@ public class InquiryRepositoryCustomImpl implements InquiryRepositoryCustom {
         List<InquiryActivity> contents = queryFactory
                 .select(Projections.constructor(InquiryActivity.class,
                         inquiry.id,
-                        space.contentId,
-                        space.name,
+                        space.id,
+                        space.title,
                         space.location,
                         space.areaM2,
                         space.areaPy,

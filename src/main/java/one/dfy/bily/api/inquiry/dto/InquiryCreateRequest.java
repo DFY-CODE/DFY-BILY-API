@@ -22,6 +22,5 @@ public record InquiryCreateRequest(
         String author,
         Integer spaceId,
         String hostCompany,
-        String spaceIdName,
-        List<MultipartFile> fileAttachments
+        String spaceIdName
 ) {}

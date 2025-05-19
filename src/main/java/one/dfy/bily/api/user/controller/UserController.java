@@ -14,6 +14,7 @@ import one.dfy.bily.api.user.constant.UserSearchDateType;
 import one.dfy.bily.api.user.dto.*;
 import one.dfy.bily.api.user.service.UserService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,6 +29,7 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/profile")
+//    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @Operation(summary = "회원 프로필 조회", description = "회원 프로필정보를 반환합니다.")
     @ApiResponse(
             responseCode = "200",

@@ -3,21 +3,21 @@ package one.dfy.bily.api.space.model;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import java.time.LocalDateTime;
+import one.dfy.bily.api.common.model.BaseEntity;
 
 @Getter
 @NoArgsConstructor
 @Entity
 @Table(name = "TBL_SPACE_FILE_INFO")
-public class SpaceFileInfo {
+public class SpaceFileInfo extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ATTACH_FILE_ID")
     private Long id;
 
-    @Column(name = "CONTENT_ID", nullable = false)
-    private Integer contentId;
+    @Column(name = "SPACE_ID", nullable = false)
+    private Long spaceId;
 
     @Column(name = "FILE_NAME", nullable = false)
     private String fileName;
@@ -31,20 +31,14 @@ public class SpaceFileInfo {
     @Column(name = "SAVE_SIZE", nullable = false)
     private Long saveSize;
 
-    @Column(name = "DELETE_FLAG")
-    private String deleteFlag = "N";
+    @Column(name = "IS_USED")
+    private boolean used = true;
 
     @Column(name = "CREATOR", nullable = false)
     private String creator;
 
-    @Column(name = "CREATE_DATE", nullable = false)
-    private LocalDateTime createDate;
-
     @Column(name = "UPDATER")
     private String updater;
-
-    @Column(name = "UPDATE_DATE")
-    private LocalDateTime updateDate;
 
     @Column(name = "FILE_TYPE", nullable = false)
     private String fileType;
@@ -53,5 +47,5 @@ public class SpaceFileInfo {
     private Integer fileOrder;
 
     @Column(name = "IS_REPRESENTATIVE")
-    private String isRepresentative = "N";
+    private boolean representative;
 }

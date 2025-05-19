@@ -1,5 +1,6 @@
 package one.dfy.bily.api.auth.facade;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import one.dfy.bily.api.auth.dto.*;
 import one.dfy.bily.api.auth.model.PasswordResetToken;
@@ -28,7 +29,7 @@ public class AuthFacade {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public JWTResponse signUp(SignUpRequest signUpRequest, MultipartFile businessCard, String clientIp) {
+    public JwtResponse signUp(SignUpRequest signUpRequest, MultipartFile businessCard, String clientIp, HttpServletResponse response) {
         authService.updateEmailUserId(signUpRequest.email(), signUpRequest.code());
 
         User user = userService.createUser(signUpRequest);
@@ -39,13 +40,13 @@ public class AuthFacade {
 
         userService.createLoginHistory(user.getId(), clientIp, LoginStatus.SUCCESS);
 
-        return authService.createRefreshToken(user);
+        return authService.createRefreshToken(user, response);
     }
 
-    public JWTResponse signIn(SignInRequest request, String clientIp) {
+    public JwtResponse signIn(SignInRequest request, String clientIp, HttpServletResponse response) {
         User user = userService.signIn(request.email(), request.password(), clientIp);
 
-        return authService.createRefreshToken(user);
+        return authService.createRefreshToken(user, response);
     }
 
     public AuthCommonResponse sendPasswordResetVerification(SendEmail request){

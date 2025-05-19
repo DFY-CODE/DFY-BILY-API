@@ -95,9 +95,9 @@ public class InquiryMapper {
                 inquiry.getCreatedAt(),
                 inquiry.getStatus(),
                 inquiry.getAuthor(),
-                inquiry.getSpace().getContentId(),
+                inquiry.getSpace().getId(),
                 inquiry.getHostCompany(),
-                inquiry.getSpace().getSpaceId()
+                inquiry.getSpace().getAlias()
         );
     }
 

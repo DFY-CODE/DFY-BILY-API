@@ -52,7 +52,7 @@ public class Inquiry extends BaseEntity {
     private String author;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "CONTENT_ID", referencedColumnName = "CONTENT_ID", nullable = false)
+    @JoinColumn(name = "SPACE_ID", referencedColumnName = "ID", nullable = false)
     private Space space;
 
     @Column(name = "HOST_COMPANY", nullable = false)

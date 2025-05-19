@@ -1,5 +1,6 @@
 package one.dfy.bily.api.auth.service;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import one.dfy.bily.api.auth.dto.*;
 import one.dfy.bily.api.auth.mapper.AuthMapper;
@@ -12,6 +13,7 @@ import one.dfy.bily.api.common.service.EmailService;
 import one.dfy.bily.api.common.dto.FileUploadInfo;
 import one.dfy.bily.api.user.constant.Role;
 import one.dfy.bily.api.user.model.User;
+import one.dfy.bily.api.util.JwtCookieUtil;
 import one.dfy.bily.api.util.JwtProvider;
 import one.dfy.bily.api.util.S3Uploader;
 import one.dfy.bily.api.util.TokenGenerator;
@@ -37,6 +39,7 @@ public class AuthService {
     private final PasswordResetTokenRepository passwordResetTokenRepository;
     private final JwtProvider jwtProvider;
     private final TokenGenerator tokenGenerator;
+    private final JwtCookieUtil jwtCookieUtil;
 
     @Transactional
     public AuthCommonResponse sendSignUpEmailVerification(SendEmail request) {
@@ -137,12 +140,13 @@ public class AuthService {
     }
 
     @Transactional
-    public JWTResponse createRefreshToken(User user) {
+    public JwtResponse createRefreshToken(User user, HttpServletResponse response) {
         authTokenRepository.findByUserAndUsed(user, true).ifPresent(authToken -> {
             authToken.updateUsed(false);
         });
 
         String accessToken = jwtProvider.createAccessToken(user.getId(), Role.USER);
+        jwtCookieUtil.setAccessTokenCookie(response, accessToken);
 
         Date date = new Date(System.currentTimeMillis() + 1000L * 60 * 60 * 24 * 7);
         String refreshToken = jwtProvider.createRefreshToken(user.getId(), date);
@@ -152,7 +156,7 @@ public class AuthService {
 
         authTokenRepository.save(authToken);
 
-        return new JWTResponse(user.getName(), accessToken, refreshToken);
+        return new JwtResponse(user.getName(), accessToken, refreshToken);
     }
 
     @Transactional
@@ -161,6 +165,5 @@ public class AuthService {
             throw new IllegalArgumentException("인증되지 않은 이메일 입니다.");
         }
     }
-
 
 }

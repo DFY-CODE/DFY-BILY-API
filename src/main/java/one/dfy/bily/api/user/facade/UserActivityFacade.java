@@ -27,10 +27,10 @@ public class UserActivityFacade {
 
     public UserActivityList findReservationAndInquiryListByUserId(Long userId, int page, int pageSize) {
         List<Object[]> reservationAndInquiryRow = reservationService.findReservationAndInquiryRow(userId, page, pageSize);
-        List<Integer> contentIds = reservationService.getInquiryIds(reservationAndInquiryRow);
+        List<Long> contentIds = reservationService.getInquiryIds(reservationAndInquiryRow);
         long totalCount = reservationService.countReservationAndInquiryRow(userId);
 
-        Map<Integer, String> fileNameListMap = spaceService.findSpaceFileByContentIds(contentIds);
+        Map<Long, String> fileNameListMap = spaceService.findSpaceFileBySpaceIds(contentIds);
 
         Map<Long, List<InquiryPreferredDateInfo>> preferredDateMap = inquiryService.findInquiryPreferredDateByObject(reservationAndInquiryRow);
         List<UserActivity> userActivityList = userActivityService.mappingToReservationAndInquiryInfo(reservationAndInquiryRow, fileNameListMap, preferredDateMap);
@@ -42,9 +42,9 @@ public class UserActivityFacade {
 
     public UserActivityList findReservationListByUserId(Long userId, int page, int pageSize) {
         Page<ReservationActivity> reservationActivityPage = reservationService.findReservationListByUserId(userId, page, pageSize);
-        List<Integer> contentIds = reservationService.getReservationActivityInquiryIds(reservationActivityPage.getContent());
+        List<Long> contentIds = reservationService.getReservationActivityInquiryIds(reservationActivityPage.getContent());
 
-        Map<Integer, String> fileNameListMap = spaceService.findSpaceFileByContentIds(contentIds);
+        Map<Long, String> fileNameListMap = spaceService.findSpaceFileBySpaceIds(contentIds);
 
         List<UserActivity> userActivityList = userActivityService.reservationActivityToUserActivityList(reservationActivityPage.getContent(), fileNameListMap);
         Pagination pagination = PaginationMapper.toPagination(reservationActivityPage.getPageable(), reservationActivityPage.getTotalElements(), reservationActivityPage.getTotalPages());
@@ -54,9 +54,9 @@ public class UserActivityFacade {
 
     public UserActivityList findInquiryListByUserId(Long userId, int page, int pageSize) {
         Page<InquiryActivity> inquiryActivityPage = inquiryService.findInquiryActivitiesByUserId(userId, page, pageSize);
-        List<Integer> contentIds = inquiryService.getInquiryActivityInquiryIds(inquiryActivityPage.getContent());
+        List<Long> spaceIds = inquiryService.getInquiryActivityInquiryIds(inquiryActivityPage.getContent());
 
-        Map<Integer, String> fileNameListMap = spaceService.findSpaceFileByContentIds(contentIds);
+        Map<Long, String> fileNameListMap = spaceService.findSpaceFileBySpaceIds(spaceIds);
 
         Map<Long, List<InquiryPreferredDateInfo>> preferredDateMap = inquiryService.findInquiryPreferredDateByInquiryActivity(inquiryActivityPage.getContent());
 
@@ -68,7 +68,7 @@ public class UserActivityFacade {
 
     public SavedSpaceList findSavedSpaceByUserId(Long userId, int page, int pageSize) {
         Page<SavedSpace> spacePage = spaceService.findSavedSpaceByUserId(userId, page, pageSize);
-        Map<Integer, String> spaceThumbnail = spaceService.findSpaceFileBySpaceList(spacePage.getContent());
+        Map<Long, String> spaceThumbnail = spaceService.findSpaceFileBySpaceList(spacePage.getContent());
 
         List<SavedSpaceInfo> savedSpaceInfoList = userActivityService.savedSpaceToSavedSpaceList(spacePage.getContent(), spaceThumbnail);
 

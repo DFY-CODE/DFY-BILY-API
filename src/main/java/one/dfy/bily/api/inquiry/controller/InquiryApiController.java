@@ -19,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -115,9 +116,11 @@ public class InquiryApiController {
                     )
             )
     )
-    public ResponseEntity<InquiryResponse> createInquiry(@RequestPart InquiryCreateRequest request, @AuthenticationPrincipal CustomUserDetails userDetails) {
+    public ResponseEntity<InquiryResponse> createInquiry(@RequestPart("data") InquiryCreateRequest request,
+                                                         @RequestPart("attachFileList") List<MultipartFile> fileAttachments,
+                                                         @AuthenticationPrincipal CustomUserDetails userDetails) {
         Long userId = userDetails.getUserId();
-        return ResponseEntity.ok(inquiryFacade.createInquiry(request,userId));
+        return ResponseEntity.ok(inquiryFacade.createInquiry(request, fileAttachments,userId));
     }
 
     @PatchMapping("/{inquiry-id}")

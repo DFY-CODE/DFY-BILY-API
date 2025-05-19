@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import one.dfy.bily.api.auth.dto.*;
@@ -58,19 +59,21 @@ public class AuthController {
             description = "성공",
             content = @Content(
                     mediaType = "application/json",
-                    schema = @Schema(implementation = JWTResponse.class),
+                    schema = @Schema(implementation = JwtResponse.class),
                     examples = @ExampleObject(
                             name = "성공 응답 예시",
                             externalValue = "/swagger/json/inquiry/findInquiryByInquiryId.json"
                     )
             )
     )
-    public ResponseEntity<JWTResponse> signUp(
+    public ResponseEntity<JwtResponse> signUp(
             @RequestPart("data") SignUpRequest request,
             @RequestPart(name = "businessCard", required = false) MultipartFile businessCard,
-            HttpServletRequest httpRequest) {
+            HttpServletRequest httpRequest,
+            HttpServletResponse response
+    ) {
         String clientIp = IpUtils.getClientIp(httpRequest);
-        return ResponseEntity.ok(authFacade.signUp(request, businessCard, clientIp));
+        return ResponseEntity.ok(authFacade.signUp(request, businessCard, clientIp, response));
     }
 
     @PostMapping(value = "/sign-in")
@@ -87,9 +90,12 @@ public class AuthController {
                     )
             )
     )
-    public ResponseEntity<JWTResponse> signIn(@RequestBody SignInRequest request, HttpServletRequest httpRequest) {
+    public ResponseEntity<JwtResponse> signIn(@RequestBody SignInRequest request,
+                                              HttpServletRequest httpRequest,
+                                              HttpServletResponse response
+    ) {
         String clientIp = IpUtils.getClientIp(httpRequest);
-        return ResponseEntity.ok(authFacade.signIn(request, clientIp));
+        return ResponseEntity.ok(authFacade.signIn(request, clientIp, response));
     }
 
 

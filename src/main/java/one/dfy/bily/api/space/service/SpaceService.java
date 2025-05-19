@@ -4,9 +4,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import one.dfy.bily.api.common.mapper.PaginationMapper;
+import one.dfy.bily.api.space.mapper.SpaceDtoMapper;
 import one.dfy.bily.api.space.model.SavedSpace;
 import one.dfy.bily.api.space.model.Space;
 import one.dfy.bily.api.space.model.SpaceFileInfo;
+import one.dfy.bily.api.space.model.repository.AmenityRepository;
 import one.dfy.bily.api.space.model.repository.SpaceFileInfoRepository;
 import one.dfy.bily.api.space.model.repository.SpaceRepository;
 import one.dfy.bily.api.common.dto.*;
@@ -37,6 +40,51 @@ public class SpaceService {
     private final SpaceRepository spaceRepository;
     private final SpaceFileInfoRepository spaceFileInfoRepository;
     private final SavedSpaceRepository savedSpaceRepository;
+    private final AmenityRepository amenityRepository;
+
+    public AmenityInfoList findAmenityInfoList(){
+        return new AmenityInfoList(
+                amenityRepository.findByUsed(true).stream()
+                .map(SpaceDtoMapper::toAmenityInfo)
+                .toList()
+        );
+    }
+
+    @Transactional
+    public NonUserSpaceInfoResponse findNonUserSpaceInfoList(int page, int size){
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
+
+        Page<Space> spaces = spaceRepository.findAll(pageable);
+
+        List<Long> spaceIds = spaces.stream()
+                .map(Space::getId)
+                .toList();
+
+        Map<Long, String> thumbNailUrl = findSpaceFileBySpaceIds(spaceIds);
+
+        List<NonUserSpaceInfo> nonUserSpaceInfoList = SpaceDtoMapper.toNonUserSpaceInfoList(spaces.getContent(), thumbNailUrl);
+        Pagination pagination = PaginationMapper.toPagination(pageable,spaces.getTotalElements(),spaces.getTotalPages());
+
+        return new NonUserSpaceInfoResponse(nonUserSpaceInfoList, pagination);
+    }
+
+    @Transactional
+    public UserSpaceInfoResponse findUserSpaceInfoList(int page, int size){
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
+
+        Page<Space> spaces = spaceRepository.findAll(pageable);
+
+        List<Long> spaceIds = spaces.stream()
+                .map(Space::getId)
+                .toList();
+
+        Map<Long, String> thumbNailUrl = findSpaceFileBySpaceIds(spaceIds);
+
+        List<UserSpaceInfo> nonUserSpaceInfoList = SpaceDtoMapper.toUserSpaceInfoList(spaces.getContent(), thumbNailUrl);
+        Pagination pagination = PaginationMapper.toPagination(pageable,spaces.getTotalElements(),spaces.getTotalPages());
+
+        return new UserSpaceInfoResponse(nonUserSpaceInfoList, pagination);
+    }
 
     // 페이징 처리된 데이터 반환
     public SpaceListResponse getSpaces(int page, int size) {
@@ -282,17 +330,17 @@ public class SpaceService {
     }
 
     @Transactional
-    public Map<Integer, String> findSpaceFileByContentIds(List<Integer> contentIds) {
+    public Map<Long, String> findSpaceFileBySpaceIds(List<Long> spaceIdList) {
         String s3Url = s3Uploader.getSpaceS3Url();
 
-        if (contentIds == null || contentIds.isEmpty()) {
+        if (spaceIdList == null || spaceIdList.isEmpty()) {
             return Map.of();
         }
 
-        return spaceFileInfoRepository.findFirstByContentIdGroup(contentIds)
+        return spaceFileInfoRepository.findBySpaceIdInAndUsedAndRepresentative(spaceIdList,true,true)
                 .stream()
                 .collect(Collectors.toMap(
-                        SpaceFileInfo::getContentId,
+                        SpaceFileInfo::getId,
                         file -> s3Url + file.getSaveFileName()
                 ));
     }
@@ -334,13 +382,13 @@ public class SpaceService {
     }
 
     @Transactional(readOnly = true)
-    public Map<Integer, String> findSpaceFileBySpaceList(List<SavedSpace> spaceList){
-        List<Integer> spaceIds = spaceList.stream()
+    public Map<Long, String> findSpaceFileBySpaceList(List<SavedSpace> spaceList){
+        List<Long> spaceIds = spaceList.stream()
                 .map(SavedSpace::getSpace)
-                .map(Space::getContentId)
+                .map(Space::getId)
                 .toList();
 
-        return findSpaceFileByContentIds(spaceIds);
+        return findSpaceFileBySpaceIds(spaceIds);
     }
 
 }

@@ -124,15 +124,15 @@ public class ReservationService {
         return reservationRepository.countReservationAndInquiry(userId);
     }
 
-    public List<Integer> getInquiryIds(List<Object[]> result) {
+    public List<Long> getInquiryIds(List<Object[]> result) {
         return result.stream()
-                .map(r -> ((Number) r[1]).intValue())
+                .map(r -> ((Number) r[1]).longValue())
                 .toList();
     }
 
-    public List<Integer> getReservationActivityInquiryIds(List<ReservationActivity> result) {
+    public List<Long> getReservationActivityInquiryIds(List<ReservationActivity> result) {
         return result.stream()
-                .map(ReservationActivity::contentId)
+                .map(ReservationActivity::spaceId)
                 .toList();
     }
 

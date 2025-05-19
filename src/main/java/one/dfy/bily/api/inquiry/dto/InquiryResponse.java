@@ -21,7 +21,7 @@ public record InquiryResponse(
         LocalDateTime createdAt,
         InquiryStatus status,
         String author,
-        Integer spaceId,
+        Long spaceId,
         String hostCompany,
         String spaceIdName
 ) {}

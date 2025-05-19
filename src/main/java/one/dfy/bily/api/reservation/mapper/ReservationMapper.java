@@ -101,7 +101,7 @@ public class ReservationMapper {
                         reservations.getStatus().getDescription(),
                         new ReservationPreferredDateInfo(reservations.getStartDate(), reservations.getEndDate())
                 ),
-                reservations.getInquiry().getSpace().getSpaceId()
+                reservations.getInquiry().getSpace().getAlias()
         );
     }
 
@@ -127,7 +127,7 @@ public class ReservationMapper {
                 files,
                 reservation.getInquiry().getCreatedAt(),
                 reservation.getInquiry().getStatus(),
-                reservation.getInquiry().getSpace().getSpaceId(),
+                reservation.getInquiry().getSpace().getAlias(),
                 reservation.getInquiry().getHostCompany(),
                 new ReservationInfo(reservation.getStatus().getDescription(), new ReservationPreferredDateInfo(reservation.getStartDate(), reservation.getEndDate()))
         );
