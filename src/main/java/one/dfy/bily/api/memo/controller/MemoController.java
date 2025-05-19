@@ -44,8 +44,12 @@ public class MemoController {
                     )
             )
     )
-    public ResponseEntity<MemoCommonResponse> createMemo(@RequestBody CreateMemoInfo createMemoInfo, @AuthenticationPrincipal CustomUserDetails userDetails) {
-        Long userId = userDetails.getUserId();
+    public ResponseEntity<MemoCommonResponse> createMemo(@RequestBody CreateMemoInfo createMemoInfo
+//                                                         @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+//        Long userId = userDetails.getUserId();
+
+        Long userId = 107L;
         return ResponseEntity.ok(memoFacade.createMemo(createMemoInfo, userId));
     }
 
@@ -63,8 +67,12 @@ public class MemoController {
                     )
             )
     )
-    public ResponseEntity<MemoResponse> findMemoByUserIdAndInquiryId(@RequestParam Long inquiryId, @AuthenticationPrincipal CustomUserDetails userDetails){
-        Long userId = userDetails.getUserId();
+    public ResponseEntity<MemoResponse> findMemoByUserIdAndInquiryId(@RequestParam Long inquiryId
+//                                                                     @AuthenticationPrincipal CustomUserDetails userDetails
+    ){
+//        Long userId = userDetails.getUserId();
+
+        Long userId = 107L;
         return ResponseEntity.ok(memoFacade.findMemoByUserIdAndInquiryId(userId, inquiryId));
     }
 

@@ -90,9 +90,11 @@ public class UserController {
                     )
             )
     )
-    public ResponseEntity<UserCommonResponse> deleteUser(@AuthenticationPrincipal CustomUserDetails userDetails
+    public ResponseEntity<UserCommonResponse> deleteUser(
+//            @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-        Long userId = userDetails.getUserId();
+//        Long userId = userDetails.getUserId();
+        Long userId = 107L;
         return ResponseEntity.ok(userService.deleteUserById(userId));
     }
 
@@ -111,10 +113,12 @@ public class UserController {
             )
     )
     public ResponseEntity<UserCommonResponse> updateUserPassword(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+//            @AuthenticationPrincipal CustomUserDetails userDetails,
             @Parameter(description = "비밀번호", required = false) @RequestBody() UpdatePassword password
     ) {
-        Long userId = userDetails.getUserId();
+//        Long userId = userDetails.getUserId();
+
+        Long userId = 107L;
         return ResponseEntity.ok(userService.updateUserPassword(userId, password));
     }
 
@@ -133,10 +137,12 @@ public class UserController {
             )
     )
     public ResponseEntity<UserCommonResponse> updatePhoneNumber(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+//            @AuthenticationPrincipal CustomUserDetails userDetails,
             @Parameter(description = "휴대폰 번호", required = false) @RequestBody(required = false) String phoneNumber
     ) {
-        Long userId = userDetails.getUserId();
+//        Long userId = userDetails.getUserId();
+
+        Long userId = 107L;
         return ResponseEntity.ok(userService.updatePhoneNumber(userId, phoneNumber));
     }
 

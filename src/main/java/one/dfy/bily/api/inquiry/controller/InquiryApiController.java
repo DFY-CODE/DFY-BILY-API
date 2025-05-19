@@ -94,10 +94,16 @@ public class InquiryApiController {
                     )
             )
     )
-    public ResponseEntity<InquiryResponse> findInquiryByInquiryId(@PathVariable(name = "inquiry-id") Long inquiryId, @AuthenticationPrincipal CustomUserDetails userDetails) {
-        Long userId = userDetails.getUserId();
-        boolean isAdmin = userDetails.getAuthorities().stream()
-                .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
+    public ResponseEntity<InquiryResponse> findInquiryByInquiryId(
+            @PathVariable(name = "inquiry-id") Long inquiryId
+//            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+//        Long userId = userDetails.getUserId();
+
+        Long userId = 107L;
+//        boolean isAdmin = userDetails.getAuthorities().stream()
+//                .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
+        boolean isAdmin = true;
         return ResponseEntity.ok(inquiryService.findInquiryByInquiryIdAndUserId(inquiryId, userId, isAdmin));
     }
 
@@ -116,10 +122,14 @@ public class InquiryApiController {
                     )
             )
     )
-    public ResponseEntity<InquiryResponse> createInquiry(@RequestPart("data") InquiryCreateRequest request,
-                                                         @RequestPart("attachFileList") List<MultipartFile> fileAttachments,
-                                                         @AuthenticationPrincipal CustomUserDetails userDetails) {
-        Long userId = userDetails.getUserId();
+    public ResponseEntity<InquiryResponse> createInquiry(
+            @RequestPart("data") InquiryCreateRequest request,
+            @RequestPart("attachFileList") List<MultipartFile> fileAttachments
+//            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+//        Long userId = userDetails.getUserId();
+        Long userId = 107L;
+
         return ResponseEntity.ok(inquiryFacade.createInquiry(request, fileAttachments,userId));
     }
 
