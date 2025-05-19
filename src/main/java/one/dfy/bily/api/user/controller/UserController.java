@@ -43,8 +43,11 @@ public class UserController {
                     )
             )
     )
-    public ResponseEntity<Profile> profile(@AuthenticationPrincipal CustomUserDetails userDetails) {
-        Long userId = userDetails.getUserId();
+    public ResponseEntity<Profile> profile(
+//            @AuthenticationPrincipal CustomUserDetails userDetails
+            @RequestParam("") Long userId
+    ) {
+//        Long userId = userDetails.getUserId();
         return ResponseEntity.ok(userService.findProfileById(userId));
     }
 
@@ -109,7 +112,7 @@ public class UserController {
     )
     public ResponseEntity<UserCommonResponse> updateUserPassword(
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            @Parameter(description = "휴대폰 번호", required = false) @RequestParam(required = false) String password
+            @Parameter(description = "비밀번호", required = false) @RequestBody() UpdatePassword password
     ) {
         Long userId = userDetails.getUserId();
         return ResponseEntity.ok(userService.updateUserPassword(userId, password));
@@ -131,7 +134,7 @@ public class UserController {
     )
     public ResponseEntity<UserCommonResponse> updatePhoneNumber(
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            @Parameter(description = "휴대폰 번호", required = false) @RequestParam(required = false) String phoneNumber
+            @Parameter(description = "휴대폰 번호", required = false) @RequestBody(required = false) String phoneNumber
     ) {
         Long userId = userDetails.getUserId();
         return ResponseEntity.ok(userService.updatePhoneNumber(userId, phoneNumber));

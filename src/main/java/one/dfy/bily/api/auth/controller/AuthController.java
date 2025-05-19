@@ -13,9 +13,11 @@ import lombok.extern.slf4j.Slf4j;
 import one.dfy.bily.api.auth.dto.*;
 import one.dfy.bily.api.auth.facade.AuthFacade;
 import one.dfy.bily.api.auth.service.AuthService;
+import one.dfy.bily.api.security.CustomUserDetails;
 import one.dfy.bily.api.user.dto.UserCommonResponse;
 import one.dfy.bily.api.util.IpUtils;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -126,4 +128,14 @@ public class AuthController {
 
         return ResponseEntity.ok(authFacade.resetPassword(request));
     }
+
+    @GetMapping(value = "/check")
+    @Operation(summary = "로그인 여부 확인", description = "로그인 여부를 확인합니다.")
+    @ApiResponse(responseCode = "200", description = "비밀번호 초기화 성공")
+    @ApiResponse(responseCode = "500", description = "비밀번호 초기화 실패")
+    public ResponseEntity<CheckSignIn> resetPassword(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        Long userId = userDetails.getUserId();
+        return ResponseEntity.ok(authFacade.checkSignIn(userId));
+    }
+
 }

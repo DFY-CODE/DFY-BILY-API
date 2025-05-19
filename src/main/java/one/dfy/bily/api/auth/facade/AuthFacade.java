@@ -61,4 +61,10 @@ public class AuthFacade {
         return userService.updateUserPassword(passwordResetToken.getEmail(), passwordResetRequest.password());
     }
 
+    @Transactional
+    public CheckSignIn checkSignIn(Long userId) {
+        userService.findUserById(userId);
+        return new CheckSignIn(true);
+    }
+
 }
