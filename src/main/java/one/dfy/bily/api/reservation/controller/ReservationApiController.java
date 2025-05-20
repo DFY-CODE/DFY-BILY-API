@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import one.dfy.bily.api.inquiry.constant.InquirySearchType;
+import one.dfy.bily.api.reservation.constant.ReservationStatus;
 import one.dfy.bily.api.reservation.dto.*;
 import one.dfy.bily.api.reservation.facade.ReservationFacade;
 import one.dfy.bily.api.reservation.service.ReservationService;
@@ -70,9 +71,10 @@ public class ReservationApiController {
             @RequestParam(value = "end_date", required = false) LocalDateTime endAt,
             @Parameter(description = "예약 검색 페이지", required = false) @RequestParam(defaultValue = "1") int page,
             @Parameter(description = "예약 검색 페이지 사이즈", required = false)
-            @RequestParam(value = "pageSize", defaultValue = "20") int pageSize
+            @RequestParam(value = "pageSize", defaultValue = "20") int pageSize,
+            @RequestParam(value = "status", required = false) List<ReservationStatus> reservationStatusList
     ) {
-        return ResponseEntity.ok(reservationService.findReservationListByKeywordAndDate(type, keyword, startAt, endAt, page, pageSize));
+        return ResponseEntity.ok(reservationService.findReservationListByKeywordAndDate(type, keyword, startAt, endAt, page, pageSize, reservationStatusList));
     }
 
     @GetMapping("/{reservation-id}")

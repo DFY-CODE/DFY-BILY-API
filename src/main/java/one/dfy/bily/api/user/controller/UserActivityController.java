@@ -46,10 +46,11 @@ public class UserActivityController {
     public ResponseEntity<UserActivityList> findReservationAndInquiry(
             @Parameter(description = "예약 검색 페이지", required = false) @RequestParam(defaultValue = "1") int page,
             @Parameter(description = "예약 검색 페이지 사이즈", required = false)
-            @RequestParam(value = "pageSize", defaultValue = "20") int pageSize,
-            @AuthenticationPrincipal CustomUserDetails userDetails
+            @RequestParam(value = "pageSize", defaultValue = "20") int pageSize
+//            @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-        Long userId = userDetails.getUserId();
+//        Long userId = userDetails.getUserId();
+        Long userId = 110L;
         return ResponseEntity.ok(userActivityFacade.findReservationAndInquiryListByUserId(userId,page,pageSize));
     }
 
@@ -70,10 +71,11 @@ public class UserActivityController {
     public ResponseEntity<UserActivityList> findInquiry(
             @Parameter(description = "예약 검색 페이지", required = false) @RequestParam(defaultValue = "1") int page,
             @Parameter(description = "예약 검색 페이지 사이즈", required = false)
-            @RequestParam(value = "pageSize", defaultValue = "20") int pageSize,
-            @AuthenticationPrincipal CustomUserDetails userDetails
+            @RequestParam(value = "pageSize", defaultValue = "20") int pageSize
+//            @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-        Long userId = userDetails.getUserId();
+//        Long userId = userDetails.getUserId();
+        Long userId = 110L;
         return ResponseEntity.ok(userActivityFacade.findInquiryListByUserId(userId,page,pageSize));
     }
 
@@ -94,10 +96,11 @@ public class UserActivityController {
     public ResponseEntity<UserActivityList> findReservation(
             @Parameter(description = "예약 검색 페이지", required = false) @RequestParam(defaultValue = "1") int page,
             @Parameter(description = "예약 검색 페이지 사이즈", required = false)
-            @RequestParam(value = "pageSize", defaultValue = "20") int pageSize,
-            @AuthenticationPrincipal CustomUserDetails userDetails
+            @RequestParam(value = "pageSize", defaultValue = "20") int pageSize
+//            @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-        Long userId = userDetails.getUserId();
+//        Long userId = userDetails.getUserId();
+        Long userId = 110L;
         return ResponseEntity.ok(userActivityFacade.findReservationListByUserId(userId,page,pageSize));
     }
 
