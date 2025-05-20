@@ -39,6 +39,7 @@ public class SpaceService {
     private final SpaceFileInfoRepository spaceFileInfoRepository;
     private final SavedSpaceRepository savedSpaceRepository;
     private final AmenityRepository amenityRepository;
+    private final AvailableUseRepository availableUseRepository;
     private final SpaceUseFileInfoRepository spaceUseFileInfoRepository;
     private final SpaceBlueprintFileInfoRepository spaceBlueprintFileInfoRepository;
     private final SpaceAmenityRepository spaceAmenityRepository;
@@ -49,6 +50,14 @@ public class SpaceService {
                 amenityRepository.findByUsed(true).stream()
                 .map(SpaceDtoMapper::toAmenityInfo)
                 .toList()
+        );
+    }
+
+    public AvailableUseList findAvailableUseList(){
+        return new AvailableUseList(
+                availableUseRepository.findByUsed(true).stream()
+                        .map(SpaceDtoMapper::toAvailableUseInfo)
+                        .toList()
         );
     }
 

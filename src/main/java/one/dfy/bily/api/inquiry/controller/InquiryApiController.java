@@ -77,7 +77,7 @@ public class InquiryApiController {
             @Parameter(description = "문의 검색 페이지 사이즈", required = false)
             @RequestParam(value = "pageSize", defaultValue = "20") int pageSize,
             @Parameter(description = "문의 상태", required = false)
-            @RequestParam(value = "status") List<InquiryStatus> statusList
+            @RequestParam(value = "status", required = false) List<InquiryStatus> statusList
     ) {
         return ResponseEntity.ok(inquiryService.findInquiryListByKeywordAndDate(type, keyword, startAt, endAt, page, pageSize, statusList));
     }

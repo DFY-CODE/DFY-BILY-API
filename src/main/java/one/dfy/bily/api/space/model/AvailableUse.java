@@ -14,8 +14,8 @@ public class AvailableUse {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "NAME")
-    private String name;
+    @Column(name = "TITLE")
+    private String title;
 
     @Column(name = "IS_USED")
     private boolean used;

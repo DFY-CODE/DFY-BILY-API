@@ -9,8 +9,13 @@ import java.util.List;
 import java.util.Map;
 
 public class SpaceDtoMapper {
+
     public static AmenityInfo toAmenityInfo(Amenity amenity) {
         return new AmenityInfo(amenity.getId(), amenity.getTitle());
+    }
+
+    public static AvailableUseInfo toAvailableUseInfo(AvailableUse availableUse) {
+        return new AvailableUseInfo(availableUse.getId(), availableUse.getTitle());
     }
 
     public static List<UserSpaceInfo> toUserSpaceInfoList(List<Space> spaces, Map<Long, String> thumbnailUrlMap) {
