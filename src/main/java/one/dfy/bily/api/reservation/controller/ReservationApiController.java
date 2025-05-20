@@ -70,7 +70,7 @@ public class ReservationApiController {
             @RequestParam(value = "end_date", required = false) LocalDateTime endAt,
             @Parameter(description = "예약 검색 페이지", required = false) @RequestParam(defaultValue = "1") int page,
             @Parameter(description = "예약 검색 페이지 사이즈", required = false)
-            @RequestParam(value = "page_size", defaultValue = "20") int pageSize
+            @RequestParam(value = "pageSize", defaultValue = "20") int pageSize
     ) {
         return ResponseEntity.ok(reservationService.findReservationListByKeywordAndDate(type, keyword, startAt, endAt, page, pageSize));
     }

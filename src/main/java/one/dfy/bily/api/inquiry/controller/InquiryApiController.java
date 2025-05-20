@@ -75,7 +75,7 @@ public class InquiryApiController {
             @RequestParam(value = "end_date", required = false) LocalDateTime endAt,
             @Parameter(description = "문의 검색 페이지", required = false) @RequestParam(defaultValue = "1") int page,
             @Parameter(description = "문의 검색 페이지 사이즈", required = false)
-            @RequestParam(value = "page_size", defaultValue = "20") int pageSize,
+            @RequestParam(value = "pageSize", defaultValue = "20") int pageSize,
             @Parameter(description = "문의 상태", required = false)
             @RequestParam(value = "status") List<InquiryStatus> statusList
     ) {

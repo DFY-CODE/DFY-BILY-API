@@ -14,12 +14,10 @@ public record InquiryCreateRequest(
         String position,
         String companyWebsite,
         String eventCategory,
-        String eventName,
         List<InquiryPreferredDateInfo> preferredDates,
         String content,
         LocalDateTime createdAt,
         InquiryStatus status,
-        String author,
         Integer spaceId,
         String hostCompany,
         String spaceIdName

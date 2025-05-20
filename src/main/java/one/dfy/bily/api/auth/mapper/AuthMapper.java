@@ -1,7 +1,7 @@
 package one.dfy.bily.api.auth.mapper;
 
 import one.dfy.bily.api.auth.model.AuthToken;
-import one.dfy.bily.api.auth.model.BusinessCard;
+import one.dfy.bily.api.user.model.BusinessCard;
 import one.dfy.bily.api.common.dto.FileUploadInfo;
 import one.dfy.bily.api.user.model.User;
 

@@ -7,7 +7,7 @@ import one.dfy.bily.api.auth.model.PasswordResetToken;
 import one.dfy.bily.api.auth.service.AuthService;
 import one.dfy.bily.api.common.annotation.Facade;
 import one.dfy.bily.api.terms.service.TermsService;
-import one.dfy.bily.api.user.constant.LoginStatus;
+import one.dfy.bily.api.user.constant.SignInStatus;
 import one.dfy.bily.api.user.dto.UserCommonResponse;
 import one.dfy.bily.api.user.model.User;
 import one.dfy.bily.api.user.service.UserService;
@@ -45,7 +45,7 @@ public class AuthFacade {
 
         termsService.createUserTermAgreement(signUpRequest.termsCodeList(), user.getId());
 
-        userService.createLoginHistory(user.getId(), clientIp, LoginStatus.SUCCESS);
+        userService.createLoginHistory(user.getId(), clientIp, SignInStatus.SUCCESS);
 
         return authService.createRefreshToken(user, response);
     }

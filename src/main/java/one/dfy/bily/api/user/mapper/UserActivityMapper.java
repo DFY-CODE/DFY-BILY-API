@@ -131,7 +131,7 @@ public class UserActivityMapper {
         return new SavedSpaceInfo(
                 space.getId(),
                 space.getTitle(),
-                space.getLocation(),
+                space.getDistrictInfo(),
                 space.getAreaM2(),
                 space.getAreaPy(),
                 space.getPrice(),

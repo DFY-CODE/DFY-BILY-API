@@ -1,4 +1,4 @@
-package one.dfy.bily.api.auth.model;
+package one.dfy.bily.api.user.model;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -32,7 +32,7 @@ public class BusinessCard extends BaseEntity {
     private Long saveSize;
 
     @Column(name = "IS_USED", length = 10)
-    private boolean isUsed = true;
+    private boolean used = true;
 
     @Column(name = "FILE_TYPE", nullable = false, length = 50)
     private String fileType;

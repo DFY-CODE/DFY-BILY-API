@@ -13,6 +13,7 @@ import one.dfy.bily.api.common.service.EmailService;
 import one.dfy.bily.api.common.dto.FileUploadInfo;
 import one.dfy.bily.api.user.constant.Role;
 import one.dfy.bily.api.user.model.User;
+import one.dfy.bily.api.user.model.repository.BusinessCardRepository;
 import one.dfy.bily.api.util.JwtCookieUtil;
 import one.dfy.bily.api.util.JwtProvider;
 import one.dfy.bily.api.util.S3Uploader;

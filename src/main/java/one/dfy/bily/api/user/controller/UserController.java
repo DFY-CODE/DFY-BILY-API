@@ -19,6 +19,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Slf4j
 @RestController
@@ -68,12 +69,33 @@ public class UserController {
     public ResponseEntity<UserInfoList> findUserInfoList(
             @Parameter(description = "이메일", required = false) @RequestParam(required = false) String email,
             @Parameter(description = "기간 타입", required = false) @RequestParam(required = false) UserSearchDateType userSearchDateType,
-            @Parameter(description = "기간", required = false) @RequestParam(required = false) LocalDate recentLoginDate,
+            @Parameter(description = "검색 시작일", required = false) @RequestParam(required = false) LocalDateTime startAt,
+            @Parameter(description = "검색 종료일", required = false) @RequestParam(required = false) LocalDateTime endAt,
             @Parameter(description = "예약 검색 페이지", required = false) @RequestParam(defaultValue = "1") int page,
             @Parameter(description = "예약 검색 페이지 사이즈", required = false)
-            @RequestParam(value = "page_size", defaultValue = "20") int pageSize
+            @RequestParam(value = "pageSize", defaultValue = "20") int pageSize
     ) {
-        return ResponseEntity.ok(userService.findUserInfoList(email, userSearchDateType, recentLoginDate, page, pageSize));
+        return ResponseEntity.ok(userService.findUserInfoList(email, userSearchDateType, startAt, endAt, page, pageSize));
+    }
+
+    @GetMapping("/{id}")
+    @Operation(summary = "사용자 상세 조회", description = "사용자 정보 리스트를 반환합니다.")
+    @ApiResponse(
+            responseCode = "200",
+            description = "성공",
+            content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = UserInfoList.class),
+                    examples = @ExampleObject(
+                            name = "성공 응답 예시",
+                            externalValue = "/swagger/json/user/activity/findReservation.json"
+                    )
+            )
+    )
+    public ResponseEntity<UserDetailInfo> findUserInfoList(
+            @Parameter(description = "회원 아이디", required = false) @PathVariable(name = "id") Long userId
+    ) {
+        return ResponseEntity.ok(userService.findUserDetailInfo(userId));
     }
 
     @PatchMapping("")

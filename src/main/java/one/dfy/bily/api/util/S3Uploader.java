@@ -312,6 +312,10 @@ public class S3Uploader {
         return "https://" + bucket + ".s3." + region + ".amazonaws.com/"+spacePath;
     }
 
+    public String getBusinessCardS3Url() {
+        return "https://" + bucket + ".s3." + region + ".amazonaws.com/"+businessCardPath;
+    }
+
     private String getFileExtension(String fileName) {
         int dotIndex = fileName.lastIndexOf(".");
         if (dotIndex > 0) {

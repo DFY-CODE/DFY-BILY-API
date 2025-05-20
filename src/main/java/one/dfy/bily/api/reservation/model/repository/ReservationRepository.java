@@ -15,9 +15,9 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long>,
     (
       SELECT
         i.ID AS id,
-        i.ID AS content_id,
+        i.ID AS spaceId,
         'INQUIRY' AS type,
-        s.NAME AS space_name,
+        s.NAME AS spaceName,
         s.LOCATION AS location,
         s.AREA_M2 AS area_m2,
         s.AREA_PY AS area_py,
@@ -28,14 +28,14 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long>,
         i.STATUS AS status,
         i.CREATED_AT AS created_at
       FROM TBL_INQUIRY i
-      JOIN TBL_SPACE s ON i.CONTENT_ID = s.CONTENT_ID
+      JOIN TBL_SPACE s ON i.SPACE_ID = s.ID
       WHERE i.USER_ID = :userId AND i.IS_USED = true
     )
     UNION ALL
     (
       SELECT
         r.ID AS id,
-        i.ID AS content_id,
+        i.ID AS space_id,
         'RESERVATION' AS type,
         s.NAME AS space_name,
         s.LOCATION AS location,
@@ -49,7 +49,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long>,
         r.CREATED_AT AS created_at
       FROM TBL_RESERVATION r
       JOIN TBL_INQUIRY i ON r.INQUIRY_ID = i.ID
-      JOIN TBL_SPACE s ON i.CONTENT_ID = s.CONTENT_ID
+      JOIN TBL_SPACE s ON i.SPACE_ID = s.ID
       WHERE r.USER_ID = :userId AND r.IS_USED = true
     )
      ORDER BY created_at DESC

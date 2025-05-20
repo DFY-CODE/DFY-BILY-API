@@ -340,7 +340,7 @@ public class SpaceService {
         return spaceFileInfoRepository.findBySpaceIdInAndUsedAndThumbnail(spaceIdList,true,true)
                 .stream()
                 .collect(Collectors.toMap(
-                        SpaceFileInfo::getId,
+                        SpaceFileInfo::getSpaceId,
                         file -> s3Url + file.getSaveFileName()
                 ));
     }
