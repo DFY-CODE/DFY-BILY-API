@@ -2,6 +2,7 @@ package one.dfy.bily.api.inquiry.service;
 
 import lombok.RequiredArgsConstructor;
 import one.dfy.bily.api.inquiry.constant.InquirySearchType;
+import one.dfy.bily.api.inquiry.constant.InquiryStatus;
 import one.dfy.bily.api.inquiry.mapper.InquiryMapper;
 import one.dfy.bily.api.inquiry.model.Inquiry;
 import one.dfy.bily.api.inquiry.model.InquiryFile;
@@ -38,7 +39,8 @@ public class InquiryService {
     public InquiryListResponse findInquiryListByKeywordAndDate(
             InquirySearchType type, String keyword,
             LocalDateTime startAt, LocalDateTime endAt,
-            int page, int pageSize
+            int page, int pageSize,
+            List<InquiryStatus> statusList
     ) {
         Pageable pageable = PageRequest.of(page - 1, pageSize, Sort.by(Sort.Direction.DESC, "id"));
 
@@ -50,7 +52,8 @@ public class InquiryService {
                 holder.spaceName(),
                 startAt,
                 endAt,
-                pageable
+                pageable,
+                statusList
         );
 
         return InquiryMapper.toInquiryListResponse(inquiryResponsePage);

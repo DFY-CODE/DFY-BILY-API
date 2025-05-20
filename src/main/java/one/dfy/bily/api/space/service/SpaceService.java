@@ -337,7 +337,7 @@ public class SpaceService {
             return Map.of();
         }
 
-        return spaceFileInfoRepository.findBySpaceIdInAndUsedAndRepresentative(spaceIdList,true,true)
+        return spaceFileInfoRepository.findBySpaceIdInAndUsedAndThumbnail(spaceIdList,true,true)
                 .stream()
                 .collect(Collectors.toMap(
                         SpaceFileInfo::getId,

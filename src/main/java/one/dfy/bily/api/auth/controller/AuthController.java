@@ -36,7 +36,7 @@ public class AuthController {
     @ApiResponse(responseCode = "200", description = "이메일 전송 성공")
     @ApiResponse(responseCode = "500", description = "이메일 전송 실패")
     public ResponseEntity<AuthCommonResponse> sendSignUpEmailVerification(@RequestBody SendEmail request) {
-        return ResponseEntity.ok(authService.sendSignUpEmailVerification(request));
+        return ResponseEntity.ok(authFacade.sendSignUpEmailVerification(request));
     }
 
     @GetMapping(value = "/verification-email")

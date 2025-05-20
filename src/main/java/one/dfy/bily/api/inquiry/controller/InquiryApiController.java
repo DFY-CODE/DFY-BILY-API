@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import one.dfy.bily.api.inquiry.constant.InquirySearchType;
+import one.dfy.bily.api.inquiry.constant.InquiryStatus;
 import one.dfy.bily.api.inquiry.dto.*;
 import one.dfy.bily.api.inquiry.facade.InquiryFacade;
 import one.dfy.bily.api.inquiry.service.InquiryService;
@@ -74,9 +75,11 @@ public class InquiryApiController {
             @RequestParam(value = "end_date", required = false) LocalDateTime endAt,
             @Parameter(description = "문의 검색 페이지", required = false) @RequestParam(defaultValue = "1") int page,
             @Parameter(description = "문의 검색 페이지 사이즈", required = false)
-            @RequestParam(value = "page_size", defaultValue = "20") int pageSize
+            @RequestParam(value = "page_size", defaultValue = "20") int pageSize,
+            @Parameter(description = "문의 상태", required = false)
+            @RequestParam(value = "status") List<InquiryStatus> statusList
     ) {
-        return ResponseEntity.ok(inquiryService.findInquiryListByKeywordAndDate(type, keyword, startAt, endAt, page, pageSize));
+        return ResponseEntity.ok(inquiryService.findInquiryListByKeywordAndDate(type, keyword, startAt, endAt, page, pageSize, statusList));
     }
 
     @GetMapping("/{inquiry-id}")

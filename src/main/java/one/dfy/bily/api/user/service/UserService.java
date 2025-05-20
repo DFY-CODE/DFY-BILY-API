@@ -112,9 +112,9 @@ public class UserService {
     }
 
     @Transactional
-    public UserCommonResponse updatePhoneNumber(Long userId, String phoneNumber) {
+    public UserCommonResponse updatePhoneNumber(Long userId, PhoneNumber request) {
         User userEntity = findUserById(userId);
-        userEntity.updatePhoneNumber(phoneNumber);
+        userEntity.updatePhoneNumber(request.phoneNumber());
 
         return new UserCommonResponse(true, "휴대폰 번호 변경이 완료되었습니다.");
     }
@@ -136,10 +136,8 @@ public class UserService {
     }
 
     @Transactional
-    public void existUserByEmail(String email) {
-         if(!userRepository.existsByEmailAndStatus(email, UserStatus.ACTIVE)) {
-            throw new IllegalArgumentException("존재하지 않는 회원입니다.");
-         }
+    public boolean existUserByEmail(String email) {
+         return userRepository.existsByEmailAndStatus(email, UserStatus.ACTIVE);
     }
 
     @Transactional

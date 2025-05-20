@@ -1,19 +1,21 @@
 package one.dfy.bily.api.space.model;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import one.dfy.bily.api.common.model.BaseEntity;
 
+import java.time.LocalDateTime;
+
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-@Table(name = "TBL_SPACE_FILE_INFO")
-public class SpaceFileInfo extends BaseEntity {
+@Table(name = "TBL_SPACE_USE_FILE_INFO")
+public class SpaceUseFileInfo extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ID")
     private Long id;
 
     @Column(name = "SPACE_ID", nullable = false)
@@ -32,20 +34,23 @@ public class SpaceFileInfo extends BaseEntity {
     private Long saveSize;
 
     @Column(name = "IS_USED")
-    private boolean used = true;
+    private boolean used = false;
 
-    @Column(name = "CREATOR", nullable = false)
+    @Column(name = "CREATOR", nullable = false, length = 50)
     private String creator;
 
-    @Column(name = "UPDATER")
+    @Column(name = "UPDATER", length = 50)
     private String updater;
 
-    @Column(name = "FILE_TYPE", nullable = false)
+    @Column(name = "FILE_TYPE", nullable = false, length = 50)
     private String fileType;
 
     @Column(name = "FILE_ORDER")
     private Integer fileOrder;
 
+    @Column(name = "FILE_TITLE")
+    private String fileTitle;
+
     @Column(name = "IS_THUMBNAIL")
-    private boolean thumbnail;
+    private Boolean isThumbnail;
 }

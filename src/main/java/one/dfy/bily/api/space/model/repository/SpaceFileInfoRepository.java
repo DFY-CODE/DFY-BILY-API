@@ -8,5 +8,5 @@ import java.util.Collection;
 import java.util.List;
 
 public interface SpaceFileInfoRepository extends JpaRepository<SpaceFileInfo, Integer> {
-    List<SpaceFileInfo> findBySpaceIdInAndUsedAndRepresentative(List<Long> spaceIds, boolean used, boolean representative);
+    List<SpaceFileInfo> findBySpaceIdInAndUsedAndThumbnail(List<Long> spaceIds, boolean used, boolean representative);
 }

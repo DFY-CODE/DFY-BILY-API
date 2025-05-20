@@ -77,7 +77,7 @@ public class UserController {
     }
 
     @PatchMapping("")
-    @Operation(summary = "회원 삭제", description = "사용자 정보 리스트를 반환합니다.")
+    @Operation(summary = "회원 탈퇴", description = "회원을 탈퇴 합니다.")
     @ApiResponse(
             responseCode = "200",
             description = "성공",
@@ -91,10 +91,8 @@ public class UserController {
             )
     )
     public ResponseEntity<UserCommonResponse> deleteUser(
-//            @AuthenticationPrincipal CustomUserDetails userDetails
+            @Parameter(description = "이메일", required = false) @RequestParam(required = false) Long userId
     ) {
-//        Long userId = userDetails.getUserId();
-        Long userId = 107L;
         return ResponseEntity.ok(userService.deleteUserById(userId));
     }
 
@@ -118,7 +116,7 @@ public class UserController {
     ) {
 //        Long userId = userDetails.getUserId();
 
-        Long userId = 107L;
+        Long userId = 110L;
         return ResponseEntity.ok(userService.updateUserPassword(userId, password));
     }
 
@@ -138,11 +136,11 @@ public class UserController {
     )
     public ResponseEntity<UserCommonResponse> updatePhoneNumber(
 //            @AuthenticationPrincipal CustomUserDetails userDetails,
-            @Parameter(description = "휴대폰 번호", required = false) @RequestBody(required = false) String phoneNumber
+            @Parameter(description = "휴대폰 번호", required = false) @RequestBody(required = false) PhoneNumber phoneNumber
     ) {
 //        Long userId = userDetails.getUserId();
 
-        Long userId = 107L;
+        Long userId = 110L;
         return ResponseEntity.ok(userService.updatePhoneNumber(userId, phoneNumber));
     }
 

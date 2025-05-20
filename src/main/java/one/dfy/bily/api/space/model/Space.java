@@ -83,7 +83,7 @@ public class Space extends BaseEntity {
     private String views;
 
     @Column(name = "IS_USED")
-    private boolean used;
+    private Boolean used = true;
 
     @Column(name = "CREATOR", length = 50)
     private String creator;

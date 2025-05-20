@@ -21,6 +21,13 @@ public class AuthFacade {
     private final AuthService authService;
     private final TermsService termsService;
 
+    public AuthCommonResponse sendSignUpEmailVerification(SendEmail request){
+        if(userService.existUserByEmail(request.email())){
+            return new AuthCommonResponse(false, "중복된 이메일입니다.");
+        }
+        return authService.sendSignUpEmailVerification(request);
+    }
+
     public AuthCommonResponse checkPhoneNumber(String phoneNumber) {
         if(userService.checkPhoneNumber(phoneNumber)){
             return new AuthCommonResponse(false, "이미 가입한 휴대번호 입니다.");
@@ -50,7 +57,9 @@ public class AuthFacade {
     }
 
     public AuthCommonResponse sendPasswordResetVerification(SendEmail request){
-        userService.existUserByEmail(request.email());
+        if(!userService.existUserByEmail(request.email())){
+            throw new IllegalArgumentException("존재하지 않는 회원입니다.");
+        }
         return authService.sendPasswordResetVerification(request);
     }
 
