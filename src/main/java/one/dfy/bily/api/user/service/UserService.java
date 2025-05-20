@@ -39,7 +39,7 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public boolean checkPhoneNumber(String phoneNumber) {
-        return userRepository.existsByPhoneNumber(phoneNumber);
+        return userRepository.existsByPhoneNumberAndStatus(phoneNumber, UserStatus.ACTIVE);
     }
 
     public User createUser(SignUpRequest signUpRequest) {
