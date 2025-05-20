@@ -35,20 +35,23 @@ public class SpaceBlueprintFileInfo extends BaseEntity {
     private Long saveSize;
 
     @Column(name = "IS_USED")
-    private Boolean isUsed;
+    private Boolean used = true;
 
     @Column(name = "CREATOR", nullable = false, length = 50)
     private String creator;
 
-    @Column(name = "CREATED_AT", nullable = false)
-    private LocalDateTime createdAt;
-
     @Column(name = "UPDATER", length = 50)
     private String updater;
 
-    @Column(name = "UPDATED_AT")
-    private LocalDateTime updatedAt;
-
     @Column(name = "FILE_TYPE", nullable = false, length = 50)
     private String fileType;
+
+    public SpaceBlueprintFileInfo(Long spaceId, String fileName, String saveFileName, String saveLocation, Long saveSize, String fileType) {
+        this.spaceId = spaceId;
+        this.fileName = fileName;
+        this.saveFileName = saveFileName;
+        this.saveLocation = saveLocation;
+        this.saveSize = saveSize;
+        this.fileType = fileType;
+    }
 }

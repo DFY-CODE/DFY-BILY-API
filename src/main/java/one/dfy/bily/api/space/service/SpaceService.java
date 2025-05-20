@@ -6,23 +6,20 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import one.dfy.bily.api.common.mapper.PaginationMapper;
 import one.dfy.bily.api.space.mapper.SpaceDtoMapper;
-import one.dfy.bily.api.space.model.SavedSpace;
-import one.dfy.bily.api.space.model.Space;
-import one.dfy.bily.api.space.model.SpaceFileInfo;
-import one.dfy.bily.api.space.model.repository.AmenityRepository;
-import one.dfy.bily.api.space.model.repository.SpaceFileInfoRepository;
-import one.dfy.bily.api.space.model.repository.SpaceRepository;
+import one.dfy.bily.api.space.model.*;
+import one.dfy.bily.api.space.model.repository.*;
 import one.dfy.bily.api.common.dto.*;
 import one.dfy.bily.api.space.mapper.SpaceMapper;
 import one.dfy.bily.api.space.dto.*;
-import one.dfy.bily.api.space.model.repository.SavedSpaceRepository;
 import one.dfy.bily.api.util.S3Uploader;
+import org.apache.tomcat.jni.FileInfo;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -30,6 +27,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Service
 @RequiredArgsConstructor
@@ -41,6 +39,10 @@ public class SpaceService {
     private final SpaceFileInfoRepository spaceFileInfoRepository;
     private final SavedSpaceRepository savedSpaceRepository;
     private final AmenityRepository amenityRepository;
+    private final SpaceUseFileInfoRepository spaceUseFileInfoRepository;
+    private final SpaceBlueprintFileInfoRepository spaceBlueprintFileInfoRepository;
+    private final SpaceAmenityRepository spaceAmenityRepository;
+    private final SpaceAvailableUseRepository spaceAvailableUseRepository;
 
     public AmenityInfoList findAmenityInfoList(){
         return new AmenityInfoList(
@@ -52,7 +54,7 @@ public class SpaceService {
 
     @Transactional
     public NonUserSpaceInfoResponse findNonUserSpaceInfoList(int page, int size){
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
+        Pageable pageable = PageRequest.of(page - 1, size, Sort.by(Sort.Direction.DESC, "id"));
 
         Page<Space> spaces = spaceRepository.findAll(pageable);
 
@@ -60,9 +62,9 @@ public class SpaceService {
                 .map(Space::getId)
                 .toList();
 
-        Map<Long, String> thumbNailUrl = findSpaceFileBySpaceIds(spaceIds);
+        Map<Long, String> thumbnailUrlMap = findSpaceFileBySpaceIds(spaceIds);
 
-        List<NonUserSpaceInfo> nonUserSpaceInfoList = SpaceDtoMapper.toNonUserSpaceInfoList(spaces.getContent(), thumbNailUrl);
+        List<NonUserSpaceInfo> nonUserSpaceInfoList = SpaceDtoMapper.toNonUserSpaceInfoList(spaces.getContent(), thumbnailUrlMap);
         Pagination pagination = PaginationMapper.toPagination(pageable,spaces.getTotalElements(),spaces.getTotalPages());
 
         return new NonUserSpaceInfoResponse(nonUserSpaceInfoList, pagination);
@@ -70,7 +72,7 @@ public class SpaceService {
 
     @Transactional
     public UserSpaceInfoResponse findUserSpaceInfoList(int page, int size){
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
+        Pageable pageable = PageRequest.of(page - 1, size, Sort.by(Sort.Direction.DESC, "id"));
 
         Page<Space> spaces = spaceRepository.findAll(pageable);
 
@@ -78,9 +80,9 @@ public class SpaceService {
                 .map(Space::getId)
                 .toList();
 
-        Map<Long, String> thumbNailUrl = findSpaceFileBySpaceIds(spaceIds);
+        Map<Long, String> thumbnailUrlMap = findSpaceFileBySpaceIds(spaceIds);
 
-        List<UserSpaceInfo> nonUserSpaceInfoList = SpaceDtoMapper.toUserSpaceInfoList(spaces.getContent(), thumbNailUrl);
+        List<UserSpaceInfo> nonUserSpaceInfoList = SpaceDtoMapper.toUserSpaceInfoList(spaces.getContent(), thumbnailUrlMap);
         Pagination pagination = PaginationMapper.toPagination(pageable,spaces.getTotalElements(),spaces.getTotalPages());
 
         return new UserSpaceInfoResponse(nonUserSpaceInfoList, pagination);
@@ -389,6 +391,51 @@ public class SpaceService {
                 .toList();
 
         return findSpaceFileBySpaceIds(spaceIds);
+    }
+
+    public SpaceCommonResponse saveSpace(SpaceRequest request, List<MultipartFile> spaceImages,  List<MultipartFile> useCaseImages, MultipartFile blueprint ) {
+        Space spaceEntity = spaceRepository.save(SpaceDtoMapper.toSpaceEntity(request));
+
+        List<SpaceFileInfo> spaceFileInfos = IntStream.range(0, spaceImages.size())
+                .mapToObj(i -> {
+                    boolean isThumbnail = i == request.thumbnailIndex();
+                    MultipartFile file = spaceImages.get(i);
+                    FileUploadInfo uploadedFile = s3Uploader.spaceFileUpload(file);
+                    return SpaceDtoMapper.toSpaceFileInfoEntity(uploadedFile, spaceEntity.getId(), i, isThumbnail);
+                })
+                .toList();
+
+        spaceFileInfoRepository.saveAll(spaceFileInfos);
+
+        List<SpaceUseFileInfo> spaceUseFileInfoList = IntStream.range(0, useCaseImages.size())
+                .mapToObj(i -> {
+                    MultipartFile file = spaceImages.get(i);
+                    FileUploadInfo uploadedFile = s3Uploader.spaceFileUpload(file);
+                    return SpaceDtoMapper.toSpaceUseFileInfoEntity(uploadedFile, spaceEntity.getId(), request.useCaseImageTitles().get(i),i);
+                })
+                .toList();
+
+        spaceUseFileInfoRepository.saveAll(spaceUseFileInfoList);
+
+        FileUploadInfo uploadedFile = s3Uploader.spaceFileUpload(blueprint);
+
+        SpaceBlueprintFileInfo spaceBlueprintFileInfo = SpaceDtoMapper.toSpaceBlueprintFileInfoEntity(uploadedFile, spaceEntity.getId());
+
+        spaceBlueprintFileInfoRepository.save(spaceBlueprintFileInfo);
+
+        List<SpaceAmenity> spaceAmenities = request.amenities().stream()
+                .map( amenity -> SpaceDtoMapper.toSpaceAmenityEntity(spaceEntity.getId(), amenity))
+                .toList();
+
+        spaceAmenityRepository.saveAll(spaceAmenities);
+
+        List<SpaceAvailableUse> spaceAvailableUses = request.availableUses().stream()
+                .map( availableUse -> SpaceDtoMapper.toSpaceAvailableUseEntity(spaceEntity.getId(), availableUse))
+                .toList();
+
+        spaceAvailableUseRepository.saveAll(spaceAvailableUses);
+
+        return new SpaceCommonResponse(true, "공간 생성이 완료되었습니다.");
     }
 
 }

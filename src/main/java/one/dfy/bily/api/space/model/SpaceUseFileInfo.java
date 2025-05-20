@@ -34,7 +34,7 @@ public class SpaceUseFileInfo extends BaseEntity {
     private Long saveSize;
 
     @Column(name = "IS_USED")
-    private boolean used = false;
+    private boolean used = true;
 
     @Column(name = "CREATOR", nullable = false, length = 50)
     private String creator;
@@ -52,5 +52,16 @@ public class SpaceUseFileInfo extends BaseEntity {
     private String fileTitle;
 
     @Column(name = "IS_THUMBNAIL")
-    private Boolean isThumbnail;
+    private Boolean thumbnail;
+
+    public SpaceUseFileInfo(Long spaceId, String fileName, String saveFileName, String saveLocation, Long saveSize, String fileType, Integer fileOrder, String fileTitle) {
+        this.spaceId = spaceId;
+        this.fileName = fileName;
+        this.saveFileName = saveFileName;
+        this.saveLocation = saveLocation;
+        this.saveSize = saveSize;
+        this.fileType = fileType;
+        this.fileOrder = fileOrder;
+        this.fileTitle = fileTitle;
+    }
 }

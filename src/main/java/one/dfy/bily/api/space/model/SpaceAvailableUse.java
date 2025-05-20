@@ -19,4 +19,9 @@ public class SpaceAvailableUse {
 
     @Column
     private Long availableUseId;
+
+    public SpaceAvailableUse(Long spaceId, Long availableUseId) {
+        this.spaceId = spaceId;
+        this.availableUseId = availableUseId;
+    }
 }

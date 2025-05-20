@@ -135,132 +135,132 @@ public class SpaceApiController {
     }
 
 
-    @PostMapping(value = "/insert", consumes = "multipart/form-data")
-    @Operation(
-            summary = "공간 정보를 삽입합니다.",
-            description = "공간 정보 입력과 관련된 API. 공간 기본 정보, 태그, 이미지 및 도면 파일을 함께 업로드할 수 있습니다."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "공간 정보가 성공적으로 삽입됨",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = Map.class))),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청",
-                    content = @Content(mediaType = "application/json")),
-            @ApiResponse(responseCode = "500", description = "서버 오류",
-                    content = @Content(mediaType = "application/json"))
-    })
-    public ResponseEntity<Map<String, Object>> insertSpaceManager(
-            @Parameter(description = "공간 표시 여부", required = false) @RequestParam(value = "displayStatus", required = false) boolean displayStatus,
-            @Parameter(description = "공간 고정 여부", required = false) @RequestParam(value = "fixedStatus", required = false) boolean fixedStatus,
-            @Parameter(description = "공간 ID", required = false) @RequestParam(value = "spaceId", required = false) String spaceId,
-            @Parameter(description = "가격(1일 기준)", required = false) @RequestParam(value = "price", required = false) Double price,
-            @Parameter(description = "면적(제곱미터)", required = false) @RequestParam(value = "areaM2", required = false) BigDecimal areaM2,
-            @Parameter(description = "최대 수용 가능 인원", required = false) @RequestParam(value = "maxCapacity", required = false) Integer maxCapacity,
-            @Parameter(description = "구/지역 정보", required = false) @RequestParam(value = "districtInfo", required = false) String districtInfo,
-            @Parameter(description = "위치", required = false) @RequestParam(value = "location", required = false) String location,
-            @Parameter(description = "공간 이름", required = false) @RequestParam(value = "name", required = false) String name,
-            @Parameter(description = "공간 태그 (쉼표로 구분된 문자열)", required = false) @RequestParam(value = "tags", required = false) String tags,
-            @Parameter(description = "공간 설명", required = false) @RequestParam(value = "info", required = false) String info,
-            @Parameter(description = "공간 특징 (쉼표로 구분된 문자열)", required = false) @RequestParam(value = "features", required = false) String features,
-            @Parameter(description = "이용 가능 시간 정보", required = false) @RequestParam(value = "usageTime", required = false) String usageTime,
-            @Parameter(description = "취소 정책", required = false) @RequestParam(value = "cancellationPolicy", required = false) String cancellationPolicy,
-            @Parameter(description = "편의 시설 정보", required = false) @RequestParam(value = "amenities", required = false) String amenities,
-            @Parameter(description = "이용 가능 용도", required = false) @RequestParam(value = "availableUses", required = false) String availableUses,
-            @Parameter(description = "면적 (평)", required = false) @RequestParam(value = "areaPy", required = false) String areaPy,
-            @Parameter(description = "위도", required = false) @RequestParam(value = "latitude", required = false) Double latitude,
-            @Parameter(description = "경도", required = false) @RequestParam(value = "longitude", required = false) Double longitude,
-            @Parameter(description = "각 이미지 순서", required = false) @RequestParam(value = "spaceImageOrders", required = false) List<Integer> spaceImageOrders,
-            @Parameter(description = "공간 이미지 파일", required = false) @RequestPart(value = "spaceImages", required = false) List<MultipartFile> spaceImages,
-            @Parameter(description = "공간 이미지 제목", required = false) @RequestPart(value = "spaceImageTitles", required = false) List<String> spaceImageTitles,
-            @Parameter(description = "사례 이미지 파일", required = false) @RequestPart(value = "useCaseImages", required = false) List<MultipartFile> useCaseImages,
-            @Parameter(description = "사례 이미지 제목", required = false) @RequestPart(value = "useCaseImageTitles", required = false) List<String> useCaseImageTitles,
-            @Parameter(description = "도면 이미지 파일", required = false) @RequestPart(value = "blueprint", required = false) List<MultipartFile> blueprint
-    ) {
-
-        try {
-            List<String> featureList = features != null ? Arrays.asList(features.split(",")) : new ArrayList<>();
-            List<String> tagList = tags != null ? Arrays.asList(tags.split(",")) : new ArrayList<>();
-
-            // 새로운 contentId 생성 - TBL_SPACE에서 max(contentId) + 1 조회
-            Long newContentId = spaceService.getNextContentId();
-
-
-            // 공간 정보 DTO 생성
-            AdminSpaceDto spaceDto = new AdminSpaceDto();
-            spaceDto.setContentId(newContentId);
-            spaceDto.setDisplayStatus(displayStatus);
-            spaceDto.setFixedStatus(fixedStatus);
-            spaceDto.setSpaceId(spaceId);
-            spaceDto.setPrice(price);
-            spaceDto.setAreaM2(areaM2);
-            spaceDto.setMaxCapacity(maxCapacity);
-            spaceDto.setDistrictInfo(districtInfo);
-            spaceDto.setLocation(location);
-            spaceDto.setName(name);
-            spaceDto.setTags(tagList);
-            spaceDto.setInfo(info);
-            spaceDto.setFeatures(featureList);
-            spaceDto.setUsageTime(usageTime);
-            spaceDto.setCancellationPolicy(cancellationPolicy);
-            spaceDto.setAmenities(amenities); // 문자열로 입력된 시설 정보
-            spaceDto.setAvailableUses(availableUses); // 문자열로 입력된 이용 가능 용도
-            spaceDto.setAreaPy(areaPy);
-            spaceDto.setLatitude(latitude);
-            spaceDto.setLongitude(longitude);
-
-            // 공간 이미지 처리
-            List<SpaceFileDto> spaceFileDtos = new ArrayList<>();
-            if (spaceImages != null && !spaceImages.isEmpty()) {
-                for (int i = 0; i < spaceImages.size(); i++) {
-                    MultipartFile file = spaceImages.get(i);
-                    String title = (spaceImageTitles != null && i < spaceImageTitles.size()) ? spaceImageTitles.get(i) : file.getOriginalFilename();
-                    SpaceFileDto uploadedFile = s3Uploader.spaceUpload(newContentId, file.getSize(), file.getOriginalFilename(), file, "space", title);
-                    uploadedFile.setFileOrder(spaceImageOrders != null && i < spaceImageOrders.size() ? spaceImageOrders.get(i) : (i + 1));
-                    spaceFileDtos.add(uploadedFile);
-                }
-            }
-
-            // 사례 이미지 처리
-            List<SpaceUseFileDto> spaceUseFileDtos = new ArrayList<>();
-            if (useCaseImages != null && !useCaseImages.isEmpty()) {
-                for (int i = 0; i < useCaseImages.size(); i++) {
-                    MultipartFile file = useCaseImages.get(i);
-                    String title = (useCaseImageTitles != null && i < useCaseImageTitles.size()) ? useCaseImageTitles.get(i) : file.getOriginalFilename();
-                    SpaceUseFileDto uploadedFile = s3Uploader.spaceUseUpload(newContentId, file.getSize(), file.getOriginalFilename(), file, "useCase", title);
-                    uploadedFile.setFileOrder(i + 1);
-                    spaceUseFileDtos.add(uploadedFile);
-                }
-            }
-
-            // 도면 파일 처리
-            List<SpaceBulePrintFileDto> blueprintFileDtos = new ArrayList<>();
-            if (blueprint != null && !blueprint.isEmpty()) {
-                for (MultipartFile file : blueprint) {
-                    if (file != null && !file.isEmpty()) {
-                        SpaceBulePrintFileDto uploadedFile = s3Uploader.blueprintUpload(
-                                newContentId,
-                                file.getSize(),
-                                file.getOriginalFilename(),
-                                file,
-                                "blueprint",
-                                file.getOriginalFilename()
-                        );
-                        blueprintFileDtos.add(uploadedFile);
-                    }
-                }
-            }
-
-            // 공간 정보 저장
-            spaceService.insertSpace(spaceDto, spaceFileDtos, spaceUseFileDtos, blueprintFileDtos);
-
-            return ResponseEntity.ok(Map.of("message", "공간 정보가 생성되었습니다."));
-        } catch (IOException e) {
-            log.error("파일 업로드 중 오류 발생:", e);
-            return ResponseEntity.internalServerError().body(Map.of("error", "파일 업로드 중 오류가 발생했습니다."));
-        } catch (Exception e) {
-            log.error("공간 정보 생성 중 오류 발생:", e);
-            return ResponseEntity.internalServerError().body(Map.of("error", "서버 오류가 발생했습니다."));
-        }
-    }
+//    @PostMapping(value = "/insert", consumes = "multipart/form-data")
+//    @Operation(
+//            summary = "공간 정보를 삽입합니다.",
+//            description = "공간 정보 입력과 관련된 API. 공간 기본 정보, 태그, 이미지 및 도면 파일을 함께 업로드할 수 있습니다."
+//    )
+//    @ApiResponses(value = {
+//            @ApiResponse(responseCode = "200", description = "공간 정보가 성공적으로 삽입됨",
+//                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = Map.class))),
+//            @ApiResponse(responseCode = "400", description = "잘못된 요청",
+//                    content = @Content(mediaType = "application/json")),
+//            @ApiResponse(responseCode = "500", description = "서버 오류",
+//                    content = @Content(mediaType = "application/json"))
+//    })
+//    public ResponseEntity<Map<String, Object>> insertSpaceManager(
+//            @Parameter(description = "공간 표시 여부", required = false) @RequestParam(value = "displayStatus", required = false) boolean displayStatus,
+//            @Parameter(description = "공간 고정 여부", required = false) @RequestParam(value = "fixedStatus", required = false) boolean fixedStatus,
+//            @Parameter(description = "공간 ID", required = false) @RequestParam(value = "spaceId", required = false) String spaceId,
+//            @Parameter(description = "가격(1일 기준)", required = false) @RequestParam(value = "price", required = false) Double price,
+//            @Parameter(description = "면적(제곱미터)", required = false) @RequestParam(value = "areaM2", required = false) BigDecimal areaM2,
+//            @Parameter(description = "최대 수용 가능 인원", required = false) @RequestParam(value = "maxCapacity", required = false) Integer maxCapacity,
+//            @Parameter(description = "구/지역 정보", required = false) @RequestParam(value = "districtInfo", required = false) String districtInfo,
+//            @Parameter(description = "위치", required = false) @RequestParam(value = "location", required = false) String location,
+//            @Parameter(description = "공간 이름", required = false) @RequestParam(value = "name", required = false) String name,
+//            @Parameter(description = "공간 태그 (쉼표로 구분된 문자열)", required = false) @RequestParam(value = "tags", required = false) String tags,
+//            @Parameter(description = "공간 설명", required = false) @RequestParam(value = "info", required = false) String info,
+//            @Parameter(description = "공간 특징 (쉼표로 구분된 문자열)", required = false) @RequestParam(value = "features", required = false) String features,
+//            @Parameter(description = "이용 가능 시간 정보", required = false) @RequestParam(value = "usageTime", required = false) String usageTime,
+//            @Parameter(description = "취소 정책", required = false) @RequestParam(value = "cancellationPolicy", required = false) String cancellationPolicy,
+//            @Parameter(description = "편의 시설 정보", required = false) @RequestParam(value = "amenities", required = false) String amenities,
+//            @Parameter(description = "이용 가능 용도", required = false) @RequestParam(value = "availableUses", required = false) String availableUses,
+//            @Parameter(description = "면적 (평)", required = false) @RequestParam(value = "areaPy", required = false) String areaPy,
+//            @Parameter(description = "위도", required = false) @RequestParam(value = "latitude", required = false) Double latitude,
+//            @Parameter(description = "경도", required = false) @RequestParam(value = "longitude", required = false) Double longitude,
+//            @Parameter(description = "각 이미지 순서", required = false) @RequestParam(value = "spaceImageOrders", required = false) List<Integer> spaceImageOrders,
+//            @Parameter(description = "공간 이미지 파일", required = false) @RequestPart(value = "spaceImages", required = false) List<MultipartFile> spaceImages,
+//            @Parameter(description = "공간 이미지 제목", required = false) @RequestPart(value = "spaceImageTitles", required = false) List<String> spaceImageTitles,
+//            @Parameter(description = "사례 이미지 파일", required = false) @RequestPart(value = "useCaseImages", required = false) List<MultipartFile> useCaseImages,
+//            @Parameter(description = "사례 이미지 제목", required = false) @RequestPart(value = "useCaseImageTitles", required = false) List<String> useCaseImageTitles,
+//            @Parameter(description = "도면 이미지 파일", required = false) @RequestPart(value = "blueprint", required = false) List<MultipartFile> blueprint
+//    ) {
+//
+//        try {
+//            List<String> featureList = features != null ? Arrays.asList(features.split(",")) : new ArrayList<>();
+//            List<String> tagList = tags != null ? Arrays.asList(tags.split(",")) : new ArrayList<>();
+//
+//            // 새로운 contentId 생성 - TBL_SPACE에서 max(contentId) + 1 조회
+//            Long newContentId = spaceService.getNextContentId();
+//
+//
+//            // 공간 정보 DTO 생성
+//            AdminSpaceDto spaceDto = new AdminSpaceDto();
+//            spaceDto.setContentId(newContentId);
+//            spaceDto.setDisplayStatus(displayStatus);
+//            spaceDto.setFixedStatus(fixedStatus);
+//            spaceDto.setSpaceId(spaceId);
+//            spaceDto.setPrice(price);
+//            spaceDto.setAreaM2(areaM2);
+//            spaceDto.setMaxCapacity(maxCapacity);
+//            spaceDto.setDistrictInfo(districtInfo);
+//            spaceDto.setLocation(location);
+//            spaceDto.setName(name);
+//            spaceDto.setTags(tagList);
+//            spaceDto.setInfo(info);
+//            spaceDto.setFeatures(featureList);
+//            spaceDto.setUsageTime(usageTime);
+//            spaceDto.setCancellationPolicy(cancellationPolicy);
+//            spaceDto.setAmenities(amenities); // 문자열로 입력된 시설 정보
+//            spaceDto.setAvailableUses(availableUses); // 문자열로 입력된 이용 가능 용도
+//            spaceDto.setAreaPy(areaPy);
+//            spaceDto.setLatitude(latitude);
+//            spaceDto.setLongitude(longitude);
+//
+//            // 공간 이미지 처리
+//            List<SpaceFileDto> spaceFileDtos = new ArrayList<>();
+//            if (spaceImages != null && !spaceImages.isEmpty()) {
+//                for (int i = 0; i < spaceImages.size(); i++) {
+//                    MultipartFile file = spaceImages.get(i);
+//                    String title = (spaceImageTitles != null && i < spaceImageTitles.size()) ? spaceImageTitles.get(i) : file.getOriginalFilename();
+//                    SpaceFileDto uploadedFile = s3Uploader.spaceUpload(newContentId, file.getSize(), file.getOriginalFilename(), file, "space", title);
+//                    uploadedFile.setFileOrder(spaceImageOrders != null && i < spaceImageOrders.size() ? spaceImageOrders.get(i) : (i + 1));
+//                    spaceFileDtos.add(uploadedFile);
+//                }
+//            }
+//
+//            // 사례 이미지 처리
+//            List<SpaceUseFileDto> spaceUseFileDtos = new ArrayList<>();
+//            if (useCaseImages != null && !useCaseImages.isEmpty()) {
+//                for (int i = 0; i < useCaseImages.size(); i++) {
+//                    MultipartFile file = useCaseImages.get(i);
+//                    String title = (useCaseImageTitles != null && i < useCaseImageTitles.size()) ? useCaseImageTitles.get(i) : file.getOriginalFilename();
+//                    SpaceUseFileDto uploadedFile = s3Uploader.spaceUseUpload(newContentId, file.getSize(), file.getOriginalFilename(), file, "useCase", title);
+//                    uploadedFile.setFileOrder(i + 1);
+//                    spaceUseFileDtos.add(uploadedFile);
+//                }
+//            }
+//
+//            // 도면 파일 처리
+//            List<SpaceBulePrintFileDto> blueprintFileDtos = new ArrayList<>();
+//            if (blueprint != null && !blueprint.isEmpty()) {
+//                for (MultipartFile file : blueprint) {
+//                    if (file != null && !file.isEmpty()) {
+//                        SpaceBulePrintFileDto uploadedFile = s3Uploader.blueprintUpload(
+//                                newContentId,
+//                                file.getSize(),
+//                                file.getOriginalFilename(),
+//                                file,
+//                                "blueprint",
+//                                file.getOriginalFilename()
+//                        );
+//                        blueprintFileDtos.add(uploadedFile);
+//                    }
+//                }
+//            }
+//
+//            // 공간 정보 저장
+//            spaceService.insertSpace(spaceDto, spaceFileDtos, spaceUseFileDtos, blueprintFileDtos);
+//
+//            return ResponseEntity.ok(Map.of("message", "공간 정보가 생성되었습니다."));
+//        } catch (IOException e) {
+//            log.error("파일 업로드 중 오류 발생:", e);
+//            return ResponseEntity.internalServerError().body(Map.of("error", "파일 업로드 중 오류가 발생했습니다."));
+//        } catch (Exception e) {
+//            log.error("공간 정보 생성 중 오류 발생:", e);
+//            return ResponseEntity.internalServerError().body(Map.of("error", "서버 오류가 발생했습니다."));
+//        }
+//    }
 
     @Operation(summary = "공간 상세 정보 수정", description = "공간 상세 정보를 수정하고, 이미지 파일도 업데이트합니다.")
     @ApiResponses(value = {
@@ -483,6 +483,28 @@ public class SpaceApiController {
         return ResponseEntity.ok(spaceService.cancelSavedSpace(contentId.contentId(), userId));
     }
 
-
+    @PostMapping("")
+    @Operation(summary = "공간 생성", description = "사용자가 공간을 저장합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = SpaceCommonResponse.class),
+                            examples = @ExampleObject(
+                                    name = "성공 응답 예시",
+                                    externalValue = "/swagger/json/space/getSpaces.json"
+                            )
+                    )
+            )
+    })
+    public ResponseEntity<SpaceCommonResponse> saveSpace(
+            @RequestPart("data") SpaceRequest request,
+            @RequestPart("spaceImages") List<MultipartFile> spaceImages,
+            @RequestPart("useCaseImages") List<MultipartFile> useCaseImages,
+            @RequestPart("blueprint") MultipartFile blueprint ) {
+        return ResponseEntity.ok(spaceService.saveSpace(request, spaceImages, useCaseImages, blueprint));
+    }
 
 }

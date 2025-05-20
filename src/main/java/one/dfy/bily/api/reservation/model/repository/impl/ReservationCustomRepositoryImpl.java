@@ -98,7 +98,6 @@ public class ReservationCustomRepositoryImpl implements ReservationCustomReposit
                         space.location,
                         space.areaM2,
                         space.areaPy,
-                        space.maxCapacity,
                         reservation.startDate,
                         reservation.endDate,
                         space.price,

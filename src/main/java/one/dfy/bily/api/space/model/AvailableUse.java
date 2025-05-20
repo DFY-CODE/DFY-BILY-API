@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-@Table(name = "TBL_SPACE_USE_FILE_INFO")
+@Table(name = "TBL_AVAILABLE_USE")
 public class AvailableUse {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -16,4 +16,7 @@ public class AvailableUse {
 
     @Column(name = "NAME")
     private String name;
+
+    @Column(name = "IS_USED")
+    private boolean used;
 }

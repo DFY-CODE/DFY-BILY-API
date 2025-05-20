@@ -48,4 +48,15 @@ public class SpaceFileInfo extends BaseEntity {
 
     @Column(name = "IS_THUMBNAIL")
     private boolean thumbnail;
+
+    public SpaceFileInfo(Long spaceId, String fileName, String saveFileName, String saveLocation, Long saveSize, String fileType, Integer fileOrder, boolean thumbnail) {
+        this.spaceId = spaceId;
+        this.fileName = fileName;
+        this.saveFileName = saveFileName;
+        this.saveLocation = saveLocation;
+        this.saveSize = saveSize;
+        this.fileType = fileType;
+        this.fileOrder = fileOrder;
+        this.thumbnail = thumbnail;
+    }
 }

@@ -122,7 +122,6 @@ public class InquiryRepositoryCustomImpl implements InquiryRepositoryCustom {
                         space.location,
                         space.areaM2,
                         space.areaPy,
-                        space.maxCapacity,
                         space.price,
                         inquiry.status,
                         inquiry.createdAt

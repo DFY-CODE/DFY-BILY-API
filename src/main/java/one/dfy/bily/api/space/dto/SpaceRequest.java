@@ -13,7 +13,7 @@ public record SpaceRequest(
         Boolean fixedStatus,
 
         @Schema(description = "공간 ID")
-        String spaceId,
+        String spaceAlias,
 
         @Schema(description = "위치")
         String location,
@@ -49,10 +49,10 @@ public record SpaceRequest(
         String cancellationPolicy,
 
         @Schema(description = "편의 시설 정보")
-        String amenities,
+        List<Long> amenities,
 
         @Schema(description = "이용 가능 용도")
-        String availableUses,
+        List<Long> availableUses,
 
         @Schema(description = "면적 (평)")
         String areaPy,

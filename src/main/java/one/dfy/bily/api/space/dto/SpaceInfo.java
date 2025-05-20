@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 
 public record SpaceInfo(
         Long id,
-        String thumbNailUrl,
+        String thumbnailUrl,
         String title,
         String districtInfo,
         BigDecimal areaM2,

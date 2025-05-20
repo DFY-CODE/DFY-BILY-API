@@ -135,7 +135,6 @@ public class UserActivityMapper {
                 space.getAreaM2(),
                 space.getAreaPy(),
                 space.getPrice(),
-                space.getTags(),
                 fileNameListMap.getOrDefault(space.getId(), null)
         );
     }

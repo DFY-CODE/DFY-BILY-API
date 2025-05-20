@@ -21,4 +21,8 @@ public class SpaceAmenity extends BaseEntity {
     @Column
     private Long amenityId;
 
+    public SpaceAmenity(Long spaceId, Long amenityId) {
+        this.spaceId = spaceId;
+        this.amenityId = amenityId;
+    }
 }

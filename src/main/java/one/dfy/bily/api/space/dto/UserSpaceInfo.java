@@ -4,8 +4,8 @@ import java.math.BigDecimal;
 
 public record UserSpaceInfo(
         Long id,
-        String thumbNailUrl,
-        String title,
+        String thumbnailUrl,
+        String spaceName,
         String districtInfo,
         BigDecimal areaM2,
         int areaPy,
