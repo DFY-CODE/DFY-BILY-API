@@ -79,13 +79,15 @@ public class Space extends BaseEntity {
     @Column(name = "UPDATER", length = 50)
     private String updater;
 
+    @Column(name = "USER_ID")
+    private Long userId;
 
     public Space(Boolean displayStatus, Boolean fixedStatus, String alias, Long price,
                  BigDecimal areaM2, String districtInfo, String location,
                  String title, String info, String features,
                  String usageTime, String cancellationPolicy,
                  Integer areaPy, BigDecimal latitude, BigDecimal longitude, Long views,
-                 Boolean used) {
+                 Boolean used, Long userId) {
         this.displayStatus = displayStatus;
         this.fixedStatus = fixedStatus;
         this.alias = alias;
@@ -103,5 +105,6 @@ public class Space extends BaseEntity {
         this.longitude = longitude;
         this.views = views;
         this.used = used;
+        this.userId = userId;
     }
 }

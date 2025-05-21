@@ -59,7 +59,7 @@ public class SpaceDtoMapper {
                 .toList();
     }
 
-    public static Space toSpaceEntity(SpaceRequest request) {
+    public static Space toSpaceEntity(SpaceRequest request, Long userId) {
         return new Space(
                 request.displayStatus(),
                 request.fixedStatus(),
@@ -77,7 +77,8 @@ public class SpaceDtoMapper {
                 request.latitude() != null ? BigDecimal.valueOf(request.latitude()) : null,
                 request.longitude() != null ? BigDecimal.valueOf(request.longitude()) : null,
                 0L,
-                true
+                true,
+                userId
         );
     }
 
@@ -198,6 +199,20 @@ public class SpaceDtoMapper {
         return new SpaceBlueprintFileInfo(
                 spaceBlueprintFile.getId(),
                 filePath + spaceBlueprintFile.getSaveFileName()
+        );
+    }
+
+    public static AdminSpaceInfo toAdminSpaceInfo(Space space, Map<Long, String> userNames) {
+        return new AdminSpaceInfo(
+                space.getId(),
+                space.getCreatedAt(),
+                space.getAlias(),
+                space.getTitle(),
+                space.getAreaM2(),
+                space.getAreaPy(),
+                space.getPrice(),
+                space.getDisplayStatus(),
+                userNames.get(space.getId())
         );
     }
 

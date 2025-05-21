@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import one.dfy.bily.api.security.CustomUserDetails;
 import one.dfy.bily.api.user.constant.UserSearchDateType;
 import one.dfy.bily.api.user.dto.*;
+import one.dfy.bily.api.user.model.FindIdRequest;
 import one.dfy.bily.api.user.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -181,9 +182,8 @@ public class UserController {
             )
     )
     public ResponseEntity<MaskingUserEmail> updatePhoneNumber(
-            @Parameter(description = "이름", required = false) @RequestParam(required = false) String name,
-            @Parameter(description = "휴대폰 번호", required = false) @RequestParam(required = false) String phoneNumber
+           @RequestBody(required = false) FindIdRequest findIdRequest
     ) {
-        return ResponseEntity.ok(userService.findMaskingUserEmail(name, phoneNumber));
+        return ResponseEntity.ok(userService.findMaskingUserEmail(findIdRequest.name(), findIdRequest.phoneNumber()));
     }
 }

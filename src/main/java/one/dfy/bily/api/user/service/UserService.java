@@ -3,6 +3,7 @@ package one.dfy.bily.api.user.service;
 import lombok.RequiredArgsConstructor;
 import one.dfy.bily.api.auth.dto.SignUpRequest;
 import one.dfy.bily.api.common.model.BaseEntity;
+import one.dfy.bily.api.inquiry.dto.InquiryPreferredDateInfo;
 import one.dfy.bily.api.user.constant.SignInStatus;
 import one.dfy.bily.api.user.model.BusinessCard;
 import one.dfy.bily.api.user.model.SignInHistory;
@@ -27,6 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -144,7 +146,7 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public MaskingUserEmail findMaskingUserEmail(String name, String phoneNumber) {
-        User user = userRepository.findByNameAndPhoneNumber(name, phoneNumber)
+        User user = userRepository.findByNameAndPhoneNumberAndStatus(name, phoneNumber, UserStatus.ACTIVE)
                 .orElseThrow(() -> new IllegalArgumentException("올바르지 않은 회원 정보입니다."));
 
         String maskingEmail = EmailMaskingUtil.maskEmail(user.getEmail());
@@ -170,6 +172,15 @@ public class UserService {
         userEntity.updatePassword(encodePassword);
 
         return new UserCommonResponse(true, "비밀번호 변경이 완료되었습니다.");
+    }
+
+    @Transactional(readOnly = true)
+    public Map<Long, String> findByIds(List<Long> ids) {
+        return userRepository.findAllById(ids).stream()
+                .collect(Collectors.toMap(
+                        User::getId,
+                        User::getName
+                ));
     }
 
 }

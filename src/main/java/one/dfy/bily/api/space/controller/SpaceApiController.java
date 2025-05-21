@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import one.dfy.bily.api.security.CustomUserDetails;
+import one.dfy.bily.api.space.facade.SpaceFacade;
 import one.dfy.bily.api.space.service.SpaceService;
 import one.dfy.bily.api.space.dto.*;
 import one.dfy.bily.api.util.S3Uploader;
@@ -29,6 +30,7 @@ public class SpaceApiController {
 
     private final S3Uploader s3Uploader;
     private final SpaceService spaceService;
+    private final SpaceFacade spaceFacade;
 
     @GetMapping("/amenity/all")
     @Operation(summary = "공간 편의시설 목록 조회", description = "공간 편의시설 목록 정보를 반환합니다.")
@@ -115,6 +117,31 @@ public class SpaceApiController {
         return ResponseEntity.ok(spaceService.findUserSpaceInfoList(page, size));
     }
 
+    @GetMapping("/list/admin")
+//    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    @Operation(summary = "어드민 공간 목록 조회", description = "페이지네이션된 공간 관리 목록 및 총 개수를 반환합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = SpaceListResponse.class),
+                            examples = @ExampleObject(
+                                    name = "성공 응답 예시",
+                                    externalValue = "/swagger/json/space/getSpaces.json"
+                            )
+                    )
+            )
+    })
+    public ResponseEntity<AdminSpaceInfoList> findAdminSpaceInfoList(
+            @RequestParam(required = false) String spaceAlias,
+            @RequestParam(required = false) Boolean displayStatus,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        return ResponseEntity.ok(spaceFacade.findAdminSpaceInfoList(spaceAlias, displayStatus, page, size));
+    }
+
     @PostMapping("/save")
     @Operation(summary = "공간 저장", description = "사용자가 공간을 저장합니다.")
     @ApiResponses(value = {
@@ -186,7 +213,8 @@ public class SpaceApiController {
             @RequestPart("spaceImages") List<MultipartFile> spaceImages,
             @RequestPart("useCaseImages") List<MultipartFile> useCaseImages,
             @RequestPart("blueprint") MultipartFile blueprint ) {
-        return ResponseEntity.ok(spaceService.saveSpace(request, spaceImages, useCaseImages, blueprint));
+        Long userId = 110L;
+        return ResponseEntity.ok(spaceService.saveSpace(request, spaceImages, useCaseImages, blueprint, userId));
     }
 
     @GetMapping("/name")
