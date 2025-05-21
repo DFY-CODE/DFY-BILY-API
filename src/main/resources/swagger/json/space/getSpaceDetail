@@ -1,7 +1,7 @@
 {
   "spaces": [
     {
-      "contentId": 1,
+      "spaceId": 1,
       "displayStatus": 1,
       "spaceId": "spaceA",
       "price": 10000,

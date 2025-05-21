@@ -10,6 +10,7 @@ public record SignUpRequest(
         String email,
         String password,
         String phoneNumber,
+        String code,
         List<TermsCode> termsCodeList
 ) {
 }

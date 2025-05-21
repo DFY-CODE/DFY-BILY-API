@@ -5,7 +5,6 @@ public record ReservationResponse (
         Long inquiryId,
         String companyName,
         String hostCompany,
-        String eventName,
         String eventCategory,
         String contactPerson,
         String position,

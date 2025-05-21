@@ -13,6 +13,6 @@ public record InquiryUpdateRequest(
         String hostCompany,
         String eventCategory,
         String content,
-        Integer spaceId,
+        Long spaceId,
         List<InquiryPreferredDateInfo> preferredDates
 ) { }

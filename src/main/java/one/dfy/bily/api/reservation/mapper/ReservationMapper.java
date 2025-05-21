@@ -93,7 +93,6 @@ public class ReservationMapper {
                 reservations.getInquiry().getId(),
                 reservations.getInquiry().getCompanyName(),
                 reservations.getInquiry().getHostCompany(),
-                reservations.getInquiry().getEventName(),
                 reservations.getInquiry().getEventCategory(),
                 reservations.getInquiry().getContactPerson(),
                 reservations.getInquiry().getPosition(),
@@ -101,7 +100,7 @@ public class ReservationMapper {
                         reservations.getStatus().getDescription(),
                         new ReservationPreferredDateInfo(reservations.getStartDate(), reservations.getEndDate())
                 ),
-                reservations.getInquiry().getSpace().getSpaceId()
+                reservations.getInquiry().getSpace().getAlias()
         );
     }
 
@@ -121,13 +120,12 @@ public class ReservationMapper {
                 reservation.getInquiry().getPosition(),
                 reservation.getInquiry().getCompanyWebsite(),
                 reservation.getInquiry().getEventCategory(),
-                reservation.getInquiry().getEventName(),
                 preferredDateInfos,
                 reservation.getInquiry().getContent(),
                 files,
                 reservation.getInquiry().getCreatedAt(),
                 reservation.getInquiry().getStatus(),
-                reservation.getInquiry().getSpace().getSpaceId(),
+                reservation.getInquiry().getSpace().getAlias(),
                 reservation.getInquiry().getHostCompany(),
                 new ReservationInfo(reservation.getStatus().getDescription(), new ReservationPreferredDateInfo(reservation.getStartDate(), reservation.getEndDate()))
         );

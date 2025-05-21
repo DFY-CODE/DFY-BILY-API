@@ -1,5 +1,5 @@
 package one.dfy.bily.api.user.constant;
 
-public enum LoginStatus {
+public enum SignInStatus {
     SUCCESS, FAIL, BLOCKED
 }

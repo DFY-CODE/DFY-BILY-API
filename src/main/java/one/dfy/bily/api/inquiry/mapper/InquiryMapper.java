@@ -27,10 +27,8 @@ public class InquiryMapper {
                 request.position(),
                 request.companyWebsite(),
                 request.eventCategory(),
-                request.eventName(),
                 request.content(),
                 request.status(),
-                request.author(),
                 space,
                 request.hostCompany(),
                 userId
@@ -88,16 +86,14 @@ public class InquiryMapper {
                 inquiry.getPosition(),
                 inquiry.getCompanyWebsite(),
                 inquiry.getEventCategory(),
-                inquiry.getEventName(),
                 preferredDateInfos,
                 inquiry.getContent(),
                 inquiryFileNames,
                 inquiry.getCreatedAt(),
                 inquiry.getStatus(),
-                inquiry.getAuthor(),
-                inquiry.getSpace().getContentId(),
+                inquiry.getSpace().getId(),
                 inquiry.getHostCompany(),
-                inquiry.getSpace().getSpaceId()
+                inquiry.getSpace().getAlias()
         );
     }
 

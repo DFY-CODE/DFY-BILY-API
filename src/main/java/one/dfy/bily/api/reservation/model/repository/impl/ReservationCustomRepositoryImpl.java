@@ -6,6 +6,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import one.dfy.bily.api.inquiry.model.QInquiry;
+import one.dfy.bily.api.reservation.constant.ReservationStatus;
 import one.dfy.bily.api.reservation.dto.ReservationResponse;
 import one.dfy.bily.api.reservation.mapper.ReservationMapper;
 import one.dfy.bily.api.reservation.model.QReservation;
@@ -35,10 +36,11 @@ public class ReservationCustomRepositoryImpl implements ReservationCustomReposit
     public Page<ReservationResponse> findReservationListByKeywordAndDate(
             String companyName,
             String contactPerson,
-            String spaceIdKeyword,
+            String alias,
             LocalDateTime startAt,
             LocalDateTime endAt,
-            Pageable pageable
+            Pageable pageable,
+            List<ReservationStatus> reservationStatusList
     ) {
         QReservation reservation = QReservation.reservation;
         QInquiry inquiry = QInquiry.inquiry;
@@ -52,10 +54,13 @@ public class ReservationCustomRepositoryImpl implements ReservationCustomReposit
                 .where(
                         companyName != null ? inquiry.companyName.contains(companyName) : null,
                         contactPerson != null ? inquiry.contactPerson.contains(contactPerson) : null,
-                        spaceIdKeyword != null ? space.spaceId.contains(spaceIdKeyword) : null,
+                        alias != null ? space.alias.contains(alias) : null,
                         startAt != null ? inquiry.createdAt.goe(startAt) : null,
                         endAt != null ? inquiry.createdAt.loe(endAt) : null,
-                        reservation.used.eq(true)
+                        reservation.used.eq(true),
+                        (reservationStatusList == null || reservationStatusList.isEmpty())
+                                ? Expressions.FALSE
+                                : reservation.status.in(reservationStatusList)
                 )
                 .orderBy(reservation.id.desc())
                 .offset(pageable.getOffset())
@@ -71,9 +76,12 @@ public class ReservationCustomRepositoryImpl implements ReservationCustomReposit
                 .where(
                         companyName != null ? inquiry.companyName.contains(companyName) : null,
                         contactPerson != null ? inquiry.contactPerson.contains(contactPerson) : null,
-                        spaceIdKeyword != null ? space.spaceId.contains(spaceIdKeyword) : null,
+                        alias != null ? space.alias.contains(alias) : null,
                         startAt != null ? inquiry.createdAt.goe(startAt) : null,
-                        endAt != null ? inquiry.createdAt.loe(endAt) : null
+                        endAt != null ? inquiry.createdAt.loe(endAt) : null,
+                        (reservationStatusList == null || reservationStatusList.isEmpty())
+                                ? Expressions.FALSE
+                                : reservation.status.in(reservationStatusList)
                 )
                 .fetchOne();
 
@@ -93,12 +101,11 @@ public class ReservationCustomRepositoryImpl implements ReservationCustomReposit
         List<ReservationActivity> contents = queryFactory
                 .select(Projections.constructor(ReservationActivity.class,
                         reservation.id,
-                        space.contentId,
-                        space.name,
+                        space.id,
+                        space.title,
                         space.location,
                         space.areaM2,
                         space.areaPy,
-                        space.maxCapacity,
                         reservation.startDate,
                         reservation.endDate,
                         space.price,

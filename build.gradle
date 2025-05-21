@@ -64,6 +64,9 @@ dependencies {
 
     implementation 'commons-io:commons-io:2.15.1'
 
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+
 }
 
 tasks.withType(JavaCompile) {

@@ -8,12 +8,11 @@ import java.time.LocalDateTime;
 
 public record InquiryActivity(
         Long id,
-        Integer contentId,
+        Long spaceId,
         String spaceName,
         String location,
         BigDecimal areaM2,
         Integer areaPy,
-        Integer maxCapacity,
         Long price,
         InquiryStatus status,
         LocalDateTime createdAt

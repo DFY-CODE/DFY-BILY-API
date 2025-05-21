@@ -6,6 +6,7 @@ import one.dfy.bily.api.reservation.constant.PaymentType;
 import one.dfy.bily.api.inquiry.dto.InquiryFileName;
 import one.dfy.bily.api.inquiry.dto.InquiryKeywordHolder;
 import one.dfy.bily.api.inquiry.dto.InquiryPreferredDateInfo;
+import one.dfy.bily.api.reservation.constant.ReservationStatus;
 import one.dfy.bily.api.reservation.dto.*;
 import one.dfy.bily.api.inquiry.mapper.InquiryMapper;
 import one.dfy.bily.api.reservation.mapper.ReservationMapper;
@@ -37,12 +38,16 @@ public class ReservationService {
     private final PaymentRepository paymentRepository;
 
     @Transactional(readOnly = true)
-    public ReservationListResponse findReservationListByKeywordAndDate(InquirySearchType type, String keyword, LocalDateTime startAt, LocalDateTime endAt, int page, int pageSize) {
+    public ReservationListResponse findReservationListByKeywordAndDate(
+            InquirySearchType type, String keyword,
+            LocalDateTime startAt, LocalDateTime endAt,
+            int page, int pageSize,
+            List<ReservationStatus> reservationStatusList
+    ) {
 
         Pageable pageable = PageRequest.of(page-1, pageSize, Sort.by(Sort.Direction.DESC, "id"));
 
         InquiryKeywordHolder holder = InquiryMapper.mapKeyword(type, keyword);
-
 
         Page<ReservationResponse> responsePage = reservationRepository.findReservationListByKeywordAndDate(
                 holder.companyName(),
@@ -50,7 +55,8 @@ public class ReservationService {
                 holder.spaceName(),
                 startAt,
                 endAt,
-                pageable
+                pageable,
+                reservationStatusList
         );
 
         return ReservationMapper.toReservationListResponse(responsePage);
@@ -124,15 +130,15 @@ public class ReservationService {
         return reservationRepository.countReservationAndInquiry(userId);
     }
 
-    public List<Integer> getInquiryIds(List<Object[]> result) {
+    public List<Long> getInquiryIds(List<Object[]> result) {
         return result.stream()
-                .map(r -> ((Number) r[1]).intValue())
+                .map(r -> ((Number) r[1]).longValue())
                 .toList();
     }
 
-    public List<Integer> getReservationActivityInquiryIds(List<ReservationActivity> result) {
+    public List<Long> getReservationActivityInquiryIds(List<ReservationActivity> result) {
         return result.stream()
-                .map(ReservationActivity::contentId)
+                .map(ReservationActivity::spaceId)
                 .toList();
     }
 

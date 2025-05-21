@@ -14,7 +14,6 @@ public record UserActivity(
         String location,
         BigDecimal areaM2,
         int areaPy,
-        int maxCapacity,
         List<InquiryPreferredDateInfo> inquiryPreferredDateList,
         ReservationPreferredDateInfo reservationPreferredDate,
         Long price,

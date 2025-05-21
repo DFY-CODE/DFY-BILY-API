@@ -11,15 +11,15 @@ public interface SpaceMapper {
 
     @Select("SELECT CONTENT_ID, DISPLAY_STATUS, SPACE_ID, PRICE, AREA_M2, NAME, AUTHOR, AMENITIES, AVAILABLE_USES, VIEWS  FROM TBL_SPACE LIMIT #{size} OFFSET #{offset}")
     @Results(id = "SpaceListDtoResultMap", value = {
-            @Result(property = "contentId", column = "CONTENT_ID"),
+            @Result(property = "spaceId", column = "CONTENT_ID"),
             @Result(property = "displayStatus", column = "DISPLAY_STATUS"),
             @Result(property = "spaceId", column = "SPACE_ID"),
             @Result(property = "price", column = "PRICE"),
             @Result(property = "areaM2", column = "AREA_M2"),
             @Result(property = "name", column = "NAME"),
             @Result(property = "author", column = "AUTHOR"),
-            @Result(property = "amenities", column = "AMENITIES"),
-            @Result(property = "availableUses", column = "AVAILABLE_USES"),
+            @Result(property = "amenityList", column = "AMENITIES"),
+            @Result(property = "availableUseList", column = "AVAILABLE_USES"),
             @Result(property = "views", column = "VIEWS")
     })
     List<SpaceListDto> getSpaces(@Param("size") int size, @Param("offset") int offset);
@@ -58,14 +58,14 @@ public interface SpaceMapper {
     int getTotalCount();
 
 
-    @Select("SELECT CONTENT_ID, DISPLAY_STATUS, FIXED_STATUS, SPACE_ID, PRICE, AREA_M2, MAX_CAPACITY, DISTRICT_INFO, LOCATION, NAME, TAGS, INFO, FEATURES, FLOOR_PLAN, USAGE_TIME, CANCELLATION_POLICY, CREATED_AT, AUTHOR, AMENITIES, AVAILABLE_USES, AREA_PY, LATITUDE, LONGITUDE, VIEWS FROM TBL_SPACE WHERE CONTENT_ID = #{contentId}")
-    SpaceDetailDto findSpaceDetailById(int contentId);
+    @Select("SELECT CONTENT_ID, DISPLAY_STATUS, FIXED_STATUS, SPACE_ID, PRICE, AREA_M2, MAX_CAPACITY, DISTRICT_INFO, LOCATION, NAME, TAGS, INFO, FEATURES, FLOOR_PLAN, USAGE_TIME, CANCELLATION_POLICY, CREATED_AT, AUTHOR, AMENITIES, AVAILABLE_USES, AREA_PY, LATITUDE, LONGITUDE, VIEWS FROM TBL_SPACE WHERE CONTENT_ID = #{spaceId}")
+    SpaceDetailDto findSpaceDetailById(int spaceId);
 
-    @Select("SELECT ATTACH_FILE_ID as attachFileId, CONTENT_ID as contentId, FILE_NAME as fileName, SAVE_FILE_NAME as saveFileName, SAVE_LOCATION as saveLocation, SAVE_SIZE as saveSize, DELETE_FLAG as deleteFlag, CREATOR as creator, CREATE_DATE as createDate, UPDATER as updater, UPDATE_DATE as updateDate, FILE_TYPE as fileType, FILE_ORDER as fileOrder, IS_REPRESENTATIVE as isRepresentative FROM TBL_SPACE_FILE_INFO WHERE CONTENT_ID = #{contentId} AND DELETE_FLAG = 'N'")
-    List<SpaceFileInfoDto> findSpaceFileInfoByContentId(int contentId);
+    @Select("SELECT ATTACH_FILE_ID as attachFileId, CONTENT_ID as spaceId, FILE_NAME as fileName, SAVE_FILE_NAME as saveFileName, SAVE_LOCATION as saveLocation, SAVE_SIZE as saveSize, DELETE_FLAG as deleteFlag, CREATOR as creator, CREATE_DATE as createDate, UPDATER as updater, UPDATE_DATE as updateDate, FILE_TYPE as fileType, FILE_ORDER as fileOrder, IS_REPRESENTATIVE as isRepresentative FROM TBL_SPACE_FILE_INFO WHERE CONTENT_ID = #{spaceId} AND DELETE_FLAG = 'N'")
+    List<SpaceFileInfoDto> findSpaceFileInfoByContentId(int spaceId);
 
-    @Select("SELECT ATTACH_FILE_ID as attachFileId, CONTENT_ID as contentId, FILE_NAME as fileName, SAVE_FILE_NAME as saveFileName, SAVE_LOCATION as saveLocation, SAVE_SIZE as saveSize, DELETE_FLAG as deleteFlag, CREATOR as creator, CREATE_DATE as createDate, UPDATER as updater, UPDATE_DATE as updateDate, FILE_TYPE as fileType, FILE_ORDER as fileOrder, IS_REPRESENTATIVE as isRepresentative FROM TBL_SPACE_USE_FILE_INFO WHERE CONTENT_ID = #{contentId} AND DELETE_FLAG = 'N'")
-    List<SpaceUseFileInfoDto> findSpaceUseFileInfoByContentId(int contentId);
+    @Select("SELECT ATTACH_FILE_ID as attachFileId, CONTENT_ID as spaceId, FILE_NAME as fileName, SAVE_FILE_NAME as saveFileName, SAVE_LOCATION as saveLocation, SAVE_SIZE as saveSize, DELETE_FLAG as deleteFlag, CREATOR as creator, CREATE_DATE as createDate, UPDATER as updater, UPDATE_DATE as updateDate, FILE_TYPE as fileType, FILE_ORDER as fileOrder, IS_REPRESENTATIVE as isRepresentative FROM TBL_SPACE_USE_FILE_INFO WHERE CONTENT_ID = #{spaceId} AND DELETE_FLAG = 'N'")
+    List<SpaceUseFileInfoDto> findSpaceUseFileInfoByContentId(int spaceId);
 
     @Select("SELECT COALESCE(MAX(content_id), 0) FROM TBL_SPACE")
     Long getMaxContentId();
@@ -89,7 +89,7 @@ public interface SpaceMapper {
         LATITUDE, 
         LONGITUDE
     ) VALUES (
-        #{contentId}, 
+        #{spaceId}, 
         #{spaceId}, 
         #{price}, 
         #{areaM2}, 
@@ -130,18 +130,18 @@ public interface SpaceMapper {
         LONGITUDE = #{longitude}, 
         AREA_PY = #{areaPy}, 
         UPDATE_DT = NOW() 
-    WHERE CONTENT_ID = #{contentId}
+    WHERE CONTENT_ID = #{spaceId}
 """)
     void updateSpace(AdminSpaceDto spaceDto);
 
 
-    @Insert("INSERT INTO TBL_SPACE_FILE_INFO (CONTENT_ID, FILE_NAME, SAVE_FILE_NAME, SAVE_LOCATION, SAVE_SIZE, CREATOR, CREATE_DATE, FILE_TYPE, FILE_ORDER, IS_REPRESENTATIVE) VALUES (#{contentId}, #{fileName}, #{saveFileName}, #{saveLocation}, #{fileSize}, #{creator}, NOW(), #{fileType}, #{fileOrder}, #{isRepresentative})")
+    @Insert("INSERT INTO TBL_SPACE_FILE_INFO (CONTENT_ID, FILE_NAME, SAVE_FILE_NAME, SAVE_LOCATION, SAVE_SIZE, CREATOR, CREATE_DATE, FILE_TYPE, FILE_ORDER, IS_REPRESENTATIVE) VALUES (#{spaceId}, #{fileName}, #{saveFileName}, #{saveLocation}, #{fileSize}, #{creator}, NOW(), #{fileType}, #{fileOrder}, #{isRepresentative})")
     void insertSpaceFile(SpaceFileDto spaceFileInfoDto);
 
     @Update("UPDATE TBL_SPACE_FILE_INFO SET FILE_NAME = #{fileName}, SAVE_FILE_NAME = #{fileName}, SAVE_LOCATION = #{saveLocation}, SAVE_SIZE = #{fileSize}, UPDATER = #{updater}, UPDATE_DATE = NOW(), FILE_TYPE = #{fileType}, FILE_ORDER = #{fileOrder}, IS_REPRESENTATIVE = #{isRepresentative} WHERE ATTACH_FILE_ID = #{attachFileId}")
     void updateSpaceFile(SpaceFileDto spaceFileInfoDto);
 
-    @Insert("INSERT INTO TBL_SPACE_USE_FILE_INFO (CONTENT_ID, FILE_NAME, SAVE_FILE_NAME, SAVE_LOCATION, SAVE_SIZE, CREATOR, CREATE_DATE, FILE_TYPE, FILE_ORDER, IS_REPRESENTATIVE) VALUES (#{contentId}, #{fileName}, #{fileName}, #{saveLocation}, #{fileSize}, #{creator}, NOW(), #{fileType}, #{fileOrder}, #{isRepresentative})")
+    @Insert("INSERT INTO TBL_SPACE_USE_FILE_INFO (CONTENT_ID, FILE_NAME, SAVE_FILE_NAME, SAVE_LOCATION, SAVE_SIZE, CREATOR, CREATE_DATE, FILE_TYPE, FILE_ORDER, IS_REPRESENTATIVE) VALUES (#{spaceId}, #{fileName}, #{fileName}, #{saveLocation}, #{fileSize}, #{creator}, NOW(), #{fileType}, #{fileOrder}, #{isRepresentative})")
     void insertSpaceUseFile(SpaceUseFileDto spaceUseFileInfoDto);
 
     @Update("UPDATE TBL_SPACE_USE_FILE_INFO SET FILE_NAME = #{fileName}, SAVE_FILE_NAME = #{saveFileName}, SAVE_LOCATION = #{saveLocation}, SAVE_SIZE = #{fileSize}, UPDATER = #{updater}, UPDATE_DATE = NOW(), FILE_TYPE = #{fileType}, FILE_ORDER = #{fileOrder}, IS_REPRESENTATIVE = #{isRepresentative}, FILE_TITLE = #{title} WHERE ATTACH_FILE_ID = #{attachFileId}")
@@ -165,7 +165,7 @@ public interface SpaceMapper {
             CREATOR, CREATE_DATE, FILE_TYPE
         )
         VALUES (
-            #{contentId}, #{fileName}, #{saveFileName}, #{saveLocation}, #{saveSize}, #{deleteFlag},
+            #{spaceId}, #{fileName}, #{saveFileName}, #{saveLocation}, #{saveSize}, #{deleteFlag},
             #{creator}, NOW(), #{fileType}
         )
     """)

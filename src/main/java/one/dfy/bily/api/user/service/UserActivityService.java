@@ -24,7 +24,7 @@ public class UserActivityService {
     @Transactional(readOnly = true)
     public List<UserActivity> mappingToReservationAndInquiryInfo(
             List<Object[]> rawResults,
-            Map<Integer, String> fileNameListMap,
+            Map<Long, String> fileNameListMap,
             Map<Long, List<InquiryPreferredDateInfo>> preferredDateMap
     ){
 
@@ -35,7 +35,7 @@ public class UserActivityService {
 
     public List<UserActivity> reservationActivityToUserActivityList(
             List<ReservationActivity> reservations,
-            Map<Integer, String> fileNameListMap
+            Map<Long, String> fileNameListMap
     ) {
         return reservations.stream()
                 .map(reservation -> UserActivityMapper.fromReservationActivity(reservation, fileNameListMap))
@@ -44,7 +44,7 @@ public class UserActivityService {
 
     public List<UserActivity> inquiryActivityToUserActivityList(
             List<InquiryActivity> inquiryActivities,
-            Map<Integer, String> fileNameListMap,
+            Map<Long, String> fileNameListMap,
             Map<Long, List<InquiryPreferredDateInfo>> preferredDateMap
     ) {
         return inquiryActivities.stream()
@@ -54,7 +54,7 @@ public class UserActivityService {
 
     public List<SavedSpaceInfo> savedSpaceToSavedSpaceList(
             List<SavedSpace> savedSpaces,
-            Map<Integer, String> fileNameListMap
+            Map<Long, String> fileNameListMap
     ) {
         return savedSpaces.stream()
                 .map(savedSpace -> UserActivityMapper.toSavedSpaceInfo(savedSpace,fileNameListMap))

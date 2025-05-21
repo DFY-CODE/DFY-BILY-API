@@ -5,14 +5,14 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import one.dfy.bily.api.common.model.BaseEntity;
-import one.dfy.bily.api.user.constant.LoginStatus;
+import one.dfy.bily.api.user.constant.SignInStatus;
 
 @Entity
-@Table(name = "TBL_LOGIN_HISTORY",
+@Table(name = "TBL_SIGN_IN_HISTORY",
         indexes = @Index(name = "idx_user_id", columnList = "user_id"))
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class LoginHistory extends BaseEntity {
+public class SignInHistory extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,18 +23,18 @@ public class LoginHistory extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "login_status", nullable = false, length = 20)
-    private LoginStatus loginStatus;
+    private SignInStatus signInStatus;
 
     @Column(name = "ip_address", length = 45)
     private String ipAddress;
 
-    public LoginHistory(Long userId, LoginStatus loginStatus, String ipAddress) {
+    public SignInHistory(Long userId, SignInStatus signInStatus, String ipAddress) {
         this.userId = userId;
-        this.loginStatus = loginStatus;
+        this.signInStatus = signInStatus;
         this.ipAddress = ipAddress;
     }
 
-    public void changeLoginStatus(LoginStatus loginStatus) {
-        this.loginStatus = loginStatus;
+    public void changeLoginStatus(SignInStatus signInStatus) {
+        this.signInStatus = signInStatus;
     }
 }

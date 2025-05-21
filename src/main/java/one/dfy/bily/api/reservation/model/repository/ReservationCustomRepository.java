@@ -1,5 +1,6 @@
 package one.dfy.bily.api.reservation.model.repository;
 
+import one.dfy.bily.api.reservation.constant.ReservationStatus;
 import one.dfy.bily.api.reservation.dto.ReservationResponse;
 import one.dfy.bily.api.user.dto.ReservationActivity;
 import one.dfy.bily.api.user.dto.UserActivity;
@@ -16,7 +17,8 @@ public interface ReservationCustomRepository {
             String spaceIdKeyword,
             LocalDateTime startAt,
             LocalDateTime endAt,
-            Pageable pageable
+            Pageable pageable,
+            List<ReservationStatus> reservationStatusList
     );
 
     Page<ReservationActivity> findReservationListByUserId(Long userId, Pageable pageable);

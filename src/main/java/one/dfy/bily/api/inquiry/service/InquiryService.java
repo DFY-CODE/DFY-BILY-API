@@ -2,6 +2,7 @@ package one.dfy.bily.api.inquiry.service;
 
 import lombok.RequiredArgsConstructor;
 import one.dfy.bily.api.inquiry.constant.InquirySearchType;
+import one.dfy.bily.api.inquiry.constant.InquiryStatus;
 import one.dfy.bily.api.inquiry.mapper.InquiryMapper;
 import one.dfy.bily.api.inquiry.model.Inquiry;
 import one.dfy.bily.api.inquiry.model.InquiryFile;
@@ -19,6 +20,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -37,7 +39,8 @@ public class InquiryService {
     public InquiryListResponse findInquiryListByKeywordAndDate(
             InquirySearchType type, String keyword,
             LocalDateTime startAt, LocalDateTime endAt,
-            int page, int pageSize
+            int page, int pageSize,
+            List<InquiryStatus> statusList
     ) {
         Pageable pageable = PageRequest.of(page - 1, pageSize, Sort.by(Sort.Direction.DESC, "id"));
 
@@ -49,7 +52,8 @@ public class InquiryService {
                 holder.spaceName(),
                 startAt,
                 endAt,
-                pageable
+                pageable,
+                statusList
         );
 
         return InquiryMapper.toInquiryListResponse(inquiryResponsePage);
@@ -96,7 +100,7 @@ public class InquiryService {
     }
 
     @Transactional
-    public InquiryResponse createInquiry(InquiryCreateRequest request, Space space, Long userId) {
+    public InquiryResponse createInquiry(InquiryCreateRequest request, List<MultipartFile> fileAttachments, Space space, Long userId) {
 
         Inquiry inquiry = InquiryMapper.inquiryCreateRequestToEntity(request, space, userId);
         inquiryRepository.save(inquiry);
@@ -106,7 +110,7 @@ public class InquiryService {
                 .toList();
         preferredDateRepository.saveAll(preferredDates);
 
-        List<InquiryFile> inquiryFiles = request.fileAttachments().stream()
+        List<InquiryFile> inquiryFiles = fileAttachments.stream()
                 .map(s3Uploader::inquiryFileUpload)
                 .toList()
                 .stream()
@@ -193,9 +197,9 @@ public class InquiryService {
         return inquiryRepository.findInquiryActivitiesByUserId(userId, pageable);
     }
 
-    public List<Integer> getInquiryActivityInquiryIds(List<InquiryActivity> result) {
+    public List<Long> getInquiryActivityInquiryIds(List<InquiryActivity> result) {
         return result.stream()
-                .map(InquiryActivity::contentId)
+                .map(InquiryActivity::spaceId)
                 .toList();
     }
 }

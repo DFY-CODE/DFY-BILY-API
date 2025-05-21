@@ -1,8 +1,10 @@
 package one.dfy.bily.api.inquiry.model.repository.impl;
 
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import one.dfy.bily.api.inquiry.constant.InquiryStatus;
 import one.dfy.bily.api.inquiry.dto.InquiryResponse;
 import one.dfy.bily.api.inquiry.mapper.InquiryMapper;
 import one.dfy.bily.api.inquiry.model.*;
@@ -31,28 +33,26 @@ public class InquiryRepositoryCustomImpl implements InquiryRepositoryCustom {
     public Page<InquiryResponse> searchInquiries(
             String companyName,
             String contactPerson,
-            String spaceIdKeyword,
+            String alias,
             LocalDateTime startAt,
             LocalDateTime endAt,
-            Pageable pageable
+            Pageable pageable,
+            List<InquiryStatus> statusList
     ) {
         QInquiry inquiry = QInquiry.inquiry;
         QInquiryFile file = QInquiryFile.inquiryFile;
         QSpace space = QSpace.space;
         QPreferredDate inquiryPreferredDate = QPreferredDate.preferredDate;
 
+        BooleanBuilder condition = buildInquirySearchCondition(
+                inquiry, space, companyName, contactPerson, alias, startAt, endAt, statusList
+        );
+
         // 1. 조회
         List<Inquiry> inquiries = queryFactory
                 .selectFrom(inquiry)
                 .leftJoin(inquiry.space, space).fetchJoin()
-                .where(
-                        companyName != null ? inquiry.companyName.contains(companyName) : null,
-                        contactPerson != null ? inquiry.contactPerson.contains(contactPerson) : null,
-                        spaceIdKeyword != null ? space.spaceId.contains(spaceIdKeyword) : null,
-                        startAt != null ? inquiry.createdAt.goe(startAt) : null,
-                        endAt != null ? inquiry.createdAt.loe(endAt) : null,
-                        inquiry.used.eq(true)
-                )
+                .where(condition)
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .orderBy(inquiry.id.desc())
@@ -95,7 +95,7 @@ public class InquiryRepositoryCustomImpl implements InquiryRepositoryCustom {
                 .where(
                         companyName != null ? inquiry.companyName.eq(companyName) : null,
                         contactPerson != null ? inquiry.contactPerson.eq(contactPerson) : null,
-                        spaceIdKeyword != null ? space.spaceId.containsIgnoreCase(spaceIdKeyword) : null,
+                        alias != null ? space.alias.containsIgnoreCase(alias) : null,
                         startAt != null ? inquiry.createdAt.goe(startAt) : null,
                         endAt != null ? inquiry.createdAt.loe(endAt) : null
                 )
@@ -117,12 +117,11 @@ public class InquiryRepositoryCustomImpl implements InquiryRepositoryCustom {
         List<InquiryActivity> contents = queryFactory
                 .select(Projections.constructor(InquiryActivity.class,
                         inquiry.id,
-                        space.contentId,
-                        space.name,
+                        space.id,
+                        space.title,
                         space.location,
                         space.areaM2,
                         space.areaPy,
-                        space.maxCapacity,
                         space.price,
                         inquiry.status,
                         inquiry.createdAt
@@ -144,5 +143,32 @@ public class InquiryRepositoryCustomImpl implements InquiryRepositoryCustom {
         return new PageImpl<>(contents, pageable, total != null ? total : 0L);
     }
 
+    private BooleanBuilder buildInquirySearchCondition(
+            QInquiry inquiry,
+            QSpace space,
+            String companyName,
+            String contactPerson,
+            String alias,
+            LocalDateTime startAt,
+            LocalDateTime endAt,
+            List<InquiryStatus> statusList
+    ) {
+        BooleanBuilder condition = new BooleanBuilder();
+
+        if (companyName != null) condition.and(inquiry.companyName.contains(companyName));
+        if (contactPerson != null) condition.and(inquiry.contactPerson.contains(contactPerson));
+        if (alias != null) condition.and(space.alias.contains(alias));
+        if (startAt != null) condition.and(inquiry.createdAt.goe(startAt));
+        if (endAt != null) condition.and(inquiry.createdAt.loe(endAt));
+        condition.and(inquiry.used.eq(true));
+
+        if (statusList != null && !statusList.isEmpty()) {
+            condition.and(inquiry.status.in(statusList));
+        } else {
+            condition.and(inquiry.id.eq(-1L)); // 조회 차단용 조건
+        }
+
+        return condition;
+    }
 
 }

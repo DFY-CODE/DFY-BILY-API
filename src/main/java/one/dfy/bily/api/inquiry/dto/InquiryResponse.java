@@ -14,14 +14,12 @@ public record InquiryResponse(
         String position,
         String companyWebsite,
         String eventCategory,
-        String eventName,
         List<InquiryPreferredDateInfo> preferredDates,
         String content,
         List<InquiryFileName> fileAttachment,
         LocalDateTime createdAt,
         InquiryStatus status,
-        String author,
-        Integer spaceId,
+        Long spaceId,
         String hostCompany,
         String spaceIdName
 ) {}

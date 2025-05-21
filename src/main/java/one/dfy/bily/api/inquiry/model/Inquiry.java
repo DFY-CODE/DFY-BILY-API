@@ -38,9 +38,6 @@ public class Inquiry extends BaseEntity {
     @Column(name = "EVENT_CATEGORY")
     private String eventCategory;
 
-    @Column(name = "EVENT_NAME", nullable = false)
-    private String eventName;
-
     @Column(name = "CONTENT")
     private String content;
 
@@ -48,11 +45,8 @@ public class Inquiry extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private InquiryStatus status;
 
-    @Column(name = "AUTHOR")
-    private String author;
-
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "CONTENT_ID", referencedColumnName = "CONTENT_ID", nullable = false)
+    @JoinColumn(name = "SPACE_ID", referencedColumnName = "ID", nullable = false)
     private Space space;
 
     @Column(name = "HOST_COMPANY", nullable = false)
@@ -72,10 +66,8 @@ public class Inquiry extends BaseEntity {
             String position,
             String companyWebsite,
             String eventCategory,
-            String eventName,
             String content,
             InquiryStatus status,
-            String author,
             Space space,
             String hostCompany,
             Long userId
@@ -87,10 +79,8 @@ public class Inquiry extends BaseEntity {
         this.position = position;
         this.companyWebsite = companyWebsite;
         this.eventCategory = eventCategory;
-        this.eventName = eventName;
         this.content = content;
         this.status = status;
-        this.author = author;
         this.space = space;
         this.hostCompany = hostCompany;
         this.used = true;
