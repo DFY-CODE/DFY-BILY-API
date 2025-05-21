@@ -49,10 +49,10 @@ public record SpaceRequest(
         String cancellationPolicy,
 
         @Schema(description = "편의 시설 정보")
-        List<Long> amenities,
+        List<Long> amenityList,
 
         @Schema(description = "이용 가능 용도")
-        List<Long> availableUses,
+        List<Long> availableUseList,
 
         @Schema(description = "면적 (평)")
         String areaPy,

@@ -107,8 +107,8 @@ public class SpaceDtoMapper {
         );
     }
 
-    public static SpaceBlueprintFileInfo toSpaceBlueprintFileInfoEntity(FileUploadInfo file, Long spaceId) {
-        return new SpaceBlueprintFileInfo(
+    public static SpaceBlueprintFile toSpaceBlueprintFileInfoEntity(FileUploadInfo file, Long spaceId) {
+        return new SpaceBlueprintFile(
                 spaceId,
                 file.originalFileName(),
                 file.newFileName(),
@@ -131,4 +131,74 @@ public class SpaceDtoMapper {
                 availableUseId
         );
     }
+
+    public static SpaceNameInfo toSpaceNameInfo(Space space) {
+        return new SpaceNameInfo(
+                space.getId(),
+                space.getTitle()
+        );
+    }
+
+    public static SpaceDetailInfo toSpaceDetailInfo(Space space, List<Long> amenitiesIds, List<Long> availableUseIds,
+                                                    List<SpaceFileInfoResponse> spaceFileInfoResponseList,
+                                                    List<SpaceUseFileResponse> spaceUseFileResponseList,
+                                                    SpaceBlueprintFileInfo spaceBlueprintFileUrl) {
+        return new SpaceDetailInfo(
+                space.getDisplayStatus(),
+                space.getFixedStatus(),
+                space.getAlias(),
+                space.getLocation(),
+                space.getPrice(),
+                space.getAreaM2(),
+                space.getDistrictInfo(),
+                space.getTitle(),
+                space.getInfo(),
+                space.getFeatures(),
+                space.getUsageTime(),
+                space.getCancellationPolicy(),
+                amenitiesIds,
+                availableUseIds,
+                space.getAreaPy(),
+                spaceFileInfoResponseList,
+                spaceUseFileResponseList,
+                spaceBlueprintFileUrl
+        );
+    }
+
+    public static List<Long> spaceAmenityListToLongList(List<SpaceAmenity> spaceAmenities) {
+        return spaceAmenities.stream()
+                .map(SpaceAmenity::getAmenityId)
+                .toList();
+    }
+
+    public static List<Long> spaceAvailableUseListToLongList(List<SpaceAvailableUse> spaceAvailableUses) {
+        return spaceAvailableUses.stream()
+                .map(SpaceAvailableUse::getAvailableUseId)
+                .toList();
+    }
+
+    public static SpaceFileInfoResponse toSpaceFileInfoResponse(SpaceFileInfo spaceFileInfo, String filePath) {
+        return new SpaceFileInfoResponse(
+                spaceFileInfo.getId(),
+                filePath + spaceFileInfo.getSaveFileName(),
+                spaceFileInfo.isThumbnail(),
+                spaceFileInfo.getFileOrder()
+        );
+    }
+
+    public static SpaceUseFileResponse toSpaceUseFileResponse(SpaceUseFileInfo spaceUseFileInfo, String filePath) {
+        return new SpaceUseFileResponse(
+                spaceUseFileInfo.getId(),
+                filePath + spaceUseFileInfo.getSaveFileName(),
+                spaceUseFileInfo.getFileOrder()
+        );
+    }
+
+    public static SpaceBlueprintFileInfo toSpaceBlueprintFileInfo(SpaceBlueprintFile spaceBlueprintFile, String filePath) {
+        return new SpaceBlueprintFileInfo(
+                spaceBlueprintFile.getId(),
+                filePath + spaceBlueprintFile.getSaveFileName()
+        );
+    }
+
 }

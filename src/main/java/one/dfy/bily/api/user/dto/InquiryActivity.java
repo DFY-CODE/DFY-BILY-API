@@ -13,7 +13,6 @@ public record InquiryActivity(
         String location,
         BigDecimal areaM2,
         Integer areaPy,
-        Integer maxCapacity,
         Long price,
         InquiryStatus status,
         LocalDateTime createdAt

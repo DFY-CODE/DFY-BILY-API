@@ -1,7 +1,6 @@
 package one.dfy.bily.api.space.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -10,19 +9,15 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import one.dfy.bily.api.common.dto.*;
 import one.dfy.bily.api.security.CustomUserDetails;
 import one.dfy.bily.api.space.service.SpaceService;
 import one.dfy.bily.api.space.dto.*;
 import one.dfy.bily.api.util.S3Uploader;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.math.BigDecimal;
 import java.util.*;
 
 @Slf4j
@@ -137,11 +132,12 @@ public class SpaceApiController {
             )
     })
     public ResponseEntity<SpaceCommonResponse> createSavedSpace(
-            @RequestBody ContentId contentId,
-            @AuthenticationPrincipal CustomUserDetails userDetails
+            @RequestBody SpaceId spaceId
+//            @AuthenticationPrincipal CustomUserDetails userDetails
             ) {
-        Long userId = userDetails.getUserId();
-        return ResponseEntity.ok(spaceService.createSavedSpace(contentId.contentId(), userId));
+//        Long userId = userDetails.getUserId();
+        Long userId = 110L;
+        return ResponseEntity.ok(spaceService.createSavedSpace(spaceId.spaceId(), userId));
     }
 
     @PatchMapping("/save")
@@ -161,11 +157,12 @@ public class SpaceApiController {
             )
     })
     public ResponseEntity<SpaceCommonResponse> cancelSavedSpace(
-            @RequestBody ContentId contentId,
-            @AuthenticationPrincipal CustomUserDetails userDetails
+            @RequestBody SpaceId spaceId
+//            @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-        Long userId = userDetails.getUserId();
-        return ResponseEntity.ok(spaceService.cancelSavedSpace(contentId.contentId(), userId));
+//        Long userId = userDetails.getUserId();
+        Long userId = 110L;
+        return ResponseEntity.ok(spaceService.cancelSavedSpace(spaceId.spaceId(), userId));
     }
 
     @PostMapping("")
@@ -191,5 +188,47 @@ public class SpaceApiController {
             @RequestPart("blueprint") MultipartFile blueprint ) {
         return ResponseEntity.ok(spaceService.saveSpace(request, spaceImages, useCaseImages, blueprint));
     }
+
+    @GetMapping("/name")
+    @Operation(summary = "공간 이름 조회", description = "공간 이름 정보를 반환합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = SpaceNameInfoList.class),
+                            examples = @ExampleObject(
+                                    name = "성공 응답 예시",
+                                    externalValue = "/swagger/json/space/getSpaces.json"
+                            )
+                    )
+            )
+    })
+    public ResponseEntity<SpaceNameInfoList> findAllSpaceNames(){
+        return ResponseEntity.ok(spaceService.findAllSpaceNames());
+    }
+
+    @GetMapping("/{id}")
+    @Operation(summary = "공간 상세 조회", description = "공간 상세 정보를 반환합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = SpaceDetailInfo.class),
+                            examples = @ExampleObject(
+                                    name = "성공 응답 예시",
+                                    externalValue = "/swagger/json/space/getSpaces.json"
+                            )
+                    )
+            )
+    })
+    public ResponseEntity<SpaceDetailInfo> findSpaceDetailInfoBySpaceId(@PathVariable("id") Long spaceId) {
+        return ResponseEntity.ok(spaceService.findSpaceDetailInfoBySpaceId(spaceId));
+    }
+
+
 
 }

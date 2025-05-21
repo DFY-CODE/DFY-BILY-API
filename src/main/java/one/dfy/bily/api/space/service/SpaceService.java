@@ -12,7 +12,6 @@ import one.dfy.bily.api.common.dto.*;
 import one.dfy.bily.api.space.mapper.SpaceMapper;
 import one.dfy.bily.api.space.dto.*;
 import one.dfy.bily.api.util.S3Uploader;
-import org.apache.tomcat.jni.FileInfo;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -22,10 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -44,6 +40,14 @@ public class SpaceService {
     private final SpaceBlueprintFileInfoRepository spaceBlueprintFileInfoRepository;
     private final SpaceAmenityRepository spaceAmenityRepository;
     private final SpaceAvailableUseRepository spaceAvailableUseRepository;
+
+    public SpaceNameInfoList findAllSpaceNames() {
+        return new SpaceNameInfoList(
+                spaceRepository.findAll().stream()
+                .map(SpaceDtoMapper::toSpaceNameInfo)
+                .toList()
+        );
+    }
 
     public AmenityInfoList findAmenityInfoList(){
         return new AmenityInfoList(
@@ -106,11 +110,11 @@ public class SpaceService {
             // JSON 문자열을 List<Integer>로 변환
             List<Integer> amenityIds = parseJsonArray(space.getAmenities());
 
-            // amenities 리스트 설정
+            // amenityList 리스트 설정
             List<AmenityDto> amenities = amenityIds.isEmpty() ? new ArrayList<>() : spaceMapper.selectAmenitiesByIds(amenityIds);
             space.updateAmenitiesList(amenities);
 
-            // availableUses 변환 및 설정
+            // availableUseList 변환 및 설정
             List<Integer> useIds = parseJsonArray(space.getAvailableUses());
             List<AvailableUseDto> availableUses = useIds.isEmpty() ? new ArrayList<>() : spaceMapper.selectAvailableUsesByIds(useIds);
             space.updateAvailableUses(availableUses);
@@ -333,11 +337,11 @@ public class SpaceService {
 
     }
 
-    public Space findById(Integer contentId) {
-        if (contentId == null) {
+    public Space findById(Long spaceId) {
+        if (spaceId == null) {
             return null;
         }
-        return spaceRepository.findById(contentId).orElseThrow(() -> new IllegalArgumentException("공간이 존재하지 않습니다."));
+        return spaceRepository.findById(spaceId).orElseThrow(() -> new IllegalArgumentException("공간이 존재하지 않습니다."));
     }
 
     @Transactional
@@ -357,7 +361,7 @@ public class SpaceService {
     }
 
     @Transactional
-    public SpaceCommonResponse createSavedSpace(Integer spaceId, Long userId) {
+    public SpaceCommonResponse createSavedSpace(Long spaceId, Long userId) {
         Space space = findById(spaceId);
 
         savedSpaceRepository.findBySpaceAndUserId(space, userId)
@@ -372,7 +376,7 @@ public class SpaceService {
     }
 
     @Transactional
-    public SpaceCommonResponse cancelSavedSpace(Integer spaceId, Long userId) {
+    public SpaceCommonResponse cancelSavedSpace(Long spaceId, Long userId) {
         Space space = findById(spaceId);
 
         savedSpaceRepository.findBySpaceAndUserId(space, userId)
@@ -428,23 +432,49 @@ public class SpaceService {
 
         FileUploadInfo uploadedFile = s3Uploader.spaceFileUpload(blueprint);
 
-        SpaceBlueprintFileInfo spaceBlueprintFileInfo = SpaceDtoMapper.toSpaceBlueprintFileInfoEntity(uploadedFile, spaceEntity.getId());
+        SpaceBlueprintFile spaceBlueprintFile = SpaceDtoMapper.toSpaceBlueprintFileInfoEntity(uploadedFile, spaceEntity.getId());
 
-        spaceBlueprintFileInfoRepository.save(spaceBlueprintFileInfo);
+        spaceBlueprintFileInfoRepository.save(spaceBlueprintFile);
 
-        List<SpaceAmenity> spaceAmenities = request.amenities().stream()
+        List<SpaceAmenity> spaceAmenities = request.amenityList().stream()
                 .map( amenity -> SpaceDtoMapper.toSpaceAmenityEntity(spaceEntity.getId(), amenity))
                 .toList();
 
         spaceAmenityRepository.saveAll(spaceAmenities);
 
-        List<SpaceAvailableUse> spaceAvailableUses = request.availableUses().stream()
+        List<SpaceAvailableUse> spaceAvailableUses = request.availableUseList().stream()
                 .map( availableUse -> SpaceDtoMapper.toSpaceAvailableUseEntity(spaceEntity.getId(), availableUse))
                 .toList();
 
         spaceAvailableUseRepository.saveAll(spaceAvailableUses);
 
         return new SpaceCommonResponse(true, "공간 생성이 완료되었습니다.");
+    }
+
+    public SpaceDetailInfo findSpaceDetailInfoBySpaceId(Long spaceId) {
+        Space spaceEntity = findById(spaceId);
+        String filePath = s3Uploader.getSpaceS3Url();
+
+
+        List<Long> spaceAmenities = SpaceDtoMapper.spaceAmenityListToLongList(spaceAmenityRepository.findBySpaceId(spaceId));
+        List<Long> spaceAvailableUses = SpaceDtoMapper.spaceAvailableUseListToLongList(spaceAvailableUseRepository.findBySpaceId(spaceId));
+
+        List<SpaceFileInfoResponse> fileInfoResponseList = spaceFileInfoRepository.findBySpaceIdAndUsed(spaceId, true).stream()
+                .map(file -> SpaceDtoMapper.toSpaceFileInfoResponse(file,filePath))
+                .toList();
+
+        List<SpaceUseFileResponse> useFileResponseList = spaceUseFileInfoRepository.findBySpaceIdAndUsed(spaceId, true).stream()
+                .map(file -> SpaceDtoMapper.toSpaceUseFileResponse(file, filePath))
+                .toList();
+
+        Optional<SpaceBlueprintFile> optionalFile = spaceBlueprintFileInfoRepository.findBySpaceIdAndUsed(spaceId, true);
+
+        SpaceBlueprintFileInfo spaceBlueprintFileInfo = optionalFile
+                .map(file -> SpaceDtoMapper.toSpaceBlueprintFileInfo(file, s3Uploader.getSpaceS3Url() + file.getSaveFileName()))
+                .orElse(null);
+
+
+        return SpaceDtoMapper.toSpaceDetailInfo(spaceEntity, spaceAmenities, spaceAvailableUses, fileInfoResponseList, useFileResponseList, spaceBlueprintFileInfo);
     }
 
 }

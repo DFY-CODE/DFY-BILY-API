@@ -23,13 +23,12 @@ public class UserActivityMapper {
             Map<Long, String> fileNameListMap
     ) {
         Long id = toLong(row[0]);
-        Integer contentId = toInt(row[1]);
+        Long spaceId = toLong(row[1]);
         String type = toStr(row[2]);
         String spaceName = toStr(row[3]);
         String location = toStr(row[4]);
         BigDecimal areaM2 = toBigDecimal(row[5]);
         int areaPy = toPrimitiveInt(row[6]);
-        int maxCapacity = toPrimitiveInt(row[7]);
         LocalDateTime from = toDateTime(row[8]);
         LocalDateTime to = toDateTime(row[9]);
         Long price = toLong(row[10]);
@@ -44,13 +43,12 @@ public class UserActivityMapper {
                 location,
                 areaM2,
                 areaPy,
-                maxCapacity,
                 "INQUIRY".equals(type) ? preferredDatesMap.getOrDefault(id, null) : null,
                 "RESERVATION".equals(type) ? new ReservationPreferredDateInfo(from, to) : null,
                 price,
                 status,
                 createdAt,
-                fileNameListMap.getOrDefault(contentId, null)
+                fileNameListMap.getOrDefault(spaceId, null)
         );
     }
 
@@ -90,7 +88,6 @@ public class UserActivityMapper {
                 inquiryActivity.location(),
                 inquiryActivity.areaM2(),
                 inquiryActivity.areaPy(),
-                inquiryActivity.maxCapacity(),
                 preferredDatesMap.getOrDefault(inquiryActivity.id(), null),
                 null,
                 inquiryActivity.price(),
@@ -113,7 +110,6 @@ public class UserActivityMapper {
                 reservation.location(),
                 reservation.areaM2(),
                 reservation.areaPy(),
-                reservation.maxCapacity(),
                 null, // inquiryPreferredDateList는 예약에서는 없음
                 new ReservationPreferredDateInfo(
                         reservation.startDate(),

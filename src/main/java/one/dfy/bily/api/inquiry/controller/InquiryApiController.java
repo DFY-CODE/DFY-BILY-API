@@ -103,7 +103,7 @@ public class InquiryApiController {
     ) {
 //        Long userId = userDetails.getUserId();
 
-        Long userId = 107L;
+        Long userId = 110L;
 //        boolean isAdmin = userDetails.getAuthorities().stream()
 //                .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
         boolean isAdmin = true;
@@ -131,7 +131,7 @@ public class InquiryApiController {
 //            @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
 //        Long userId = userDetails.getUserId();
-        Long userId = 107L;
+        Long userId = 110L;
 
         return ResponseEntity.ok(inquiryFacade.createInquiry(request, fileAttachments,userId));
     }

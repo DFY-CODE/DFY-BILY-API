@@ -15,9 +15,7 @@ import one.dfy.bily.api.memo.dto.MemoCommonResponse;
 import one.dfy.bily.api.memo.dto.MemoResponse;
 import one.dfy.bily.api.memo.facade.MemoFacade;
 import one.dfy.bily.api.memo.service.MemoService;
-import one.dfy.bily.api.security.CustomUserDetails;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
@@ -49,7 +47,7 @@ public class MemoController {
     ) {
 //        Long userId = userDetails.getUserId();
 
-        Long userId = 107L;
+        Long userId = 110L;
         return ResponseEntity.ok(memoFacade.createMemo(createMemoInfo, userId));
     }
 
@@ -72,7 +70,7 @@ public class MemoController {
     ){
 //        Long userId = userDetails.getUserId();
 
-        Long userId = 107L;
+        Long userId = 110L;
         return ResponseEntity.ok(memoFacade.findMemoByUserIdAndInquiryId(userId, inquiryId));
     }
 

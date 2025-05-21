@@ -15,10 +15,10 @@ public class SpaceAmenity extends BaseEntity {
     @Column(name = "ID")
     private Long id;
 
-    @Column
+    @Column(name = "SPACE_ID")
     private Long spaceId;
 
-    @Column
+    @Column(name = "AMENITY_ID")
     private Long amenityId;
 
     public SpaceAmenity(Long spaceId, Long amenityId) {

@@ -35,7 +35,7 @@ public class UserActivityFacade {
         Map<Long, List<InquiryPreferredDateInfo>> preferredDateMap = inquiryService.findInquiryPreferredDateByObject(reservationAndInquiryRow);
         List<UserActivity> userActivityList = userActivityService.mappingToReservationAndInquiryInfo(reservationAndInquiryRow, fileNameListMap, preferredDateMap);
 
-        Pagination pagination = new Pagination(page + 1, pageSize, totalCount, (int) Math.ceil((double) totalCount / pageSize));
+        Pagination pagination = new Pagination(page, pageSize, totalCount, (int) Math.ceil((double) totalCount / pageSize));
 
         return new UserActivityList(userActivityList, pagination);
     }

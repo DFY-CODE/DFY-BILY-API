@@ -127,8 +127,12 @@ public class ReservationApiController {
                     )
             )
     )
-    public ResponseEntity<ReservationPaymentInfo> createReservationPayment(@RequestBody CreateReservation createReservation, @AuthenticationPrincipal CustomUserDetails userDetails) {
-        Long adminId = userDetails.getUserId();
+    public ResponseEntity<ReservationPaymentInfo> createReservationPayment(
+            @RequestBody CreateReservation createReservation
+//            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+//        Long adminId = userDetails.getUserId();
+        Long adminId = 110L;
         return ResponseEntity.ok(reservationFacade.createReservationPayment(createReservation, adminId));
     }
 
@@ -148,10 +152,11 @@ public class ReservationApiController {
     )
     public ResponseEntity<ReservationPaymentInfo> updateReservation(
             @PathVariable(name = "reservation-id") Long reservationId,
-            @RequestBody ReservationPaymentInfo reservationPaymentInfo,
-            @AuthenticationPrincipal CustomUserDetails userDetails
+            @RequestBody ReservationPaymentInfo reservationPaymentInfo
+//            @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-        Long adminId = userDetails.getUserId();
+//        Long adminId = userDetails.getUserId();
+        Long adminId = 110L;
         return ResponseEntity.ok(reservationService.updateReservation(reservationId,reservationPaymentInfo, adminId));
     }
 }

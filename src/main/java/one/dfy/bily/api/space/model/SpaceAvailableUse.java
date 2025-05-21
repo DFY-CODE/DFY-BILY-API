@@ -8,16 +8,16 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-@Table(name = "TBL_SPACE_USE_FILE_INFO")
+@Table(name = "TBL_SPACE_AVAILABLE_USE")
 public class SpaceAvailableUse {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column
+    @Column(name = "SPACE_ID")
     private Long spaceId;
 
-    @Column
+    @Column(name = "AVAILABLE_USE_ID")
     private Long availableUseId;
 
     public SpaceAvailableUse(Long spaceId, Long availableUseId) {

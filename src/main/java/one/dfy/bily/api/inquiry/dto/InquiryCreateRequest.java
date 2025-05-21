@@ -18,7 +18,7 @@ public record InquiryCreateRequest(
         String content,
         LocalDateTime createdAt,
         InquiryStatus status,
-        Integer spaceId,
+        Long spaceId,
         String hostCompany,
         String spaceIdName
 ) {}

@@ -6,13 +6,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import one.dfy.bily.api.common.model.BaseEntity;
 
-import java.time.LocalDateTime;
-
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "TBL_SPACE_BLUEPRINT_FILE_INFO")
-public class SpaceBlueprintFileInfo extends BaseEntity {
+public class SpaceBlueprintFile extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -46,7 +44,7 @@ public class SpaceBlueprintFileInfo extends BaseEntity {
     @Column(name = "FILE_TYPE", nullable = false, length = 50)
     private String fileType;
 
-    public SpaceBlueprintFileInfo(Long spaceId, String fileName, String saveFileName, String saveLocation, Long saveSize, String fileType) {
+    public SpaceBlueprintFile(Long spaceId, String fileName, String saveFileName, String saveLocation, Long saveSize, String fileType) {
         this.spaceId = spaceId;
         this.fileName = fileName;
         this.saveFileName = saveFileName;
