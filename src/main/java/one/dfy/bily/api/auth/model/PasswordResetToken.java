@@ -22,10 +22,10 @@ public class PasswordResetToken extends BaseEntity {
     @Column(nullable = false)
     private String email;
 
-    @Column(nullable = false)
+    @Column(name = "EXPIRES_AT", nullable = false)
     private LocalDateTime expiresAt;
 
-    @Column(nullable = false)
+    @Column(name = "IS_USED", nullable = false)
     private boolean used = true;
 
     public PasswordResetToken(String token, String email) {

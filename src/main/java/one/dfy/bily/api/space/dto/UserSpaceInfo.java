@@ -3,7 +3,7 @@ package one.dfy.bily.api.space.dto;
 import java.math.BigDecimal;
 
 public record UserSpaceInfo(
-        Long id,
+        String id,
         String thumbnailUrl,
         String spaceName,
         String districtInfo,

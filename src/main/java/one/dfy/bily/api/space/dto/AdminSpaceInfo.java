@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public record AdminSpaceInfo (
-        Long id,
+        String id,
         LocalDateTime createdAt,
         String spaceAlias,
         String spaceName,
@@ -12,6 +12,7 @@ public record AdminSpaceInfo (
         Integer areaPy,
         Long price,
         boolean displayStatus,
+        boolean fixedStatus,
         String userName
 ) {
 }

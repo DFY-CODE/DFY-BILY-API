@@ -16,6 +16,7 @@ import one.dfy.bily.api.auth.service.AuthService;
 import one.dfy.bily.api.security.CustomUserDetails;
 import one.dfy.bily.api.user.dto.UserCommonResponse;
 import one.dfy.bily.api.util.IpUtils;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -138,4 +139,31 @@ public class AuthController {
         return ResponseEntity.ok(authFacade.checkSignIn(userId));
     }
 
+    @PostMapping(value = "/sign-out")
+    @Operation(summary = "로그아웃", description = "로그아웃 합니다.")
+    public ResponseEntity<AuthCommonResponse> signOut(HttpServletResponse response) {
+        ResponseCookie cookie = ResponseCookie.from("ACCESS_TOKEN", "")
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .maxAge(0)
+                .build();
+        response.addHeader("Set-Cookie", cookie.toString());
+
+        return ResponseEntity.ok(new AuthCommonResponse(true, "로그아웃이 완료되었습니다."));
+    }
+
+    @GetMapping(value = "/admin")
+    @Operation(summary = "운영자 여부 확인", description = "운영자 여부를 확인합니다.")
+    @ApiResponse(responseCode = "200", description = "비밀번호 초기화 성공")
+    @ApiResponse(responseCode = "500", description = "비밀번호 초기화 실패")
+    public ResponseEntity<AuthCommonResponse> checkAdmin(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        Long userId = userDetails.getUserId();
+        boolean isAdmin = userDetails.getAuthorities().stream()
+                .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
+        if (isAdmin) {
+            return ResponseEntity.ok(new AuthCommonResponse(true, "운영자"));
+        }
+        return ResponseEntity.ok(new AuthCommonResponse(false, "사용자"));
+    }
 }

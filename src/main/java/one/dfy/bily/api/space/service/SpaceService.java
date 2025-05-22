@@ -11,6 +11,7 @@ import one.dfy.bily.api.space.model.repository.*;
 import one.dfy.bily.api.common.dto.*;
 import one.dfy.bily.api.space.mapper.SpaceMapper;
 import one.dfy.bily.api.space.dto.*;
+import one.dfy.bily.api.util.AES256Util;
 import one.dfy.bily.api.util.S3Uploader;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -215,23 +216,24 @@ public class SpaceService {
         return new SpaceCommonResponse(true, "공간 생성이 완료되었습니다.");
     }
 
-    public SpaceDetailInfo findSpaceDetailInfoBySpaceId(Long spaceId) {
-        Space spaceEntity = findById(spaceId);
+    public SpaceDetailInfo findSpaceDetailInfoBySpaceId(String spaceId) throws Exception {
+        Long decSpaceId = AES256Util.decrypt(spaceId);
+        Space spaceEntity = findById(decSpaceId);
         String filePath = s3Uploader.getSpaceS3Url();
 
 
-        List<Long> spaceAmenities = SpaceDtoMapper.spaceAmenityListToLongList(spaceAmenityRepository.findBySpaceId(spaceId));
-        List<Long> spaceAvailableUses = SpaceDtoMapper.spaceAvailableUseListToLongList(spaceAvailableUseRepository.findBySpaceId(spaceId));
+        List<Long> spaceAmenities = SpaceDtoMapper.spaceAmenityListToLongList(spaceAmenityRepository.findBySpaceId(decSpaceId));
+        List<Long> spaceAvailableUses = SpaceDtoMapper.spaceAvailableUseListToLongList(spaceAvailableUseRepository.findBySpaceId(decSpaceId));
 
-        List<SpaceFileInfoResponse> fileInfoResponseList = spaceFileInfoRepository.findBySpaceIdAndUsed(spaceId, true).stream()
+        List<SpaceFileInfoResponse> fileInfoResponseList = spaceFileInfoRepository.findBySpaceIdAndUsed(decSpaceId, true).stream()
                 .map(file -> SpaceDtoMapper.toSpaceFileInfoResponse(file,filePath))
                 .toList();
 
-        List<SpaceUseFileResponse> useFileResponseList = spaceUseFileInfoRepository.findBySpaceIdAndUsed(spaceId, true).stream()
+        List<SpaceUseFileResponse> useFileResponseList = spaceUseFileInfoRepository.findBySpaceIdAndUsed(decSpaceId, true).stream()
                 .map(file -> SpaceDtoMapper.toSpaceUseFileResponse(file, filePath))
                 .toList();
 
-        Optional<SpaceBlueprintFile> optionalFile = spaceBlueprintFileInfoRepository.findBySpaceIdAndUsed(spaceId, true);
+        Optional<SpaceBlueprintFile> optionalFile = spaceBlueprintFileInfoRepository.findBySpaceIdAndUsed(decSpaceId, true);
 
         SpaceBlueprintFileInfo spaceBlueprintFileInfo = optionalFile
                 .map(file -> SpaceDtoMapper.toSpaceBlueprintFileInfo(file, s3Uploader.getSpaceS3Url() + file.getSaveFileName()))

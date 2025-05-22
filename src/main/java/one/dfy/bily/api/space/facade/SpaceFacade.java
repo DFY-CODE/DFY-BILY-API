@@ -29,7 +29,13 @@ public class SpaceFacade {
         Map<Long, String> userList = userService.findByIds(userIds);
 
         List<AdminSpaceInfo> spaceInfoList =spacePage.getContent().stream()
-                        .map(space -> SpaceDtoMapper.toAdminSpaceInfo(space, userList))
+                        .map(space -> {
+                            try {
+                                return SpaceDtoMapper.toAdminSpaceInfo(space, userList);
+                            } catch (Exception e) {
+                                throw new RuntimeException(e);
+                            }
+                        })
                                 .toList();
 
         return new AdminSpaceInfoList(spaceInfoList, new Pagination(page, size, spacePage.getTotalElements(), spacePage.getTotalPages()));

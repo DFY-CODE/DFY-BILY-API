@@ -253,7 +253,7 @@ public class SpaceApiController {
                     )
             )
     })
-    public ResponseEntity<SpaceDetailInfo> findSpaceDetailInfoBySpaceId(@PathVariable("id") Long spaceId) {
+    public ResponseEntity<SpaceDetailInfo> findSpaceDetailInfoBySpaceId(@PathVariable("id") String spaceId) throws Exception {
         return ResponseEntity.ok(spaceService.findSpaceDetailInfoBySpaceId(spaceId));
     }
 
