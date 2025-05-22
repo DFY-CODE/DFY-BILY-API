@@ -9,16 +9,15 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import one.dfy.bily.api.security.CustomUserDetails;
 import one.dfy.bily.api.space.facade.SpaceFacade;
 import one.dfy.bily.api.space.service.SpaceService;
 import one.dfy.bily.api.space.dto.*;
 import one.dfy.bily.api.util.S3Uploader;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.util.*;
 
 @Slf4j
@@ -138,8 +137,8 @@ public class SpaceApiController {
             @RequestParam(required = false) String spaceAlias,
             @RequestParam(required = false) Boolean displayStatus,
             @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "20") int size) {
-        return ResponseEntity.ok(spaceFacade.findAdminSpaceInfoList(spaceAlias, displayStatus, page, size));
+            @RequestParam(defaultValue = "20") int pageSize) {
+        return ResponseEntity.ok(spaceFacade.findAdminSpaceInfoList(spaceAlias, displayStatus, page, pageSize));
     }
 
     @GetMapping("/list/map/non-user")
@@ -299,6 +298,25 @@ public class SpaceApiController {
         return ResponseEntity.ok(spaceService.findSpaceDetailInfoBySpaceId(spaceId));
     }
 
+    @GetMapping("/file/{saveFileName}")
+    @Operation(summary = "파일 다운로드", description = "공간 상세 정보를 반환합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = SpaceDetailInfo.class),
+                            examples = @ExampleObject(
+                                    name = "성공 응답 예시",
+                                    externalValue = "/swagger/json/space/getSpaces.json"
+                            )
+                    )
+            )
+    })
+    public ResponseEntity<File> downloadSpaceFileAsTempFile(@PathVariable("saveFileName") String saveFileName) {
+        return ResponseEntity.ok(spaceService.downloadSpaceFileAsTempFile(saveFileName));
+    }
 
 
 }

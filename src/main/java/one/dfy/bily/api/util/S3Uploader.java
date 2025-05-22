@@ -2,6 +2,8 @@ package one.dfy.bily.api.util;
 
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.amazonaws.services.s3.model.S3Object;
+import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import one.dfy.bily.api.common.dto.FileUploadInfo;
@@ -344,6 +346,26 @@ public class S3Uploader {
             fos.write(file.getBytes());
         }
         return Optional.of(convertFile);
+    }
+
+    public File downloadSpaceFileAsTempFile(String saveLocation) {
+        try {
+            S3Object s3Object = amazonS3Client.getObject(bucket, spacePath + saveLocation);
+            File tempFile = File.createTempFile("s3-download-", ".tmp");
+
+            try (S3ObjectInputStream s3InputStream = s3Object.getObjectContent();
+                 FileOutputStream fos = new FileOutputStream(tempFile)) {
+                byte[] buffer = new byte[1024];
+                int read;
+                while ((read = s3InputStream.read(buffer)) != -1) {
+                    fos.write(buffer, 0, read);
+                }
+            }
+
+            return tempFile;
+        } catch (IOException e) {
+            throw new RuntimeException("S3 파일 다운로드 실패: " + saveLocation, e);
+        }
     }
 
 

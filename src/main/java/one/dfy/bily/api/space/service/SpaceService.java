@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -265,7 +266,7 @@ public class SpaceService {
         Optional<SpaceBlueprintFile> optionalFile = spaceBlueprintFileInfoRepository.findBySpaceIdAndUsed(decSpaceId, true);
 
         SpaceBlueprintFileInfo spaceBlueprintFileInfo = optionalFile
-                .map(file -> SpaceDtoMapper.toSpaceBlueprintFileInfo(file, s3Uploader.getSpaceS3Url() + file.getSaveFileName()))
+                .map(SpaceDtoMapper::toSpaceBlueprintFileInfo)
                 .orElse(null);
 
 
@@ -284,7 +285,10 @@ public class SpaceService {
         } else {
             return spaceRepository.findByTitleContainingAndDisplayStatus(spaceAlias, displayStatus, pageable);
         }
+    }
 
+    public File downloadSpaceFileAsTempFile(String saveFileName) {
+        return s3Uploader.downloadSpaceFileAsTempFile(saveFileName);
     }
 
 }

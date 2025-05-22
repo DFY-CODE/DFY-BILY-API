@@ -252,10 +252,11 @@ public class SpaceDtoMapper {
         );
     }
 
-    public static SpaceBlueprintFileInfo toSpaceBlueprintFileInfo(SpaceBlueprintFile spaceBlueprintFile, String filePath) {
+    public static SpaceBlueprintFileInfo toSpaceBlueprintFileInfo(SpaceBlueprintFile spaceBlueprintFile) {
         return new SpaceBlueprintFileInfo(
                 spaceBlueprintFile.getId(),
-                filePath + spaceBlueprintFile.getSaveFileName()
+                spaceBlueprintFile.getFileName(),
+                spaceBlueprintFile.getSaveFileName()
         );
     }
 
