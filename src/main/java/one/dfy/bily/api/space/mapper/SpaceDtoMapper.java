@@ -39,6 +39,49 @@ public class SpaceDtoMapper {
                 .toList();
     }
 
+    public static List<MapUserSpaceInfo> toMapUserSpaceInfoList(List<Space> spaces, Map<Long, String> thumbnailUrlMap) {
+        return spaces.stream()
+                .map(space -> {
+                    try {
+                        return new MapUserSpaceInfo(
+                                AES256Util.encrypt(space.getId()),
+                                thumbnailUrlMap.get(space.getId()),
+                                space.getTitle(),
+                                space.getDistrictInfo(),
+                                space.getAreaM2(),
+                                space.getAreaPy(),
+                                space.getPrice(),
+                                space.getLatitude(),
+                                space.getLongitude()
+                        );
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .toList();
+    }
+
+    public static List<MapNonUserSpaceInfo> toMapNonUserSpaceInfoList(List<Space> spaces, Map<Long, String> thumbnailUrlMap) {
+        return spaces.stream()
+                .map(space -> {
+                    try {
+                        return new MapNonUserSpaceInfo(
+                                AES256Util.encrypt(space.getId()),
+                                thumbnailUrlMap.get(space.getId()),
+                                space.getTitle(),
+                                space.getDistrictInfo(),
+                                space.getAreaM2(),
+                                space.getAreaPy(),
+                                space.getLatitude(),
+                                space.getLongitude()
+                        );
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .toList();
+    }
+
     public static List<NonUserSpaceInfo> toNonUserSpaceInfoList(List<Space> spaces, Map<Long, String> thumbnailUrlMap) {
         return spaces.stream()
                 .map(space -> {

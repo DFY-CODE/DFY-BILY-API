@@ -1,7 +1,5 @@
 package one.dfy.bily.api.space.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import one.dfy.bily.api.common.mapper.PaginationMapper;
@@ -21,7 +19,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -100,6 +97,38 @@ public class SpaceService {
         Pagination pagination = PaginationMapper.toPagination(pageable,spaces.getTotalElements(),spaces.getTotalPages());
 
         return new UserSpaceInfoResponse(nonUserSpaceInfoList, pagination);
+    }
+
+    @Transactional
+    public MapNonUserSpaceInfoList findMapNonUserSpaceInfoList(){
+
+        List<Space> spaces = spaceRepository.findAll();
+
+        List<Long> spaceIds = spaces.stream()
+                .map(Space::getId)
+                .toList();
+
+        Map<Long, String> thumbnailUrlMap = findSpaceFileBySpaceIds(spaceIds);
+
+        List<MapNonUserSpaceInfo> nonUserSpaceInfoList = SpaceDtoMapper.toMapNonUserSpaceInfoList(spaces, thumbnailUrlMap);
+
+        return new MapNonUserSpaceInfoList(nonUserSpaceInfoList);
+    }
+
+    @Transactional
+    public MapUserSpaceInfoList findMapUserSpaceInfoList(){
+
+        List<Space> spaces = spaceRepository.findAll();
+
+        List<Long> spaceIds = spaces.stream()
+                .map(Space::getId)
+                .toList();
+
+        Map<Long, String> thumbnailUrlMap = findSpaceFileBySpaceIds(spaceIds);
+
+        List<MapUserSpaceInfo> userSpaceInfoList = SpaceDtoMapper.toMapUserSpaceInfoList(spaces, thumbnailUrlMap);
+
+        return new MapUserSpaceInfoList(userSpaceInfoList);
     }
 
     public Space findById(Long spaceId) {

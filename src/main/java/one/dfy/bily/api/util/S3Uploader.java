@@ -305,15 +305,15 @@ public class S3Uploader {
 
     private String putS3(File uploadFile, String newFileName) {
         amazonS3Client.putObject(new PutObjectRequest(bucket, newFileName, uploadFile));
-        return "https://" + bucket + ".s3." + region + ".amazonaws.com/" + newFileName;
+        return "https://" + "s3." + region + ".amazonaws.com/" + bucket + "/" + newFileName;
     }
 
     public String getSpaceS3Url() {
-        return "https://" + bucket + ".s3." + region + ".amazonaws.com/"+spacePath;
+        return "https://" + "s3." + region + ".amazonaws.com/" + bucket + "/" + spacePath;
     }
 
     public String getBusinessCardS3Url() {
-        return "https://" + bucket + ".s3." + region + ".amazonaws.com/"+businessCardPath;
+        return "https://" + "s3." + region + ".amazonaws.com/"+ bucket + "/" + businessCardPath;
     }
 
     private String getFileExtension(String fileName) {

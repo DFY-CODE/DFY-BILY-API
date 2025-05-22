@@ -142,6 +142,48 @@ public class SpaceApiController {
         return ResponseEntity.ok(spaceFacade.findAdminSpaceInfoList(spaceAlias, displayStatus, page, size));
     }
 
+    @GetMapping("/list/map/non-user")
+//    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    @Operation(summary = "비회원 공간 지도 목록 조회", description = "모든 공간의 목록을 반환합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = SpaceListResponse.class),
+                            examples = @ExampleObject(
+                                    name = "성공 응답 예시",
+                                    externalValue = "/swagger/json/space/getSpaces.json"
+                            )
+                    )
+            )
+    })
+    public ResponseEntity<MapNonUserSpaceInfoList> findMapNonSpaceInfoList() {
+        return ResponseEntity.ok(spaceService.findMapNonUserSpaceInfoList());
+    }
+
+    @GetMapping("/list/map")
+//    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    @Operation(summary = "공간 지도 목록 조회", description = "모든 공간의 목록을 반환합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = SpaceListResponse.class),
+                            examples = @ExampleObject(
+                                    name = "성공 응답 예시",
+                                    externalValue = "/swagger/json/space/getSpaces.json"
+                            )
+                    )
+            )
+    })
+    public ResponseEntity<MapUserSpaceInfoList> findMapSpaceInfoList() {
+        return ResponseEntity.ok(spaceService.findMapUserSpaceInfoList());
+    }
+
     @PostMapping("/save")
     @Operation(summary = "공간 저장", description = "사용자가 공간을 저장합니다.")
     @ApiResponses(value = {
@@ -192,7 +234,7 @@ public class SpaceApiController {
         return ResponseEntity.ok(spaceService.cancelSavedSpace(spaceId.spaceId(), userId));
     }
 
-    @PostMapping("")
+    @PostMapping(consumes = "multipart/form-data")
     @Operation(summary = "공간 생성", description = "사용자가 공간을 저장합니다.")
     @ApiResponses(value = {
             @ApiResponse(
