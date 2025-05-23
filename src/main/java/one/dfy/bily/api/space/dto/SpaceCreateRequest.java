@@ -5,7 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.math.BigDecimal;
 import java.util.List;
 
-public record SpaceRequest(
+public record SpaceCreateRequest(
         @Schema(description = "공간 표시 여부")
         Boolean displayStatus,
 
@@ -55,7 +55,7 @@ public record SpaceRequest(
         List<Long> availableUseList,
 
         @Schema(description = "면적 (평)")
-        String areaPy,
+        Integer areaPy,
 
         @Schema(description = "사례 이미지 제목")
         List<String> useCaseImageTitles,

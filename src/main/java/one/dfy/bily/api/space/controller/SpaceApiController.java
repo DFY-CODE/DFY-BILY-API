@@ -250,12 +250,37 @@ public class SpaceApiController {
             )
     })
     public ResponseEntity<SpaceCommonResponse> saveSpace(
-            @RequestPart("data") SpaceRequest request,
+            @RequestPart("data") SpaceCreateRequest request,
             @RequestPart("spaceImages") List<MultipartFile> spaceImages,
             @RequestPart("useCaseImages") List<MultipartFile> useCaseImages,
             @RequestPart("blueprint") MultipartFile blueprint ) {
         Long userId = 110L;
         return ResponseEntity.ok(spaceService.saveSpace(request, spaceImages, useCaseImages, blueprint, userId));
+    }
+
+    @PatchMapping(consumes = "multipart/form-data")
+    @Operation(summary = "공간 수정", description = "사용자가 공간을 수정합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = SpaceCommonResponse.class),
+                            examples = @ExampleObject(
+                                    name = "성공 응답 예시",
+                                    externalValue = "/swagger/json/space/getSpaces.json"
+                            )
+                    )
+            )
+    })
+    public ResponseEntity<SpaceCommonResponse> updateSpace(
+            @RequestPart("data") SpaceUpdateRequest request,
+            @RequestPart("spaceImages") List<MultipartFile> spaceImages,
+            @RequestPart("useCaseImages") List<MultipartFile> useCaseImages,
+            @RequestPart("blueprint") MultipartFile blueprint ) throws Exception {
+        Long userId = 110L;
+        return ResponseEntity.ok(spaceService.updateSpace(request, spaceImages, useCaseImages, blueprint, userId));
     }
 
     @GetMapping("/name")

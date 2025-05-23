@@ -115,7 +115,7 @@ public class SpaceDtoMapper {
                 .toList();
     }
 
-    public static Space toSpaceEntity(SpaceRequest request, Long userId) {
+    public static Space toSpaceEntity(SpaceCreateRequest request, Long userId) {
         return new Space(
                 request.displayStatus(),
                 request.fixedStatus(),

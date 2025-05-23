@@ -27,8 +27,6 @@ import java.util.stream.IntStream;
 @Service
 @RequiredArgsConstructor
 public class SpaceService {
-    private final SpaceMapper spaceMapper;
-    private final ObjectMapper objectMapper;
     private final S3Uploader s3Uploader;
     private final SpaceRepository spaceRepository;
     private final SpaceFileInfoRepository spaceFileInfoRepository;
@@ -201,7 +199,7 @@ public class SpaceService {
         return findSpaceFileBySpaceIds(spaceIds);
     }
 
-    public SpaceCommonResponse saveSpace(SpaceRequest request, List<MultipartFile> spaceImages,  List<MultipartFile> useCaseImages, MultipartFile blueprint, Long userId ) {
+    public SpaceCommonResponse saveSpace(SpaceCreateRequest request, List<MultipartFile> spaceImages, List<MultipartFile> useCaseImages, MultipartFile blueprint, Long userId ) {
         Space spaceEntity = spaceRepository.save(SpaceDtoMapper.toSpaceEntity(request, userId));
 
         List<SpaceFileInfo> spaceFileInfos = IntStream.range(0, spaceImages.size())
@@ -246,6 +244,88 @@ public class SpaceService {
         return new SpaceCommonResponse(true, "공간 생성이 완료되었습니다.");
     }
 
+    public SpaceCommonResponse updateSpace(SpaceUpdateRequest request, List<MultipartFile> spaceImages, List<MultipartFile> useCaseImages, MultipartFile blueprint, Long userId ) throws Exception {
+        Long spaceId = AES256Util.decrypt(request.id());
+        Space spaceEntity = findById(spaceId);
+
+        spaceEntity.updateSpace(
+                request.displayStatus(),
+                request.fixedStatus(),
+                request.spaceAlias(),
+                request.location(),
+                request.latitude(),
+                request.longitude(),
+                request.price(),
+                request.areaM2(),
+                request.districtInfo(),
+                request.name(),
+                request.info(),
+                request.features(),
+                request.usageTime(),
+                request.cancellationPolicy(),
+                request.areaPy()
+        );
+
+
+        List<SpaceFileInfo> spaceFileInfos = IntStream.range(0, spaceImages.size())
+                .mapToObj(i -> {
+                    boolean isThumbnail = i == request.thumbnailIndex();
+                    MultipartFile file = spaceImages.get(i);
+                    FileUploadInfo uploadedFile = s3Uploader.spaceFileUpload(file);
+                    return SpaceDtoMapper.toSpaceFileInfoEntity(uploadedFile, spaceEntity.getId(), request.newSpaceFileList().get(i), isThumbnail);
+                })
+                .toList();
+
+        spaceFileInfoRepository.saveAll(spaceFileInfos);
+
+        request.spaceFileList().forEach(spaceFileInfo -> {
+            SpaceFileInfo sp = spaceFileInfoRepository.findById(spaceFileInfo.id()).orElseThrow(RuntimeException::new);
+            sp.updateFileOrder(spaceFileInfo.fileOrder());
+            sp.updateUsed(!spaceFileInfo.deleteStatus());
+        });
+
+        List<SpaceUseFileInfo> spaceUseFileInfoList = IntStream.range(0, useCaseImages.size())
+                .mapToObj(i -> {
+                    MultipartFile file = spaceImages.get(i);
+                    FileUploadInfo uploadedFile = s3Uploader.spaceFileUpload(file);
+                    return SpaceDtoMapper.toSpaceUseFileInfoEntity(uploadedFile, spaceEntity.getId(), request.useCaseImageTitles().get(i),request.newSpaceUseFileList().get(i));
+                })
+                .toList();
+
+        spaceUseFileInfoRepository.saveAll(spaceUseFileInfoList);
+
+        if(blueprint != null) {
+            FileUploadInfo uploadedFile = s3Uploader.spaceFileUpload(blueprint);
+            SpaceBlueprintFile spaceBlueprintFile = SpaceDtoMapper.toSpaceBlueprintFileInfoEntity(uploadedFile, spaceEntity.getId());
+            spaceBlueprintFileInfoRepository.save(spaceBlueprintFile);
+        }
+
+        request.spaceUseFileList().forEach(spaceUseFile -> {
+            SpaceUseFileInfo sp = spaceUseFileInfoRepository.findById(spaceUseFile.id()).orElseThrow(RuntimeException::new);
+            sp.updateFileOrder(spaceUseFile.fileOrder());
+            sp.updateUsed(!spaceUseFile.deleteStatus());
+        });
+
+        spaceAmenityRepository.deleteBySpaceId(spaceId);
+
+        List<SpaceAmenity> spaceAmenities = request.amenityList().stream()
+                .map( amenity -> SpaceDtoMapper.toSpaceAmenityEntity(spaceEntity.getId(), amenity))
+                .toList();
+
+        spaceAmenityRepository.saveAll(spaceAmenities);
+
+
+        spaceAvailableUseRepository.deleteBySpaceId(spaceId);
+
+        List<SpaceAvailableUse> spaceAvailableUses = request.availableUseList().stream()
+                .map( availableUse -> SpaceDtoMapper.toSpaceAvailableUseEntity(spaceEntity.getId(), availableUse))
+                .toList();
+
+        spaceAvailableUseRepository.saveAll(spaceAvailableUses);
+
+        return new SpaceCommonResponse(true, "공간 생성이 완료되었습니다.");
+    }
+
     public SpaceDetailInfo findSpaceDetailInfoBySpaceId(String spaceId) throws Exception {
         Long decSpaceId = AES256Util.decrypt(spaceId);
         Space spaceEntity = findById(decSpaceId);
@@ -255,11 +335,11 @@ public class SpaceService {
         List<Long> spaceAmenities = SpaceDtoMapper.spaceAmenityListToLongList(spaceAmenityRepository.findBySpaceId(decSpaceId));
         List<Long> spaceAvailableUses = SpaceDtoMapper.spaceAvailableUseListToLongList(spaceAvailableUseRepository.findBySpaceId(decSpaceId));
 
-        List<SpaceFileInfoResponse> fileInfoResponseList = spaceFileInfoRepository.findBySpaceIdAndUsed(decSpaceId, true).stream()
+        List<SpaceFileInfoResponse> fileInfoResponseList = spaceFileInfoRepository.findBySpaceIdAndUsedOrderByFileOrderAsc(decSpaceId, true).stream()
                 .map(file -> SpaceDtoMapper.toSpaceFileInfoResponse(file,filePath))
                 .toList();
 
-        List<SpaceUseFileResponse> useFileResponseList = spaceUseFileInfoRepository.findBySpaceIdAndUsed(decSpaceId, true).stream()
+        List<SpaceUseFileResponse> useFileResponseList = spaceUseFileInfoRepository.findBySpaceIdAndUsedOrderByFileOrderAsc(decSpaceId, true).stream()
                 .map(file -> SpaceDtoMapper.toSpaceUseFileResponse(file, filePath))
                 .toList();
 

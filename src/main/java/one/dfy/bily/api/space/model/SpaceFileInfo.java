@@ -59,4 +59,12 @@ public class SpaceFileInfo extends BaseEntity {
         this.fileOrder = fileOrder;
         this.thumbnail = thumbnail;
     }
+
+    public void updateFileOrder(int fileOrder) {
+        this.fileOrder = fileOrder;
+    }
+
+    public void updateUsed(boolean used) {
+        this.used = used;
+    }
 }

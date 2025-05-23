@@ -107,4 +107,38 @@ public class Space extends BaseEntity {
         this.used = used;
         this.userId = userId;
     }
+
+    public void updateSpace(
+            boolean displayStatus,
+            boolean fixedStatus,
+            String alias,
+            String location,
+            BigDecimal latitude,
+            BigDecimal longitude,
+            Long price,
+            BigDecimal areaM2,
+            String districtInfo,
+            String title,
+            String info,
+            String features,
+            String usageTime,
+            String cancellationPolicy,
+            int areaPy
+    ){
+        this.displayStatus = displayStatus;
+        this.fixedStatus = fixedStatus;
+        this.alias = alias;
+        this.location = location;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.price = price;
+        this.areaM2 = areaM2;
+        this.districtInfo = districtInfo;
+        this.title = title;
+        this.info = info;
+        this.features = features;
+        this.usageTime = usageTime;
+        this.cancellationPolicy = cancellationPolicy;
+        this.areaPy = areaPy;
+    }
 }

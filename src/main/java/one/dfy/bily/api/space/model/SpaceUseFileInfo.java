@@ -64,4 +64,12 @@ public class SpaceUseFileInfo extends BaseEntity {
         this.fileOrder = fileOrder;
         this.fileTitle = fileTitle;
     }
+
+    public void updateFileOrder(int fileOrder) {
+        this.fileOrder = fileOrder;
+    }
+
+    public void updateUsed(boolean used) {
+        this.used = used;
+    }
 }
