@@ -1,7 +1,5 @@
 package one.dfy.bily.api.space.dto;
 
-import one.dfy.bily.api.space.model.SpaceBlueprintFile;
-
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -13,7 +11,7 @@ public record SpaceDetailInfo(
         Long price,
         BigDecimal areaM2,
         String districtInfo,
-        String name,
+        String spaceName,
         String info,
         String features,
         String usageTime,

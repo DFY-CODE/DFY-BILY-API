@@ -3,6 +3,7 @@ package one.dfy.bily.api.space.mapper;
 import one.dfy.bily.api.common.dto.FileUploadInfo;
 import one.dfy.bily.api.space.dto.*;
 import one.dfy.bily.api.space.model.*;
+import one.dfy.bily.api.util.AES256Util;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -20,28 +21,83 @@ public class SpaceDtoMapper {
 
     public static List<UserSpaceInfo> toUserSpaceInfoList(List<Space> spaces, Map<Long, String> thumbnailUrlMap) {
         return spaces.stream()
-                .map(space -> new UserSpaceInfo(
-                        space.getId(),
-                        thumbnailUrlMap.get(space.getId()),
-                        space.getTitle(),
-                        space.getDistrictInfo(),
-                        space.getAreaM2(),
-                        space.getAreaPy(),
-                        space.getPrice()
-                ))
+                .map(space -> {
+                    try {
+                        return new UserSpaceInfo(
+                                AES256Util.encrypt(space.getId()),
+                                thumbnailUrlMap.get(space.getId()),
+                                space.getTitle(),
+                                space.getDistrictInfo(),
+                                space.getAreaM2(),
+                                space.getAreaPy(),
+                                space.getPrice()
+                        );
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .toList();
+    }
+
+    public static List<MapUserSpaceInfo> toMapUserSpaceInfoList(List<Space> spaces, Map<Long, String> thumbnailUrlMap) {
+        return spaces.stream()
+                .map(space -> {
+                    try {
+                        return new MapUserSpaceInfo(
+                                AES256Util.encrypt(space.getId()),
+                                thumbnailUrlMap.get(space.getId()),
+                                space.getTitle(),
+                                space.getDistrictInfo(),
+                                space.getAreaM2(),
+                                space.getAreaPy(),
+                                space.getPrice(),
+                                space.getLatitude(),
+                                space.getLongitude()
+                        );
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .toList();
+    }
+
+    public static List<MapNonUserSpaceInfo> toMapNonUserSpaceInfoList(List<Space> spaces, Map<Long, String> thumbnailUrlMap) {
+        return spaces.stream()
+                .map(space -> {
+                    try {
+                        return new MapNonUserSpaceInfo(
+                                AES256Util.encrypt(space.getId()),
+                                thumbnailUrlMap.get(space.getId()),
+                                space.getTitle(),
+                                space.getDistrictInfo(),
+                                space.getAreaM2(),
+                                space.getAreaPy(),
+                                space.getLatitude(),
+                                space.getLongitude()
+                        );
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                })
                 .toList();
     }
 
     public static List<NonUserSpaceInfo> toNonUserSpaceInfoList(List<Space> spaces, Map<Long, String> thumbnailUrlMap) {
         return spaces.stream()
-                .map(space -> new NonUserSpaceInfo(
-                        space.getId(),
-                        thumbnailUrlMap.get(space.getId()),
-                        space.getTitle(),
-                        space.getDistrictInfo(),
-                        space.getAreaM2(),
-                        space.getAreaPy()
-                ))
+                .map(space -> {
+                    try {
+                        return new NonUserSpaceInfo(
+                                AES256Util.encrypt(space.getId()),
+                                thumbnailUrlMap.get(space.getId()),
+                                space.getTitle(),
+                                space.getDistrictInfo(),
+                                space.getAreaM2(),
+                                space.getAreaPy()
+                        );
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                })
                 .toList();
     }
 
@@ -59,7 +115,7 @@ public class SpaceDtoMapper {
                 .toList();
     }
 
-    public static Space toSpaceEntity(SpaceRequest request) {
+    public static Space toSpaceEntity(SpaceCreateRequest request, Long userId) {
         return new Space(
                 request.displayStatus(),
                 request.fixedStatus(),
@@ -77,7 +133,8 @@ public class SpaceDtoMapper {
                 request.latitude() != null ? BigDecimal.valueOf(request.latitude()) : null,
                 request.longitude() != null ? BigDecimal.valueOf(request.longitude()) : null,
                 0L,
-                true
+                true,
+                userId
         );
     }
 
@@ -190,14 +247,31 @@ public class SpaceDtoMapper {
         return new SpaceUseFileResponse(
                 spaceUseFileInfo.getId(),
                 filePath + spaceUseFileInfo.getSaveFileName(),
-                spaceUseFileInfo.getFileOrder()
+                spaceUseFileInfo.getFileOrder(),
+                spaceUseFileInfo.getFileTitle()
         );
     }
 
-    public static SpaceBlueprintFileInfo toSpaceBlueprintFileInfo(SpaceBlueprintFile spaceBlueprintFile, String filePath) {
+    public static SpaceBlueprintFileInfo toSpaceBlueprintFileInfo(SpaceBlueprintFile spaceBlueprintFile) {
         return new SpaceBlueprintFileInfo(
                 spaceBlueprintFile.getId(),
-                filePath + spaceBlueprintFile.getSaveFileName()
+                spaceBlueprintFile.getFileName(),
+                spaceBlueprintFile.getSaveFileName()
+        );
+    }
+
+    public static AdminSpaceInfo toAdminSpaceInfo(Space space, Map<Long, String> userNames) throws Exception {
+        return new AdminSpaceInfo(
+                AES256Util.encrypt(space.getId()),
+                space.getCreatedAt(),
+                space.getAlias(),
+                space.getTitle(),
+                space.getAreaM2(),
+                space.getAreaPy(),
+                space.getPrice(),
+                space.getDisplayStatus(),
+                space.getFixedStatus(),
+                userNames.get(space.getId())
         );
     }
 

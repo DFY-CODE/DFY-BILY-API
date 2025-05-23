@@ -16,7 +16,6 @@ public record InquiryCreateRequest(
         String eventCategory,
         List<InquiryPreferredDateInfo> preferredDates,
         String content,
-        LocalDateTime createdAt,
         InquiryStatus status,
         Long spaceId,
         String hostCompany,

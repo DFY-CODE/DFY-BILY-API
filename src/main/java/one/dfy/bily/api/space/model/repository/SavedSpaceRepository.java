@@ -10,5 +10,5 @@ import java.util.Optional;
 
 public interface SavedSpaceRepository extends JpaRepository<SavedSpace, Long> {
     Optional<SavedSpace> findBySpaceAndUserId(Space space, Long userId);
-    Page<SavedSpace> findByUserId(Long userId, Pageable pageable);
+    Page<SavedSpace> findByUserIdAndUsed(Long userId, boolean used, Pageable pageable);
 }

@@ -9,15 +9,15 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import one.dfy.bily.api.security.CustomUserDetails;
+import one.dfy.bily.api.space.facade.SpaceFacade;
 import one.dfy.bily.api.space.service.SpaceService;
 import one.dfy.bily.api.space.dto.*;
 import one.dfy.bily.api.util.S3Uploader;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.util.*;
 
 @Slf4j
@@ -29,6 +29,7 @@ public class SpaceApiController {
 
     private final S3Uploader s3Uploader;
     private final SpaceService spaceService;
+    private final SpaceFacade spaceFacade;
 
     @GetMapping("/amenity/all")
     @Operation(summary = "공간 편의시설 목록 조회", description = "공간 편의시설 목록 정보를 반환합니다.")
@@ -115,6 +116,73 @@ public class SpaceApiController {
         return ResponseEntity.ok(spaceService.findUserSpaceInfoList(page, size));
     }
 
+    @GetMapping("/list/admin")
+//    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    @Operation(summary = "어드민 공간 목록 조회", description = "페이지네이션된 공간 관리 목록 및 총 개수를 반환합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = SpaceListResponse.class),
+                            examples = @ExampleObject(
+                                    name = "성공 응답 예시",
+                                    externalValue = "/swagger/json/space/getSpaces.json"
+                            )
+                    )
+            )
+    })
+    public ResponseEntity<AdminSpaceInfoList> findAdminSpaceInfoList(
+            @RequestParam(required = false) String spaceAlias,
+            @RequestParam(required = false) Boolean displayStatus,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "20") int pageSize) {
+        return ResponseEntity.ok(spaceFacade.findAdminSpaceInfoList(spaceAlias, displayStatus, page, pageSize));
+    }
+
+    @GetMapping("/list/map/non-user")
+//    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    @Operation(summary = "비회원 공간 지도 목록 조회", description = "모든 공간의 목록을 반환합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = SpaceListResponse.class),
+                            examples = @ExampleObject(
+                                    name = "성공 응답 예시",
+                                    externalValue = "/swagger/json/space/getSpaces.json"
+                            )
+                    )
+            )
+    })
+    public ResponseEntity<MapNonUserSpaceInfoList> findMapNonSpaceInfoList() {
+        return ResponseEntity.ok(spaceService.findMapNonUserSpaceInfoList());
+    }
+
+    @GetMapping("/list/map")
+//    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    @Operation(summary = "공간 지도 목록 조회", description = "모든 공간의 목록을 반환합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = SpaceListResponse.class),
+                            examples = @ExampleObject(
+                                    name = "성공 응답 예시",
+                                    externalValue = "/swagger/json/space/getSpaces.json"
+                            )
+                    )
+            )
+    })
+    public ResponseEntity<MapUserSpaceInfoList> findMapSpaceInfoList() {
+        return ResponseEntity.ok(spaceService.findMapUserSpaceInfoList());
+    }
+
     @PostMapping("/save")
     @Operation(summary = "공간 저장", description = "사용자가 공간을 저장합니다.")
     @ApiResponses(value = {
@@ -165,7 +233,7 @@ public class SpaceApiController {
         return ResponseEntity.ok(spaceService.cancelSavedSpace(spaceId.spaceId(), userId));
     }
 
-    @PostMapping("")
+    @PostMapping(consumes = "multipart/form-data")
     @Operation(summary = "공간 생성", description = "사용자가 공간을 저장합니다.")
     @ApiResponses(value = {
             @ApiResponse(
@@ -182,11 +250,37 @@ public class SpaceApiController {
             )
     })
     public ResponseEntity<SpaceCommonResponse> saveSpace(
-            @RequestPart("data") SpaceRequest request,
+            @RequestPart("data") SpaceCreateRequest request,
             @RequestPart("spaceImages") List<MultipartFile> spaceImages,
             @RequestPart("useCaseImages") List<MultipartFile> useCaseImages,
             @RequestPart("blueprint") MultipartFile blueprint ) {
-        return ResponseEntity.ok(spaceService.saveSpace(request, spaceImages, useCaseImages, blueprint));
+        Long userId = 110L;
+        return ResponseEntity.ok(spaceService.saveSpace(request, spaceImages, useCaseImages, blueprint, userId));
+    }
+
+    @PatchMapping(consumes = "multipart/form-data")
+    @Operation(summary = "공간 수정", description = "사용자가 공간을 수정합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = SpaceCommonResponse.class),
+                            examples = @ExampleObject(
+                                    name = "성공 응답 예시",
+                                    externalValue = "/swagger/json/space/getSpaces.json"
+                            )
+                    )
+            )
+    })
+    public ResponseEntity<SpaceCommonResponse> updateSpace(
+            @RequestPart("data") SpaceUpdateRequest request,
+            @RequestPart("spaceImages") List<MultipartFile> spaceImages,
+            @RequestPart("useCaseImages") List<MultipartFile> useCaseImages,
+            @RequestPart("blueprint") MultipartFile blueprint ) throws Exception {
+        Long userId = 110L;
+        return ResponseEntity.ok(spaceService.updateSpace(request, spaceImages, useCaseImages, blueprint, userId));
     }
 
     @GetMapping("/name")
@@ -225,10 +319,29 @@ public class SpaceApiController {
                     )
             )
     })
-    public ResponseEntity<SpaceDetailInfo> findSpaceDetailInfoBySpaceId(@PathVariable("id") Long spaceId) {
+    public ResponseEntity<SpaceDetailInfo> findSpaceDetailInfoBySpaceId(@PathVariable("id") String spaceId) throws Exception {
         return ResponseEntity.ok(spaceService.findSpaceDetailInfoBySpaceId(spaceId));
     }
 
+    @GetMapping("/file/{saveFileName}")
+    @Operation(summary = "파일 다운로드", description = "공간 상세 정보를 반환합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = SpaceDetailInfo.class),
+                            examples = @ExampleObject(
+                                    name = "성공 응답 예시",
+                                    externalValue = "/swagger/json/space/getSpaces.json"
+                            )
+                    )
+            )
+    })
+    public ResponseEntity<File> downloadSpaceFileAsTempFile(@PathVariable("saveFileName") String saveFileName) {
+        return ResponseEntity.ok(spaceService.downloadSpaceFileAsTempFile(saveFileName));
+    }
 
 
 }

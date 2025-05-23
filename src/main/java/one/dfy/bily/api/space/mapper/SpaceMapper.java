@@ -16,7 +16,7 @@ public interface SpaceMapper {
             @Result(property = "spaceId", column = "SPACE_ID"),
             @Result(property = "price", column = "PRICE"),
             @Result(property = "areaM2", column = "AREA_M2"),
-            @Result(property = "name", column = "NAME"),
+            @Result(property = "spaceName", column = "NAME"),
             @Result(property = "author", column = "AUTHOR"),
             @Result(property = "amenityList", column = "AMENITIES"),
             @Result(property = "availableUseList", column = "AVAILABLE_USES"),

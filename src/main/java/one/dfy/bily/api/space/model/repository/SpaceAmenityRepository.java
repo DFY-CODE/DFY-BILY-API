@@ -9,4 +9,5 @@ import java.util.Optional;
 
 public interface SpaceAmenityRepository extends JpaRepository<SpaceAmenity, Long> {
     List<SpaceAmenity> findBySpaceId(Long spaceId);
+    void deleteBySpaceId(Long spaceId);
 }

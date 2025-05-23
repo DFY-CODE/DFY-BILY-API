@@ -8,4 +8,5 @@ import java.util.Optional;
 
 public interface SpaceAvailableUseRepository extends JpaRepository<SpaceAvailableUse, Long> {
     List<SpaceAvailableUse> findBySpaceId(Long spaceId);
+    void deleteBySpaceId(Long spaceId);
 }

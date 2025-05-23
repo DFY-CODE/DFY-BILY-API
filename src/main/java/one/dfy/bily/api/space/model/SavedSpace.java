@@ -22,15 +22,15 @@ public class SavedSpace extends BaseEntity{
     private Long userId;
 
     @Column(name = "IS_USED")
-    private boolean isUsed;
+    private boolean used;
 
     public SavedSpace(Space space, Long userId) {
         this.space = space;
         this.userId = userId;
-        this.isUsed = true;
+        this.used = true;
     }
 
     public void updateUsed(boolean used) {
-        this.isUsed = used;
+        this.used = used;
     }
 }

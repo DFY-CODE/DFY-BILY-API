@@ -2,6 +2,7 @@ package one.dfy.bily.api.space.dto;
 
 public record SpaceBlueprintFileInfo(
         Long id,
-        String fileUrl
+        String fileName,
+        String saveFileName
 ) {
 }
