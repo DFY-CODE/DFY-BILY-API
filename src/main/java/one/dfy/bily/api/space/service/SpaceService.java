@@ -1,13 +1,11 @@
 package one.dfy.bily.api.space.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import one.dfy.bily.api.common.mapper.PaginationMapper;
 import one.dfy.bily.api.space.mapper.SpaceDtoMapper;
 import one.dfy.bily.api.space.model.*;
 import one.dfy.bily.api.space.model.repository.*;
 import one.dfy.bily.api.common.dto.*;
-import one.dfy.bily.api.space.mapper.SpaceMapper;
 import one.dfy.bily.api.space.dto.*;
 import one.dfy.bily.api.util.AES256Util;
 import one.dfy.bily.api.util.S3Uploader;
@@ -361,9 +359,9 @@ public class SpaceService {
         } else if (spaceAlias == null) {
             return spaceRepository.findByDisplayStatus(displayStatus, pageable);
         } else if (displayStatus == null) {
-            return spaceRepository.findByTitleContaining(spaceAlias, pageable);
+            return spaceRepository.findByAliasContaining(spaceAlias, pageable);
         } else {
-            return spaceRepository.findByTitleContainingAndDisplayStatus(spaceAlias, displayStatus, pageable);
+            return spaceRepository.findByAliasContainingAndDisplayStatus(spaceAlias, displayStatus, pageable);
         }
     }
 
