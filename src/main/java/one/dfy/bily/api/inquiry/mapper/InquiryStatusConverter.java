@@ -9,6 +9,6 @@ public class InquiryStatusConverter implements Converter<String, InquiryStatus> 
 
     @Override
     public InquiryStatus convert(String source) {
-        return InquiryStatus.fromLabel(source);
+        return InquiryStatus.fromDescription(source);
     }
 }

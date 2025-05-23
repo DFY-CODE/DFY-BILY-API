@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 
-import java.util.stream.Stream;
+import java.util.Arrays;
 
 @Getter
 public enum InquiryStatus {
@@ -18,16 +18,22 @@ public enum InquiryStatus {
         this.description = description;
     }
 
+    /**
+     * JSON 변환 시 한글 이름(description)을 사용
+     */
     @JsonValue
-    public String getLabel() {
+    public String getDescription() {
         return description;
     }
 
+    /**
+     * JSON 역직렬화 시 한글 이름(description)으로 Enum 값 변환
+     */
     @JsonCreator
-    public static InquiryStatus fromLabel(String label) {
-        return Stream.of(InquiryStatus.values())
-                .filter(e -> e.description.equals(label))
+    public static InquiryStatus fromDescription(String description) {
+        return Arrays.stream(InquiryStatus.values())
+                .filter(status -> status.getDescription().equals(description))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Unknown label: " + label));
+                .orElseThrow(() -> new IllegalArgumentException("Unknown InquiryStatus description: " + description));
     }
 }

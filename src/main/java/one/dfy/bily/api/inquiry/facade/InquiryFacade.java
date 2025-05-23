@@ -8,6 +8,7 @@ import one.dfy.bily.api.space.model.Space;
 import one.dfy.bily.api.inquiry.service.InquiryService;
 import one.dfy.bily.api.common.annotation.Facade;
 import one.dfy.bily.api.space.service.SpaceService;
+import one.dfy.bily.api.util.AES256Util;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -24,8 +25,8 @@ public class InquiryFacade {
         return inquiryService.updateInquiry(inquiryId, inquiryUpdateRequest, space);
     }
 
-    public InquiryResponse createInquiry(InquiryCreateRequest request, List<MultipartFile> fileAttachments, Long userId) {
-        Space space = spaceService.findById(request.spaceId());
+    public InquiryResponse createInquiry(InquiryCreateRequest request, List<MultipartFile> fileAttachments, Long userId) throws Exception {
+        Space space = spaceService.findById(AES256Util.decrypt(request.spaceId()));
 
         return inquiryService.createInquiry(request, fileAttachments, space, userId);
     }

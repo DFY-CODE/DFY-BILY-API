@@ -1,5 +1,9 @@
 package one.dfy.bily.api.inquiry.controller;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -126,14 +130,27 @@ public class InquiryApiController {
             )
     )
     public ResponseEntity<InquiryResponse> createInquiry(
-            @RequestPart("data") InquiryCreateRequest request,
+            @RequestPart("data") String jsonData,
             @RequestPart("attachFileList") List<MultipartFile> fileAttachments
 //            @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-//        Long userId = userDetails.getUserId();
-        Long userId = 110L;
+        try {
 
-        return ResponseEntity.ok(inquiryFacade.createInquiry(request, fileAttachments,userId));
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.registerModule(new Jdk8Module());
+            objectMapper.registerModule(new JavaTimeModule());
+            objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false); // 알 수 없는 필드 무시
+            objectMapper.findAndRegisterModules();
+
+            InquiryCreateRequest request = objectMapper.readValue(jsonData, InquiryCreateRequest.class);
+
+            Long userId = 110L;
+            return ResponseEntity.ok(inquiryFacade.createInquiry(request, fileAttachments, userId));
+        } catch (Exception e) {
+            // JSON 파싱 오류 처리
+            return ResponseEntity.badRequest().build();
+        }
+
     }
 
     @PatchMapping("/{inquiry-id}")
