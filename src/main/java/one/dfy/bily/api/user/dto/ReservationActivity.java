@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 public record ReservationActivity(
         Long id,
-        Long spaceId,
+        String spaceId,
         String spaceName,
         String location,
         BigDecimal areaM2,

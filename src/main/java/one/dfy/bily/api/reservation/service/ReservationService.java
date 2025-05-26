@@ -138,7 +138,7 @@ public class ReservationService {
 
     public List<Long> getReservationActivityInquiryIds(List<ReservationActivity> result) {
         return result.stream()
-                .map(ReservationActivity::spaceId)
+                .map(activity -> Long.valueOf(activity.spaceId()))
                 .toList();
     }
 

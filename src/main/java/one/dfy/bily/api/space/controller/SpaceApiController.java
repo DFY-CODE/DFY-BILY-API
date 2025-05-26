@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import one.dfy.bily.api.space.facade.SpaceFacade;
 import one.dfy.bily.api.space.service.SpaceService;
 import one.dfy.bily.api.space.dto.*;
+import one.dfy.bily.api.util.AES256Util;
 import one.dfy.bily.api.util.S3Uploader;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -162,6 +163,8 @@ public class SpaceApiController {
         return ResponseEntity.ok(spaceService.findMapNonUserSpaceInfoList());
     }
 
+
+
     @GetMapping("/list/map")
 //    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @Operation(summary = "공간 지도 목록 조회", description = "모든 공간의 목록을 반환합니다.")
@@ -184,7 +187,7 @@ public class SpaceApiController {
     }
 
     @PostMapping("/save")
-    @Operation(summary = "공간 저장", description = "사용자가 공간을 저장합니다.")
+    @Operation(summary = "회원 공간 저장", description = "사용자가 공간을 저장합니다.")
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
@@ -202,10 +205,10 @@ public class SpaceApiController {
     public ResponseEntity<SpaceCommonResponse> createSavedSpace(
             @RequestBody SpaceId spaceId
 //            @AuthenticationPrincipal CustomUserDetails userDetails
-            ) {
+            ) throws Exception {
 //        Long userId = userDetails.getUserId();
         Long userId = 110L;
-        return ResponseEntity.ok(spaceService.createSavedSpace(spaceId.spaceId(), userId));
+        return ResponseEntity.ok(spaceService.createSavedSpace(AES256Util.decrypt(spaceId.spaceId()), userId));
     }
 
     @PatchMapping("/save")
@@ -227,10 +230,10 @@ public class SpaceApiController {
     public ResponseEntity<SpaceCommonResponse> cancelSavedSpace(
             @RequestBody SpaceId spaceId
 //            @AuthenticationPrincipal CustomUserDetails userDetails
-    ) {
+    ) throws Exception {
 //        Long userId = userDetails.getUserId();
         Long userId = 110L;
-        return ResponseEntity.ok(spaceService.cancelSavedSpace(spaceId.spaceId(), userId));
+        return ResponseEntity.ok(spaceService.cancelSavedSpace(AES256Util.decrypt(spaceId.spaceId()), userId));
     }
 
     @PostMapping(consumes = "multipart/form-data")

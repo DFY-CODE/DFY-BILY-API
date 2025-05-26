@@ -9,6 +9,7 @@ import java.util.List;
 
 public record UserActivity(
         Long id,
+        String spaceId,
         String type,
         String spaceName,
         String location,

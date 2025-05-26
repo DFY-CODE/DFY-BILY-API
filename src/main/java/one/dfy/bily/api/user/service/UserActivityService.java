@@ -14,6 +14,8 @@ import one.dfy.bily.api.user.mapper.UserActivityMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 
@@ -57,7 +59,20 @@ public class UserActivityService {
             Map<Long, String> fileNameListMap
     ) {
         return savedSpaces.stream()
-                .map(savedSpace -> UserActivityMapper.toSavedSpaceInfo(savedSpace,fileNameListMap))
+                .map(savedSpace -> {
+                    String encryptedSpaceId = encryptSpaceId(savedSpace.getId()); // spaceId 암호화
+                    return UserActivityMapper.toSavedSpaceInfo(savedSpace, fileNameListMap, encryptedSpaceId);
+                })
                 .toList();
     }
+
+    private String encryptSpaceId(Long spaceId) {
+        try {
+            // 예제 암호화 로직 (Base64로 변환하는 간단한 방식 사용)
+            return Base64.getEncoder().encodeToString(spaceId.toString().getBytes(StandardCharsets.UTF_8));
+        } catch (Exception e) {
+            throw new IllegalArgumentException("SpaceId 암호화 실패", e);
+        }
+    }
+
 }

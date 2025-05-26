@@ -3,9 +3,9 @@ package one.dfy.bily.api.space.dto;
 import java.math.BigDecimal;
 
 public record NonUserSpaceInfo(
-        String id,
+        String spaceId,
         String thumbnailUrl,
-        String title,
+        String spaceName,
         String districtInfo,
         BigDecimal areaM2,
         int areaPy

@@ -13,6 +13,7 @@ import one.dfy.bily.api.common.constant.YesNo;
 import one.dfy.bily.api.space.model.QSpace;
 import one.dfy.bily.api.user.dto.InquiryActivity;
 import one.dfy.bily.api.user.dto.UserActivity;
+import one.dfy.bily.api.util.AES256Util;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -114,10 +115,10 @@ public class InquiryRepositoryCustomImpl implements InquiryRepositoryCustom {
         QInquiry inquiry = QInquiry.inquiry;
         QSpace space = QSpace.space;
 
+        // fetch 결과 후 암호화 처리
         List<InquiryActivity> contents = queryFactory
                 .select(Projections.constructor(InquiryActivity.class,
                         inquiry.id,
-                        space.id,
                         space.title,
                         space.location,
                         space.areaM2,
@@ -131,7 +132,19 @@ public class InquiryRepositoryCustomImpl implements InquiryRepositoryCustom {
                 .where(inquiry.userId.eq(userId), inquiry.used.eq(true))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
-                .fetch();
+                .fetch()
+                .stream()
+                .map(activity -> new InquiryActivity(
+                        activity.id(),
+                        activity.spaceName(),
+                        activity.location(),
+                        activity.areaM2(),
+                        activity.areaPy(),
+                        activity.price(),
+                        activity.status(),
+                        activity.createdAt()
+                ))
+                .collect(Collectors.toList());
 
         Long total = queryFactory
                 .select(inquiry.count())
@@ -142,6 +155,15 @@ public class InquiryRepositoryCustomImpl implements InquiryRepositoryCustom {
 
         return new PageImpl<>(contents, pageable, total != null ? total : 0L);
     }
+
+    private String encryptSpaceId(Long id) {
+        try {
+            return AES256Util.encrypt(id);
+        } catch (Exception e) {
+            throw new RuntimeException("SpaceId 암호화 실패", e);
+        }
+    }
+
 
     private BooleanBuilder buildInquirySearchCondition(
             QInquiry inquiry,

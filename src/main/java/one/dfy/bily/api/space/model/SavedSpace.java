@@ -24,6 +24,11 @@ public class SavedSpace extends BaseEntity{
     @Column(name = "IS_USED")
     private boolean used;
 
+    // 암호화된 ID 필드 추가
+    @Transient // DB에 저장하지 않기 위해 @Transient 사용
+    private String encryptedId;
+
+
     public SavedSpace(Space space, Long userId) {
         this.space = space;
         this.userId = userId;
@@ -33,4 +38,10 @@ public class SavedSpace extends BaseEntity{
     public void updateUsed(boolean used) {
         this.used = used;
     }
+
+    // 암호화된 ID 세터 메서드 추가
+    public void setEncryptedId(String encryptedId) {
+        this.encryptedId = encryptedId;
+    }
+
 }

@@ -8,6 +8,7 @@ import one.dfy.bily.api.user.dto.InquiryActivity;
 import one.dfy.bily.api.user.dto.ReservationActivity;
 import one.dfy.bily.api.user.dto.SavedSpaceInfo;
 import one.dfy.bily.api.user.dto.UserActivity;
+import one.dfy.bily.api.util.AES256Util;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
@@ -23,7 +24,16 @@ public class UserActivityMapper {
             Map<Long, String> fileNameListMap
     ) {
         Long id = toLong(row[0]);
-        Long spaceId = toLong(row[1]);
+        Long spaceIdLong = toLong(row[1]); // 기존 spaceId (Long)
+        String spaceId;
+
+        try {
+            // AES256Util을 이용해 spaceId 암호화
+            spaceId = AES256Util.encrypt(spaceIdLong);
+        } catch (Exception e) {
+            throw new RuntimeException("SpaceId 암호화 실패", e);
+        }
+
         String type = toStr(row[2]);
         String spaceName = toStr(row[3]);
         String location = toStr(row[4]);
@@ -35,9 +45,9 @@ public class UserActivityMapper {
         String status = toStr(row[11]);
         LocalDateTime createdAt = toDateTime(row[12]);
 
-
         return new UserActivity(
                 id,
+                spaceId, // AES256으로 암호화된 spaceId 전달
                 type,
                 spaceName,
                 location,
@@ -48,9 +58,12 @@ public class UserActivityMapper {
                 price,
                 status,
                 createdAt,
-                fileNameListMap.getOrDefault(spaceId, null)
+                fileNameListMap.getOrDefault(spaceIdLong, null) // 파일 맵은 기존 Long spaceId로 처리
         );
     }
+
+
+
 
     private static String toStr(Object obj) {
         return obj != null ? obj.toString() : null;
@@ -81,8 +94,17 @@ public class UserActivityMapper {
             Map<Long, String> fileNameListMap,
             Map<Long, List<InquiryPreferredDateInfo>> preferredDatesMap
     ) {
+        String spaceId;
+        try {
+            // 암호화된 spaceId 생성 (id 값을 암호화)
+            spaceId = AES256Util.encrypt(inquiryActivity.id());
+        } catch (Exception e) {
+            throw new RuntimeException("SpaceId 암호화 실패", e);
+        }
+
         return new UserActivity(
                 inquiryActivity.id(),
+                spaceId, // 암호화된 spaceId 사용
                 "INQUIRY",
                 inquiryActivity.spaceName(),
                 inquiryActivity.location(),
@@ -93,9 +115,11 @@ public class UserActivityMapper {
                 inquiryActivity.price(),
                 inquiryActivity.status().getDescription(),
                 inquiryActivity.createdAt(),
-                fileNameListMap.getOrDefault(inquiryActivity.spaceId(), null)
+                fileNameListMap.getOrDefault(inquiryActivity.id(), null) // fileName 맵은 id로 처리
         );
     }
+
+
 
 
 
@@ -105,6 +129,7 @@ public class UserActivityMapper {
     ) {
         return new UserActivity(
                 reservation.id(),
+                reservation.spaceId(), // spaceId 추가
                 "RESERVATION",
                 reservation.spaceName(),
                 reservation.location(),
@@ -122,10 +147,12 @@ public class UserActivityMapper {
         );
     }
 
-    public static SavedSpaceInfo toSavedSpaceInfo(SavedSpace savedSpace, Map<Long, String> fileNameListMap) {
+
+    public static SavedSpaceInfo toSavedSpaceInfo(SavedSpace savedSpace, Map<Long, String> fileNameListMap, String encryptedId) {
         Space space = savedSpace.getSpace();
         return new SavedSpaceInfo(
                 space.getId(),
+                encryptedId, // 암호화된 ID 추가
                 space.getTitle(),
                 space.getDistrictInfo(),
                 space.getAreaM2(),
@@ -134,5 +161,6 @@ public class UserActivityMapper {
                 fileNameListMap.getOrDefault(space.getId(), null)
         );
     }
+
 
 }

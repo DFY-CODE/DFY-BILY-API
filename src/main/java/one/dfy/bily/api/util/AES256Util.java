@@ -12,6 +12,9 @@ public class AES256Util {
     private static final String IV = "abcdef1234567890"; // 16바이트
 
     public static String encrypt(Long value) throws Exception {
+        if (value == null) {
+            throw new IllegalArgumentException("Value to encrypt cannot be null");
+        }
         String plainText = value.toString();
         Cipher cipher = Cipher.getInstance(ALGORITHM);
         SecretKeySpec keySpec = new SecretKeySpec(SECRET_KEY.getBytes(StandardCharsets.UTF_8), "AES");
@@ -20,6 +23,7 @@ public class AES256Util {
         byte[] encrypted = cipher.doFinal(plainText.getBytes(StandardCharsets.UTF_8));
         return Base64.getUrlEncoder().withoutPadding().encodeToString(encrypted);
     }
+
 
     public static Long decrypt(String encryptedText) throws Exception {
         Cipher cipher = Cipher.getInstance(ALGORITHM);

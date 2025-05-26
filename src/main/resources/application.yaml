@@ -7,7 +7,7 @@ server:
 
 jwt:
   secret: DjktOBVHAu0VxgLpj5HQFprityt4WamJQBeh21lA+N8=
-  expiration: 86400 # 1일 (초 단위)
+  expiration: 86400000  # 1일 (초 단위)
 
 jasypt:
   encryptor:
