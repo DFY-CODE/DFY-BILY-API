@@ -20,6 +20,7 @@ import one.dfy.bily.api.inquiry.dto.*;
 import one.dfy.bily.api.inquiry.facade.InquiryFacade;
 import one.dfy.bily.api.inquiry.service.InquiryService;
 import one.dfy.bily.api.security.CustomUserDetails;
+import one.dfy.bily.api.util.AES256Util;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -102,16 +103,18 @@ public class InquiryApiController {
             )
     )
     public ResponseEntity<InquiryResponse> findInquiryByInquiryId(
-            @PathVariable(name = "inquiry-id") Long inquiryId
+            @PathVariable(name = "inquiry-id") String inquiryId
 //            @AuthenticationPrincipal CustomUserDetails userDetails
-    ) {
+    ) throws Exception {
 //        Long userId = userDetails.getUserId();
+
+        Long encryptedId = AES256Util.decrypt(inquiryId);
 
         Long userId = 110L;
 //        boolean isAdmin = userDetails.getAuthorities().stream()
 //                .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
         boolean isAdmin = true;
-        return ResponseEntity.ok(inquiryService.findInquiryByInquiryIdAndUserId(inquiryId, userId, isAdmin));
+        return ResponseEntity.ok(inquiryService.findInquiryByInquiryIdAndUserId(encryptedId, userId, isAdmin));
     }
 
     @PostMapping(consumes = "multipart/form-data")

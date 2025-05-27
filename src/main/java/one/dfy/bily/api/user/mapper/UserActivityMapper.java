@@ -149,17 +149,28 @@ public class UserActivityMapper {
 
 
     public static SavedSpaceInfo toSavedSpaceInfo(SavedSpace savedSpace, Map<Long, String> fileNameListMap, String encryptedId) {
-        Space space = savedSpace.getSpace();
-        return new SavedSpaceInfo(
-                space.getId(),
-                encryptedId, // 암호화된 ID 추가
-                space.getTitle(),
-                space.getDistrictInfo(),
-                space.getAreaM2(),
-                space.getAreaPy(),
-                space.getPrice(),
-                fileNameListMap.getOrDefault(space.getId(), null)
-        );
+        try {
+            Space space = savedSpace.getSpace();
+
+            if (space == null || space.getId() == null) {
+                throw new IllegalArgumentException("SavedSpace.getSpace() or space ID is null");
+            }
+
+            return new SavedSpaceInfo(
+                    space.getId(),
+                    encryptedId,
+                    space.getTitle(),
+                    space.getDistrictInfo(),
+                    space.getAreaM2(),
+                    space.getAreaPy(),
+                    space.getPrice(),
+                    fileNameListMap.getOrDefault(space.getId(), null)
+            );
+        } catch (Exception e) {
+            System.err.println("❌ Error in toSavedSpaceInfo: " + e.getMessage());
+            e.printStackTrace();
+            return null;
+        }
     }
 
 

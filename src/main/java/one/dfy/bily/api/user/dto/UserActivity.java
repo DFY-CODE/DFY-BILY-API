@@ -20,6 +20,6 @@ public record UserActivity(
         Long price,
         String status,
         LocalDateTime createdAt,
-        String thumbnail
+        String thumbnailUrl
 ){
 }

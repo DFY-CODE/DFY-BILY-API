@@ -1,16 +1,19 @@
 package one.dfy.bily.api.user.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import one.dfy.bily.api.inquiry.dto.InquiryPreferredDateInfo;
 import one.dfy.bily.api.inquiry.mapper.InquiryMapper;
 import one.dfy.bily.api.inquiry.model.PreferredDate;
 import one.dfy.bily.api.space.model.SavedSpace;
+import one.dfy.bily.api.space.model.Space;
 import one.dfy.bily.api.user.dto.InquiryActivity;
 import one.dfy.bily.api.user.dto.ReservationActivity;
 import one.dfy.bily.api.user.dto.SavedSpaceInfo;
 import one.dfy.bily.api.user.dto.UserActivity;
 import one.dfy.bily.api.user.facade.UserActivityFacade;
 import one.dfy.bily.api.user.mapper.UserActivityMapper;
+import one.dfy.bily.api.util.AES256Util;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,7 +21,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserActivityService {
@@ -60,19 +65,30 @@ public class UserActivityService {
     ) {
         return savedSpaces.stream()
                 .map(savedSpace -> {
-                    String encryptedSpaceId = encryptSpaceId(savedSpace.getId()); // spaceId 암호화
-                    return UserActivityMapper.toSavedSpaceInfo(savedSpace, fileNameListMap, encryptedSpaceId);
+                    log.info(">> Start mapping savedSpace: " + savedSpace);
+
+                    try {
+                        Space space = savedSpace.getSpace();
+                        if (space == null || space.getId() == null) {
+                            throw new IllegalArgumentException("SavedSpace.getSpace() or space ID cannot be null");
+                        }
+
+                        Long spaceId = space.getId(); // 공간 ID로 변경
+                        log.info("Encrypting Space ID: " + spaceId);
+
+                        String encryptedSpaceId = AES256Util.encrypt(spaceId);
+                        return UserActivityMapper.toSavedSpaceInfo(savedSpace, fileNameListMap, encryptedSpaceId);
+
+                    } catch (Exception e) {
+                        log.info("Exception: " + e.getMessage());
+                        e.printStackTrace();
+                        return null;
+                    }
                 })
+                .filter(Objects::nonNull)
                 .toList();
     }
 
-    private String encryptSpaceId(Long spaceId) {
-        try {
-            // 예제 암호화 로직 (Base64로 변환하는 간단한 방식 사용)
-            return Base64.getEncoder().encodeToString(spaceId.toString().getBytes(StandardCharsets.UTF_8));
-        } catch (Exception e) {
-            throw new IllegalArgumentException("SpaceId 암호화 실패", e);
-        }
-    }
+
 
 }
