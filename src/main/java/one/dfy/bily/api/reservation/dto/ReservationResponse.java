@@ -2,6 +2,7 @@ package one.dfy.bily.api.reservation.dto;
 
 public record ReservationResponse (
         Long id,
+        String spaceId,
         Long inquiryId,
         String companyName,
         String hostCompany,

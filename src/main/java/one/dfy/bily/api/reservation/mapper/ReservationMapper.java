@@ -9,9 +9,11 @@ import one.dfy.bily.api.inquiry.model.Inquiry;
 import one.dfy.bily.api.reservation.model.Payment;
 import one.dfy.bily.api.reservation.model.Reservation;
 import one.dfy.bily.api.reservation.dto.*;
+import one.dfy.bily.api.util.AES256Util;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -88,8 +90,17 @@ public class ReservationMapper {
     public static ReservationResponse toReservationResponse(
             Reservation reservations
     ) {
+        String encryptedSpaceId;
+        try {
+            encryptedSpaceId = AES256Util.encrypt(reservations.getId());
+        } catch (GeneralSecurityException e) {
+            throw new RuntimeException("Failed to encrypt space ID", e); // 또는 커스텀 예외로 래핑
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         return new ReservationResponse(
                 reservations.getId(),
+                encryptedSpaceId,
                 reservations.getInquiry().getId(),
                 reservations.getInquiry().getCompanyName(),
                 reservations.getInquiry().getHostCompany(),

@@ -35,7 +35,7 @@ public class InquiryFile extends BaseEntity {
     @Column(name = "IS_USED", length = 10)
     private boolean isUsed = true;
 
-    @Column(name = "CREATOR", nullable = false, length = 50)
+    @Column(name = "CREATOR", length = 50)
     private Long creator;
 
     @Column(name = "UPDATER", length = 50)

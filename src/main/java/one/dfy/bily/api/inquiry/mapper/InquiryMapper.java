@@ -9,9 +9,12 @@ import one.dfy.bily.api.inquiry.model.InquiryFile;
 import one.dfy.bily.api.inquiry.model.PreferredDate;
 import one.dfy.bily.api.space.model.Space;
 import one.dfy.bily.api.inquiry.dto.*;
+import one.dfy.bily.api.util.AES256Util;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.security.GeneralSecurityException;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -76,9 +79,18 @@ public class InquiryMapper {
         List<InquiryPreferredDateInfo> preferredDateInfos = preferredDates.stream()
                 .map(InquiryMapper::inquiryPreferredDateInfoToResponse)
                 .toList();
+        String encryptedSpaceId;
+        try {
+            encryptedSpaceId = AES256Util.encrypt(inquiry.getSpace().getId());
+        } catch (GeneralSecurityException e) {
+            throw new RuntimeException("Failed to encrypt space ID", e); // 또는 커스텀 예외로 래핑
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
 
         return new InquiryResponse(
                 inquiry.getId(),
+                encryptedSpaceId, // 🔐 암호화된 spaceId
                 inquiry.getContactPerson(),
                 inquiry.getPhoneNumber(),
                 inquiry.getEmail(),
@@ -91,10 +103,16 @@ public class InquiryMapper {
                 inquiryFileNames,
                 inquiry.getCreatedAt(),
                 inquiry.getStatus(),
-                inquiry.getSpace().getId(),
                 inquiry.getHostCompany(),
                 inquiry.getSpace().getAlias()
         );
+    }
+
+    public class EncryptionUtils {
+        public static String encryptId(Long id) {
+            // 암호화 로직 예시 (Base64나 AES 등 실제 사용 중인 로직에 맞게 구현)
+            return Base64.getEncoder().encodeToString(String.valueOf(id).getBytes());
+        }
     }
 
     public static InquiryFileName inquiryFileToResponse(InquiryFile file) {

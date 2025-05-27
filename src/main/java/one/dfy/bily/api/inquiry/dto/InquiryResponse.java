@@ -7,6 +7,7 @@ import java.util.List;
 
 public record InquiryResponse(
         Long id,
+        String spaceId,
         String contactPerson,
         String phoneNumber,
         String email,
@@ -19,7 +20,6 @@ public record InquiryResponse(
         List<InquiryFileName> fileAttachment,
         LocalDateTime createdAt,
         InquiryStatus status,
-        Long spaceId,
         String hostCompany,
         String spaceIdName
 ) {}

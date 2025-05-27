@@ -1,5 +1,7 @@
 package one.dfy.bily.api.space.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -253,10 +255,18 @@ public class SpaceApiController {
             )
     })
     public ResponseEntity<SpaceCommonResponse> saveSpace(
-            @RequestPart("data") SpaceCreateRequest request,
+           /* @RequestPart("data") SpaceCreateRequest request,*/
+            @RequestPart("data") String requestJson, // JSON 문자열로 수신
             @RequestPart("spaceImages") List<MultipartFile> spaceImages,
             @RequestPart("useCaseImages") List<MultipartFile> useCaseImages,
-            @RequestPart("blueprint") MultipartFile blueprint ) {
+            @RequestPart("blueprint") MultipartFile blueprint ) throws JsonProcessingException {
+
+        // JSON 문자열을 SpaceCreateRequest 객체로 변환
+        ObjectMapper objectMapper = new ObjectMapper();
+        SpaceCreateRequest request = objectMapper.readValue(requestJson, SpaceCreateRequest.class);
+
+
+
         Long userId = 110L;
         return ResponseEntity.ok(spaceService.saveSpace(request, spaceImages, useCaseImages, blueprint, userId));
     }
