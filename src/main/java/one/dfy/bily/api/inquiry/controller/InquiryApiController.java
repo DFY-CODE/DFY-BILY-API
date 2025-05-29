@@ -19,11 +19,10 @@ import one.dfy.bily.api.inquiry.constant.InquiryStatus;
 import one.dfy.bily.api.inquiry.dto.*;
 import one.dfy.bily.api.inquiry.facade.InquiryFacade;
 import one.dfy.bily.api.inquiry.service.InquiryService;
-import one.dfy.bily.api.security.CustomUserDetails;
-import one.dfy.bily.api.util.AES256Util;
+import one.dfy.bily.api.space.dto.SpaceDetailInfo;
+import one.dfy.bily.api.space.dto.SpaceFileInfoResponse;
+import one.dfy.bily.api.space.service.SpaceService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -39,6 +38,8 @@ public class InquiryApiController {
 
     private final InquiryService inquiryService;
     private final InquiryFacade inquiryFacade;
+    private final SpaceService spaceService;
+
 
     @GetMapping()
 //    @PreAuthorize("hasRole('ADMIN')")
@@ -112,8 +113,63 @@ public class InquiryApiController {
 //        boolean isAdmin = userDetails.getAuthorities().stream()
 //                .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
         boolean isAdmin = true;
-        return ResponseEntity.ok(inquiryService.findInquiryByInquiryIdAndUserId(inquiryId, userId, isAdmin));
+
+        // 1. 기본 InquiryResponse 가져오기
+        InquiryResponse inquiryResponse = inquiryService.findInquiryByInquiryIdAndUserId(inquiryId, userId, isAdmin);
+
+        // 2. 암호화된 spaceId 추출
+        String encryptedSpaceId = inquiryResponse.spaceId();
+
+        // 3. Space 상세 정보 조회
+        SpaceDetailInfo spaceDetailInfo = null;
+
+        try {
+            spaceDetailInfo = spaceService.findSpaceDetailInfoBySpaceId(encryptedSpaceId);
+        } catch (Exception e) {
+            throw new RuntimeException("공간 정보 조회 중 오류가 발생했습니다.", e);
+        }
+
+        // 4. 추가된 공간 정보를 InquiryResponse로 매핑
+        InquiryResponse updatedResponse = new InquiryResponse(
+                inquiryResponse.id(),
+                inquiryResponse.spaceId(),
+                inquiryResponse.contactPerson(),
+                inquiryResponse.phoneNumber(),
+                inquiryResponse.email(),
+                inquiryResponse.companyName(),
+                inquiryResponse.position(),
+                inquiryResponse.companyWebsite(),
+                inquiryResponse.eventCategory(),
+                inquiryResponse.preferredDates(),
+                inquiryResponse.content(),
+                inquiryResponse.fileAttachment(),
+                inquiryResponse.createdAt(),
+                inquiryResponse.status(),
+                inquiryResponse.hostCompany(),
+                inquiryResponse.spaceIdName(),
+                spaceDetailInfo != null ? spaceDetailInfo.spaceName() : null, // 공간 이름
+                spaceDetailInfo != null ? getThumbnailUrl(spaceDetailInfo) : null, // 썸네일 URL
+                spaceDetailInfo != null ? spaceDetailInfo.spaceAlias() : null  // 공간 별칭
+        );
+
+
+        // 5. 최종 ResponseEntity로 반환
+        return ResponseEntity.ok(updatedResponse);
+
+
+
+//        return ResponseEntity.ok(inquiryService.findInquiryByInquiryIdAndUserId(inquiryId, userId, isAdmin));
     }
+
+    // 썸네일 URL 추출 메서드
+    private String getThumbnailUrl(SpaceDetailInfo spaceDetailInfo) {
+        return spaceDetailInfo.spaceFileInfoResponseList().stream()
+                .filter(SpaceFileInfoResponse::isThumbnail)
+                .map(SpaceFileInfoResponse::fileUrl)
+                .findFirst()
+                .orElse(null);
+    }
+
 
     @PostMapping(consumes = "multipart/form-data")
 //    @PreAuthorize("hasRole('USER')")

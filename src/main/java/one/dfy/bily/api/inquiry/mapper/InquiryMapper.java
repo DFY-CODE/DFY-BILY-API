@@ -104,7 +104,10 @@ public class InquiryMapper {
                 inquiry.getCreatedAt(),
                 inquiry.getStatus(),
                 inquiry.getHostCompany(),
-                inquiry.getSpace().getAlias()
+                inquiry.getSpace().getAlias(),
+                null,
+                null,
+                null
         );
     }
 

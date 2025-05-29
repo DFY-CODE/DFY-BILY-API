@@ -34,7 +34,7 @@ public record SpaceCreateRequest(
         String districtInfo,
 
         @Schema(description = "공간 이름")
-        String name,
+        String spaceName, // name에서 spaceName로 변경처리
 
         @Schema(description = "공간 설명")
         String info,

@@ -21,5 +21,9 @@ public record InquiryResponse(
         LocalDateTime createdAt,
         InquiryStatus status,
         String hostCompany,
-        String spaceIdName
+        String spaceIdName,
+        String spaceName, //추가
+        String thumbnailUrl, //추가
+        String spaceAlias//추가
+
 ) {}

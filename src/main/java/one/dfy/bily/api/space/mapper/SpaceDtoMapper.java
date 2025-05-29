@@ -124,7 +124,7 @@ public class SpaceDtoMapper {
                 request.areaM2(),
                 request.districtInfo(),
                 request.location(),
-                request.name(),
+                request.spaceName(),
                 request.info(),
                 request.features(),
                 request.usageTime(),

@@ -10,6 +10,7 @@ import one.dfy.bily.api.inquiry.model.PreferredDate;
 import one.dfy.bily.api.inquiry.model.repository.InquiryFileRepository;
 import one.dfy.bily.api.inquiry.model.repository.PreferredDateRepository;
 import one.dfy.bily.api.inquiry.model.repository.InquiryRepository;
+import one.dfy.bily.api.space.service.SpaceService;
 import one.dfy.bily.api.user.dto.InquiryActivity;
 import one.dfy.bily.api.space.model.Space;
 import one.dfy.bily.api.inquiry.dto.*;
@@ -34,6 +35,8 @@ public class InquiryService {
     private final InquiryFileRepository inquiryFileRepository;
     private final PreferredDateRepository preferredDateRepository;
     private final S3Uploader s3Uploader;
+    private final SpaceService spaceService;
+
 
     @Transactional(readOnly = true)
     public InquiryListResponse findInquiryListByKeywordAndDate(
