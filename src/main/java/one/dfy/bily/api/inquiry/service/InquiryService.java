@@ -14,6 +14,7 @@ import one.dfy.bily.api.space.service.SpaceService;
 import one.dfy.bily.api.user.dto.InquiryActivity;
 import one.dfy.bily.api.space.model.Space;
 import one.dfy.bily.api.inquiry.dto.*;
+import one.dfy.bily.api.user.dto.UserActivity;
 import one.dfy.bily.api.util.S3Uploader;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -150,11 +151,16 @@ public class InquiryService {
     }
 
     @Transactional(readOnly = true)
-    public List<InquiryFileName> findInquiryFileByInquiry(Inquiry inquiry){
+    public List<InquiryFileName> findInquiryFileByInquiry(Inquiry inquiry) {
+        // S3 URL 프리픽스는 환경변수나 설정 파일에서 주입받아 사용합니다.
+        // 예: @Value("${app.s3-url}") private String s3Url;
+        String s3Url = s3Uploader.getInquiryPath();  // 실제 코드에서는 주입받은 값 사용
+
         return inquiryFileRepository.findByInquiry(inquiry).stream()
-                .map(InquiryMapper::inquiryFileToResponse)
+                .map(file -> InquiryMapper.inquiryFileV2ToResponse(file, s3Url)) // ✅ 프리픽스 전달
                 .toList();
     }
+
 
     @Transactional(readOnly = true)
     public List<InquiryPreferredDateInfo> findInquiryPreferredDateByInquiry(Inquiry inquiry){
@@ -182,15 +188,20 @@ public class InquiryService {
     }
 
     @Transactional(readOnly = true)
-    public Map<Long, List<InquiryPreferredDateInfo>> findInquiryPreferredDateByObject(List<Object[]> rawResults){
-        List<Long> inquiryIds = rawResults.stream()
-                .filter(r -> "INQUIRY".equals(r[2]))
-                .map(r -> ((Number) r[0]).longValue())
+    public Map<Long, List<InquiryPreferredDateInfo>> findInquiryPreferredDateByObject(List<UserActivity> userActivityList) {
+        // UserActivity에서 INQUIRY 타입의 ID 추출
+        List<Long> inquiryIds = userActivityList.stream()
+                .filter(activity -> "INQUIRY".equals(activity.type())) // 타입이 "INQUIRY"인 항목만 처리
+                .map(UserActivity::id) // UserActivity의 ID를 추출
                 .toList();
 
+        // 선호 날짜 조회
         List<PreferredDate> preferredDates = preferredDateRepository.findByInquiryIdIn(inquiryIds);
+
+        // InquiryMapper를 사용해 Map으로 변환
         return InquiryMapper.toPreferredDateMap(preferredDates);
     }
+
 
     @Transactional(readOnly = true)
     public Page<InquiryActivity> findInquiryActivitiesByUserId(Long userId, int page, int pageSize) {

@@ -51,7 +51,11 @@ public class UserActivityController {
     ) {
 //        Long userId = userDetails.getUserId();
         Long userId = 110L;
-        return ResponseEntity.ok(userActivityFacade.findReservationAndInquiryListByUserId(userId,page,pageSize));
+
+        UserActivityList result = userActivityFacade.findReservationAndInquiryListByUserId(userId, page, pageSize);
+        log.info("Facade Result: {}", result);
+        return ResponseEntity.ok(result);
+
     }
 
     @GetMapping("/inquiry")
