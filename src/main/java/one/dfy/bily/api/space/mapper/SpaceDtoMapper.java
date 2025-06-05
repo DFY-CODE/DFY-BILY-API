@@ -171,7 +171,8 @@ public class SpaceDtoMapper {
                 file.newFileName(),
                 file.saveLocation(),
                 file.fileSize(),
-                file.fileType()
+                file.fileType(),
+                "admin"
         );
     }
 

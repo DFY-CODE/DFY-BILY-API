@@ -254,12 +254,12 @@ public class SpaceApiController {
                     )
             )
     })
-    public ResponseEntity<SpaceCommonResponse> saveSpace(
+    public ResponseEntity<SpaceResultResponse> saveSpace(
            /* @RequestPart("data") SpaceCreateRequest request,*/
             @RequestPart("data") String requestJson, // JSON 문자열로 수신
-            @RequestPart("spaceImages") List<MultipartFile> spaceImages,
-            @RequestPart("useCaseImages") List<MultipartFile> useCaseImages,
-            @RequestPart("blueprint") MultipartFile blueprint ) throws JsonProcessingException {
+            @RequestPart("spaceFileInfoResponseList") List<MultipartFile> spaceImages,
+            @RequestPart("spaceUseFileResponseList") List<MultipartFile> useCaseImages,
+            @RequestPart("spaceBlueprintFileUrl") MultipartFile blueprint ) throws JsonProcessingException {
 
         // JSON 문자열을 SpaceCreateRequest 객체로 변환
         ObjectMapper objectMapper = new ObjectMapper();
@@ -289,9 +289,9 @@ public class SpaceApiController {
     })
     public ResponseEntity<SpaceCommonResponse> updateSpace(
             @RequestPart("data") SpaceUpdateRequest request,
-            @RequestPart("spaceImages") List<MultipartFile> spaceImages,
-            @RequestPart("useCaseImages") List<MultipartFile> useCaseImages,
-            @RequestPart("blueprint") MultipartFile blueprint ) throws Exception {
+            @RequestPart("spaceFileInfoResponseList") List<MultipartFile> spaceImages,
+            @RequestPart("spaceUseFileResponseList") List<MultipartFile> useCaseImages,
+            @RequestPart("spaceBlueprintFileUrl") MultipartFile blueprint ) throws Exception {
         Long userId = 110L;
         return ResponseEntity.ok(spaceService.updateSpace(request, spaceImages, useCaseImages, blueprint, userId));
     }

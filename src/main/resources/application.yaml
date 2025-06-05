@@ -125,4 +125,4 @@ s3:
     business_card: images/business_card/
 
 cors:
-  allowed-origins: "http://localhost:3000,https://api.bily.at,http://localhost:8081"
+  allowed-origins: "http://localhost:3001,https://api.bily.at,http://localhost:8081"

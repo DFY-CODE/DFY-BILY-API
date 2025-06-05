@@ -314,6 +314,10 @@ public class S3Uploader {
         return "https://" + "s3." + region + ".amazonaws.com/" + bucket + "/" + spacePath;
     }
 
+    public String getInquiryPath() {
+        return "https://" + "s3." + region + ".amazonaws.com/" + bucket + "/" + inquiryPath;
+    }
+
     public String getBusinessCardS3Url() {
         return "https://" + "s3." + region + ".amazonaws.com/"+ bucket + "/" + businessCardPath;
     }

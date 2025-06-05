@@ -118,10 +118,21 @@ public class InquiryMapper {
         }
     }
 
-    public static InquiryFileName inquiryFileToResponse(InquiryFile file) {
+    public static InquiryFileName inquiryFileV2ToResponse(InquiryFile file, String s3UrlPrefix) {
         return new InquiryFileName(
                 file.getId(),
-                file.getFileName()
+                file.getFileName(),
+                s3UrlPrefix + file.getSaveFileName()   // ✅ URL 생성
+        );
+    }
+
+
+    public static InquiryFileName inquiryFileToResponse(InquiryFile file) {
+
+        return new InquiryFileName(
+                file.getId(),
+                file.getFileName(),
+                null
         );
     }
 
