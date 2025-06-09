@@ -365,14 +365,19 @@ public class SpaceService {
                 .map(file -> SpaceDtoMapper.toSpaceFileInfoResponse(file,filePath))
                 .toList();
 
-        List<SpaceUseFileResponse> useFileResponseList = spaceUseFileInfoRepository.findBySpaceIdAndUsedOrderByFileOrderAsc(decSpaceId, true).stream()
-                .map(file -> SpaceDtoMapper.toSpaceUseFileResponse(file, filePath))
-                .toList();
+        List<SpaceUseFileResponse> useFileResponseList =
+                spaceUseFileInfoRepository
+                        .findAllBySpaceIdAndUsedOrderByFileOrderAsc(decSpaceId, true)  // ← 수정된 메서드
+                        .stream()
+                        .map(file -> SpaceDtoMapper.toSpaceUseFileResponse(file, filePath))
+                        .toList();
+
 
         Optional<SpaceBlueprintFile> optionalFile = spaceBlueprintFileInfoRepository.findBySpaceIdAndUsed(decSpaceId, true);
 
         SpaceBlueprintFileInfo spaceBlueprintFileInfo = optionalFile
-                .map(SpaceDtoMapper::toSpaceBlueprintFileInfo)
+                //.map(SpaceDtoMapper::toSpaceBlueprintFileInfo)
+                .map(file -> SpaceDtoMapper.toSpaceBlueprintFileInfo(file, filePath))
                 .orElse(null);
 
 
