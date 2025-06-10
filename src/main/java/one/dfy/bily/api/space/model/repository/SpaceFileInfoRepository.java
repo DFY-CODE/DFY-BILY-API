@@ -7,5 +7,11 @@ import java.util.List;
 
 public interface SpaceFileInfoRepository extends JpaRepository<SpaceFileInfo, Long> {
     List<SpaceFileInfo> findBySpaceIdInAndUsedAndThumbnail(List<Long> spaceIds, boolean used, boolean thumbnail);
+
+
+    List<SpaceFileInfo> findBySpaceIdInAndThumbnail(List<Long> spaceIds,
+                                                    boolean thumbnail);
+
+
     List<SpaceFileInfo> findBySpaceIdAndUsedOrderByFileOrderAsc(Long spaceId, boolean used);
 }

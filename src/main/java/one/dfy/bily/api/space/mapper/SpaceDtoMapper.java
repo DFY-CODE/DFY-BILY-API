@@ -208,6 +208,8 @@ public class SpaceDtoMapper {
                 space.getLocation(),
                 space.getPrice(),
                 space.getAreaM2(),
+                space.getLatitude(),
+                space.getLongitude(),
                 space.getDistrictInfo(),
                 space.getTitle(),
                 space.getInfo(),

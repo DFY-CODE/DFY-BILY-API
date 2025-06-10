@@ -37,7 +37,7 @@ public record SpaceUpdateRequest(
         String districtInfo,
 
         @Schema(description = "공간 이름")
-        String name,
+        String spaceName,
 
         @Schema(description = "공간 설명")
         String info,

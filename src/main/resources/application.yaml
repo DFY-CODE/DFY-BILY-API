@@ -126,3 +126,8 @@ s3:
 
 cors:
   allowed-origins: "http://localhost:3001,https://api.bily.at,http://localhost:8081"
+
+dev:
+  fallback-user-id: 110
+
+

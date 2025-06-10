@@ -31,7 +31,7 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/profile")
-//    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    //@PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @Operation(summary = "회원 프로필 조회", description = "회원 프로필정보를 반환합니다.")
     @ApiResponse(
             responseCode = "200",

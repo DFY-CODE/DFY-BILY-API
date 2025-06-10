@@ -9,7 +9,7 @@ server:
 
 jwt:
   secret: DjktOBVHAu0VxgLpj5HQFprityt4WamJQBeh21lA+N8=
-  expiration: 86400 # 1일 (초 단위)
+  expiration: 345600000  # 4일 (초 단위)
 
 jasypt:
   encryptor:
@@ -120,4 +120,7 @@ s3:
     inquiry: images/inquiry/
 
 cors:
-  allowed-origins: "http://localhost:3001,https://api.bily.at,http://localhost:8081"
+  allowed-origins: "http://localhost:3001,https://api.bily.at,http://localhost:8081,https://bily.at"
+
+dev:
+  fallback-user-id: 110

@@ -9,14 +9,19 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import one.dfy.bily.api.security.CustomUserDetails;
 import one.dfy.bily.api.space.facade.SpaceFacade;
 import one.dfy.bily.api.space.service.SpaceService;
 import one.dfy.bily.api.space.dto.*;
 import one.dfy.bily.api.util.AES256Util;
 import one.dfy.bily.api.util.S3Uploader;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -30,7 +35,7 @@ import java.util.*;
 @RequiredArgsConstructor
 public class SpaceApiController {
 
-    private final S3Uploader s3Uploader;
+    // private final S3Uploader s3Uploader;
     private final SpaceService spaceService;
     private final SpaceFacade spaceFacade;
 
@@ -97,7 +102,7 @@ public class SpaceApiController {
     }
 
     @GetMapping("/list")
-//    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    //@PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @Operation(summary = "공간 목록 조회", description = "페이지네이션된 공간 관리 목록 및 총 개수를 반환합니다.")
     @ApiResponses(value = {
             @ApiResponse(
@@ -120,7 +125,7 @@ public class SpaceApiController {
     }
 
     @GetMapping("/list/admin")
-//    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    //@PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @Operation(summary = "어드민 공간 목록 조회", description = "페이지네이션된 공간 관리 목록 및 총 개수를 반환합니다.")
     @ApiResponses(value = {
             @ApiResponse(
@@ -145,7 +150,7 @@ public class SpaceApiController {
     }
 
     @GetMapping("/list/map/non-user")
-//    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    //@PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @Operation(summary = "비회원 공간 지도 목록 조회", description = "모든 공간의 목록을 반환합니다.")
     @ApiResponses(value = {
             @ApiResponse(
@@ -168,7 +173,7 @@ public class SpaceApiController {
 
 
     @GetMapping("/list/map")
-//    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    //@PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @Operation(summary = "공간 지도 목록 조회", description = "모든 공간의 목록을 반환합니다.")
     @ApiResponses(value = {
             @ApiResponse(
@@ -205,11 +210,23 @@ public class SpaceApiController {
             )
     })
     public ResponseEntity<SpaceCommonResponse> createSavedSpace(
-            @RequestBody SpaceId spaceId
-//            @AuthenticationPrincipal CustomUserDetails userDetails
-            ) throws Exception {
-//        Long userId = userDetails.getUserId();
-        Long userId = 110L;
+            @RequestBody SpaceId spaceId,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            HttpServletRequest request
+
+    ) throws Exception {
+        Long userId;
+        if (userDetails != null) {
+            userId = userDetails.getUserId();
+        } else {
+            // local 환경 + Origin 이 localhost:3001 일 때만 세팅된 값
+            userId = (Long) request.getAttribute("FALLBACK_USER_ID");
+            if (userId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+        }
+
+        //Long userId = 110L;
         return ResponseEntity.ok(spaceService.createSavedSpace(AES256Util.decrypt(spaceId.spaceId()), userId));
     }
 
@@ -230,11 +247,23 @@ public class SpaceApiController {
             )
     })
     public ResponseEntity<SpaceCommonResponse> cancelSavedSpace(
-            @RequestBody SpaceId spaceId
-//            @AuthenticationPrincipal CustomUserDetails userDetails
+            @RequestBody SpaceId spaceId,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            HttpServletRequest request
+
     ) throws Exception {
-//        Long userId = userDetails.getUserId();
-        Long userId = 110L;
+        Long userId;
+        if (userDetails != null) {
+            userId = userDetails.getUserId();
+        } else {
+            // local 환경 + Origin 이 localhost:3001 일 때만 세팅된 값
+            userId = (Long) request.getAttribute("FALLBACK_USER_ID");
+            if (userId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+        }
+
+//        Long userId = 110L;
         return ResponseEntity.ok(spaceService.cancelSavedSpace(AES256Util.decrypt(spaceId.spaceId()), userId));
     }
 
@@ -257,18 +286,38 @@ public class SpaceApiController {
     public ResponseEntity<SpaceResultResponse> saveSpace(
            /* @RequestPart("data") SpaceCreateRequest request,*/
             @RequestPart("data") String requestJson, // JSON 문자열로 수신
-            @RequestPart("spaceFileInfoResponseList") List<MultipartFile> spaceImages,
-            @RequestPart("spaceUseFileResponseList") List<MultipartFile> useCaseImages,
-            @RequestPart("spaceBlueprintFileUrl") MultipartFile blueprint ) throws JsonProcessingException {
+            @RequestPart("spaceFileInfoResponseList")                    // 필수
+            List<MultipartFile> spaceImages,
+
+            @RequestPart(value = "spaceUseFileResponseList", required = false)   // 선택
+            List<MultipartFile> useCaseImages,
+
+            @RequestPart(value = "spaceBlueprintFileUrl",   required = false)    // 선택
+            MultipartFile blueprint,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            HttpServletRequest request
+
+    ) throws JsonProcessingException {
 
         // JSON 문자열을 SpaceCreateRequest 객체로 변환
         ObjectMapper objectMapper = new ObjectMapper();
-        SpaceCreateRequest request = objectMapper.readValue(requestJson, SpaceCreateRequest.class);
+        SpaceCreateRequest spaceCreateRequest = objectMapper.readValue(requestJson, SpaceCreateRequest.class);
 
 
 
-        Long userId = 110L;
-        return ResponseEntity.ok(spaceService.saveSpace(request, spaceImages, useCaseImages, blueprint, userId));
+        Long userId;
+        if (userDetails != null) {
+            userId = userDetails.getUserId();
+        } else {
+            // local 환경 + Origin 이 localhost:3001 일 때만 세팅된 값
+            userId = (Long) request.getAttribute("FALLBACK_USER_ID");
+            if (userId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+        }
+
+        // Long userId = 110L;
+        return ResponseEntity.ok(spaceService.saveSpace(spaceCreateRequest, spaceImages, useCaseImages, blueprint, userId));
     }
 
     @PatchMapping(consumes = "multipart/form-data")
@@ -288,12 +337,33 @@ public class SpaceApiController {
             )
     })
     public ResponseEntity<SpaceCommonResponse> updateSpace(
-            @RequestPart("data") SpaceUpdateRequest request,
-            @RequestPart("spaceFileInfoResponseList") List<MultipartFile> spaceImages,
-            @RequestPart("spaceUseFileResponseList") List<MultipartFile> useCaseImages,
-            @RequestPart("spaceBlueprintFileUrl") MultipartFile blueprint ) throws Exception {
-        Long userId = 110L;
-        return ResponseEntity.ok(spaceService.updateSpace(request, spaceImages, useCaseImages, blueprint, userId));
+            @RequestPart("data") SpaceUpdateRequest spaceUpdateRequest,
+            @RequestPart(value ="spaceFileInfoResponseList", required = false)                    // 선택
+            List<MultipartFile> spaceImages,
+
+            @RequestPart(value = "spaceUseFileResponseList", required = false)   // 선택
+            List<MultipartFile> useCaseImages,
+
+            @RequestPart(value = "spaceBlueprintFileUrl",   required = false)    // 선택
+            MultipartFile blueprint,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            HttpServletRequest request
+
+    ) throws Exception {
+
+        Long userId;
+        if (userDetails != null) {
+            userId = userDetails.getUserId();
+        } else {
+            // local 환경 + Origin 이 localhost:3001 일 때만 세팅된 값
+            userId = (Long) request.getAttribute("FALLBACK_USER_ID");
+            if (userId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+        }
+
+        //Long userId = 110L;
+        return ResponseEntity.ok(spaceService.updateSpace(spaceUpdateRequest, spaceImages, useCaseImages, blueprint, userId));
     }
 
     @GetMapping("/name")
@@ -333,7 +403,11 @@ public class SpaceApiController {
             )
     })
     public ResponseEntity<SpaceDetailInfo> findSpaceDetailInfoBySpaceId(@PathVariable("id") String spaceId) throws Exception {
-        return ResponseEntity.ok(spaceService.findSpaceDetailInfoBySpaceId(spaceId));
+
+        SpaceDetailInfo result = spaceService.findSpaceDetailInfoBySpaceId(spaceId);
+
+        log.info("findSpaceDetailInfoBySpaceId Result: {}", result);
+        return ResponseEntity.ok(result);
     }
 
     @GetMapping("/file/{saveFileName}")

@@ -145,12 +145,14 @@ public class SpaceService {
             return Map.of();
         }
 
-        return spaceFileInfoRepository.findBySpaceIdInAndUsedAndThumbnail(spaceIdList,true,true)
+        return spaceFileInfoRepository
+                .findBySpaceIdInAndThumbnail(spaceIdList, true) // used 조건 없이 조회
                 .stream()
                 .collect(Collectors.toMap(
                         SpaceFileInfo::getSpaceId,
                         file -> s3Url + file.getSaveFileName()
                 ));
+
     }
 
     @Transactional
@@ -219,7 +221,7 @@ public class SpaceService {
                     FileUploadInfo uploadedFile = s3Uploader.spaceFileUpload(file);
 
                     // 하드코딩된 fileTitle 설정
-                    String fileTitle = "HARDCODED_TITLE_" + i; // 필요에 따라 수정 가능
+                    String fileTitle = "공간 이용 사례_" + i; // 필요에 따라 수정 가능
 
                     // SpaceUseFileInfo 생성 시 CREATOR를 하드코딩
                     SpaceUseFileInfo spaceUseFileInfo = SpaceDtoMapper.toSpaceUseFileInfoEntity(
@@ -284,7 +286,7 @@ public class SpaceService {
                 request.price(),
                 request.areaM2(),
                 request.districtInfo(),
-                request.name(),
+                request.spaceName(),
                 request.info(),
                 request.features(),
                 request.usageTime(),

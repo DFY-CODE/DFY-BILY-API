@@ -23,31 +23,35 @@ public class UserActivityMapper {
             Map<Long, String> fileNameListMap,
             Map<Long, List<InquiryPreferredDateInfo>> preferredDatesMap
     ) {
-        String spaceId;
+        // 공간 ID 가져오기
+        Long spaceIdRaw = inquiryActivity.spaceId();   // ← spaceId 를 제공하는 getter 사용
+
+        // spaceId 암호화
+        String encryptedSpaceId;
         try {
-            // 암호화된 spaceId 생성 (id 값을 암호화)
-            spaceId = AES256Util.encrypt(inquiryActivity.id());
+            encryptedSpaceId = AES256Util.encrypt(spaceIdRaw);
         } catch (Exception e) {
             throw new RuntimeException("SpaceId 암호화 실패", e);
         }
 
         return new UserActivity(
                 inquiryActivity.id(),
-                spaceId, // 암호화된 spaceId 사용
+                encryptedSpaceId,
                 "INQUIRY",
                 inquiryActivity.spaceName(),
                 inquiryActivity.location(),
                 inquiryActivity.areaM2(),
                 inquiryActivity.areaPy(),
                 preferredDatesMap.getOrDefault(inquiryActivity.id(), null),
-                null, // reservationPreferredDate는 없음
-                null, // ✅ preferredReservationDate도 없음 (INQUIRY니까)
+                null,
+                null,
                 inquiryActivity.price(),
                 inquiryActivity.status().getDescription(),
                 inquiryActivity.createdAt(),
-                fileNameListMap.getOrDefault(inquiryActivity.id(), null) // fileName 맵은 id로 처리
+                fileNameListMap.getOrDefault(spaceIdRaw, null) // ★ spaceId 로 조회
         );
     }
+
 
 
 

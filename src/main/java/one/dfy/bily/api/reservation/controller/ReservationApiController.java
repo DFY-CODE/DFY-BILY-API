@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import one.dfy.bily.api.inquiry.constant.InquirySearchType;
@@ -16,6 +17,7 @@ import one.dfy.bily.api.reservation.dto.*;
 import one.dfy.bily.api.reservation.facade.ReservationFacade;
 import one.dfy.bily.api.reservation.service.ReservationService;
 import one.dfy.bily.api.security.CustomUserDetails;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -128,11 +130,23 @@ public class ReservationApiController {
             )
     )
     public ResponseEntity<ReservationPaymentInfo> createReservationPayment(
-            @RequestBody CreateReservation createReservation
-//            @AuthenticationPrincipal CustomUserDetails userDetails
+            @RequestBody CreateReservation createReservation,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            HttpServletRequest request
+
     ) {
-//        Long adminId = userDetails.getUserId();
-        Long adminId = 110L;
+        Long adminId;
+        if (userDetails != null) {
+            adminId = userDetails.getUserId();
+        } else {
+            // local 환경 + Origin 이 localhost:3001 일 때만 세팅된 값
+            adminId = (Long) request.getAttribute("FALLBACK_USER_ID");
+            if (adminId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+        }
+
+//        Long adminId = 110L;
         return ResponseEntity.ok(reservationFacade.createReservationPayment(createReservation, adminId));
     }
 
@@ -152,11 +166,23 @@ public class ReservationApiController {
     )
     public ResponseEntity<ReservationPaymentInfo> updateReservation(
             @PathVariable(name = "reservation-id") Long reservationId,
-            @RequestBody ReservationPaymentInfo reservationPaymentInfo
-//            @AuthenticationPrincipal CustomUserDetails userDetails
+            @RequestBody ReservationPaymentInfo reservationPaymentInfo,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            HttpServletRequest request
+
     ) {
-//        Long adminId = userDetails.getUserId();
-        Long adminId = 110L;
+        Long adminId;
+        if (userDetails != null) {
+            adminId = userDetails.getUserId();
+        } else {
+            // local 환경 + Origin 이 localhost:3001 일 때만 세팅된 값
+            adminId = (Long) request.getAttribute("FALLBACK_USER_ID");
+            if (adminId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+        }
+
+//        Long adminId = 110L;
         return ResponseEntity.ok(reservationService.updateReservation(reservationId,reservationPaymentInfo, adminId));
     }
 }

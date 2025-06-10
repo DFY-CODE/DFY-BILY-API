@@ -20,7 +20,15 @@ public class InquiryFacade {
     private final SpaceService spaceService;
 
     public InquiryResponse updateInquiry(Long inquiryId, InquiryUpdateRequest inquiryUpdateRequest){
-        Space space = spaceService.findById(inquiryUpdateRequest.spaceId());
+
+        Long spaceId = null;
+        try {
+            spaceId = AES256Util.decrypt(inquiryUpdateRequest.spaceId());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        Space space = spaceService.findById(spaceId);
 
         return inquiryService.updateInquiry(inquiryId, inquiryUpdateRequest, space);
     }

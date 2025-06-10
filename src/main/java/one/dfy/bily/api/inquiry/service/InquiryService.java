@@ -85,16 +85,20 @@ public class InquiryService {
 //                    return InquiryMapper.toInquiryResponse(inquiry, files, preferredDates);
 //                })
 //                .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 문의 정보입니다."));
+
+        String s3Url = s3Uploader.getInquiryPath();
+
         return inquiryRepository.findById(inquiryId)
                 .map(inquiry -> {
                     List<InquiryFile> files = inquiryFileRepository.findByInquiry(inquiry);
                     List<PreferredDate> preferredDates = preferredDateRepository.findByInquiry(inquiry);
 
-                    return InquiryMapper.toInquiryResponse(inquiry, files, preferredDates);
+                    return InquiryMapper.toInquiryResponseV2(inquiry, files, preferredDates, s3Url);
                 })
                 .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 문의 정보입니다."));
 
     }
+
 
     @Transactional(readOnly = true)
     public Inquiry findInquiryById(Long inquiryId){

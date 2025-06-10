@@ -8,4 +8,5 @@ import java.util.List;
 
 public interface InquiryFileRepository extends JpaRepository<InquiryFile, Long> {
     List<InquiryFile> findByInquiry(Inquiry inquiry);
+
 }
