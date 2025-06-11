@@ -7,7 +7,7 @@ import java.util.List;
 
 public record SpaceUpdateRequest(
         @Schema(description = "공간 아이디")
-        String id,
+        String spaceId,
 
         @Schema(description = "공간 표시 여부")
         Boolean displayStatus,

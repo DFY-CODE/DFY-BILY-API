@@ -273,8 +273,18 @@ public class SpaceService {
     }
 
     public SpaceCommonResponse updateSpace(SpaceUpdateRequest request, List<MultipartFile> spaceImages, List<MultipartFile> useCaseImages, MultipartFile blueprint, Long userId ) throws Exception {
-        Long spaceId = AES256Util.decrypt(request.id());
+
+        String encSpaceId = request.spaceId();
+        if (encSpaceId == null || encSpaceId.isBlank()) {
+            throw new IllegalArgumentException("spaceId 가 전달되지 않았습니다.");
+        }
+
+        // 2) 복호화
+        Long spaceId = AES256Util.decrypt(encSpaceId);
+
+        // 3) 후속 로직
         Space spaceEntity = findById(spaceId);
+
 
         spaceEntity.updateSpace(
                 request.displayStatus(),

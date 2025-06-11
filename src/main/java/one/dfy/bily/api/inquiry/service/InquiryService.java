@@ -217,7 +217,7 @@ public class InquiryService {
 
     public List<Long> getInquiryActivityInquiryIds(List<InquiryActivity> result) {
         return result.stream()
-                .map(InquiryActivity::id)
+                .map(InquiryActivity::spaceId)
                 .toList();
     }
 }

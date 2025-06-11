@@ -66,37 +66,41 @@ spring:
       ddl-auto: none
       naming:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
-
-
-mybatis:
-  configuration:
-    map-underscore-to-camel-case: true
-
-  mvc:
-    pathmatch:
-      matching-strategy: ant_path_matcher
-  # 로그 레벨 설정
-logging:
-  pattern:
-    console: "%clr(%d{yyyy-MM-dd HH:mm:ss}){green} [%thread] %clr(%-5level){cyan} %clr([%logger{36}]){blue} - %msg%n"
-  level:
-    org.springframework.web.multipart: DEBUG
-    root: INFO          # 기본 로그 레벨
-    org:
-      springframework:
-        web: DEBUG       # Spring Web 로깅
-        orm: DEBUG       # ORM 관련 로깅
+    show-sql: true                       # 콘솔에 SQL 출력
+    properties:
       hibernate:
-        SQL: DEBUG       # Hibernate 실행 SQL
+        format_sql: true                 # 가독성 좋은 줄바꿈
+        highlight_sql: true              # ANSI 컬러 하이라이트
+        # --------------------------------------------
+        #  ↓ 바인딩 파라미터 로그를 위해 TRACE 레벨 필요
+        # --------------------------------------------
         type:
-          descriptor: TRACE  # SQL 바인딩 파라미터
-      apache:
-        ibatis: TRACE    # MyBatis 관련 메서드 및 쿼리문 디버깅
-        mybatis: TRACE      # MyBatis SQL 실행 및 결과 디버깅
-    jdbc:
-      connection: DEBUG   # JDBC 연결 관련 로그
-      result: DEBUG       # JDBC 결과 로그
-      statement: DEBUG    # JDBC Statement 관련 로그
+          descriptor: TRACE
+
+    mvc:
+      pathmatch:
+        matching-strategy: ant_path_matcher
+
+  mybatis:
+    configuration:
+      map-underscore-to-camel-case: true
+
+  logging:
+    pattern:
+      console: "%clr(%d{yyyy-MM-dd HH:mm:ss}){green} [%thread] %clr(%-5level){cyan} %clr([%logger{36}]){blue} - %msg%n"
+    level:
+      root: INFO
+
+      # --- Hibernate 실행 SQL ---
+      "org.hibernate.SQL": DEBUG
+
+      # --- Hibernate 6.x 바인딩 값 ---
+      "org.hibernate.orm.jdbc.bind": TRACE
+
+      # --- Hibernate 5.x 바인딩 값 ---
+      "org.hibernate.type.descriptor.sql": TRACE
+
+
 
 cloud:
   aws:
