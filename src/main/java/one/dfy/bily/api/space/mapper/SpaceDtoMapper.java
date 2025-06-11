@@ -171,7 +171,8 @@ public class SpaceDtoMapper {
                 file.newFileName(),
                 file.saveLocation(),
                 file.fileSize(),
-                file.fileType()
+                file.fileType(),
+                "admin"
         );
     }
 
@@ -207,6 +208,8 @@ public class SpaceDtoMapper {
                 space.getLocation(),
                 space.getPrice(),
                 space.getAreaM2(),
+                space.getLatitude(),
+                space.getLongitude(),
                 space.getDistrictInfo(),
                 space.getTitle(),
                 space.getInfo(),
@@ -234,6 +237,7 @@ public class SpaceDtoMapper {
                 .toList();
     }
 
+
     public static SpaceFileInfoResponse toSpaceFileInfoResponse(SpaceFileInfo spaceFileInfo, String filePath) {
         return new SpaceFileInfoResponse(
                 spaceFileInfo.getId(),
@@ -252,11 +256,11 @@ public class SpaceDtoMapper {
         );
     }
 
-    public static SpaceBlueprintFileInfo toSpaceBlueprintFileInfo(SpaceBlueprintFile spaceBlueprintFile) {
+    public static SpaceBlueprintFileInfo toSpaceBlueprintFileInfo(SpaceBlueprintFile spaceBlueprintFile, String filePath) {
         return new SpaceBlueprintFileInfo(
                 spaceBlueprintFile.getId(),
                 spaceBlueprintFile.getFileName(),
-                spaceBlueprintFile.getSaveFileName()
+                filePath + spaceBlueprintFile.getSaveFileName()
         );
     }
 

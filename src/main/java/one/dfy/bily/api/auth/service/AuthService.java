@@ -157,7 +157,7 @@ public class AuthService {
 
         authTokenRepository.save(authToken);
 
-        return new JwtResponse(user.getName(), accessToken, refreshToken);
+        return new JwtResponse(user.getId(), user.getName(), accessToken, refreshToken);
     }
 
     @Transactional

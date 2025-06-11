@@ -13,6 +13,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -143,12 +145,14 @@ public class SpaceService {
             return Map.of();
         }
 
-        return spaceFileInfoRepository.findBySpaceIdInAndUsedAndThumbnail(spaceIdList,true,true)
+        return spaceFileInfoRepository
+                .findBySpaceIdInAndThumbnail(spaceIdList, true) // used 조건 없이 조회
                 .stream()
                 .collect(Collectors.toMap(
                         SpaceFileInfo::getSpaceId,
                         file -> s3Url + file.getSaveFileName()
                 ));
+
     }
 
     @Transactional
@@ -197,7 +201,7 @@ public class SpaceService {
         return findSpaceFileBySpaceIds(spaceIds);
     }
 
-    public SpaceCommonResponse saveSpace(SpaceCreateRequest request, List<MultipartFile> spaceImages, List<MultipartFile> useCaseImages, MultipartFile blueprint, Long userId ) {
+    public SpaceResultResponse saveSpace(SpaceCreateRequest request, List<MultipartFile> spaceImages, List<MultipartFile> useCaseImages, MultipartFile blueprint, Long userId ) {
         Space spaceEntity = spaceRepository.save(SpaceDtoMapper.toSpaceEntity(request, userId));
 
         List<SpaceFileInfo> spaceFileInfos = IntStream.range(0, spaceImages.size())
@@ -213,11 +217,22 @@ public class SpaceService {
 
         List<SpaceUseFileInfo> spaceUseFileInfoList = IntStream.range(0, useCaseImages.size())
                 .mapToObj(i -> {
-                    MultipartFile file = spaceImages.get(i);
+                    MultipartFile file = useCaseImages.get(i);
                     FileUploadInfo uploadedFile = s3Uploader.spaceFileUpload(file);
-                    return SpaceDtoMapper.toSpaceUseFileInfoEntity(uploadedFile, spaceEntity.getId(), request.useCaseImageTitles().get(i),i);
+
+                    // 하드코딩된 fileTitle 설정
+                    String fileTitle = "공간 이용 사례_" + i; // 필요에 따라 수정 가능
+
+                    // SpaceUseFileInfo 생성 시 CREATOR를 하드코딩
+                    SpaceUseFileInfo spaceUseFileInfo = SpaceDtoMapper.toSpaceUseFileInfoEntity(
+                            uploadedFile, spaceEntity.getId(), fileTitle, i
+                    );
+                    spaceUseFileInfo.setCreator("admin"); // CREATOR 하드코딩// CREATOR 하드코딩
+
+                    return spaceUseFileInfo;
                 })
                 .toList();
+
 
         spaceUseFileInfoRepository.saveAll(spaceUseFileInfoList);
 
@@ -226,6 +241,8 @@ public class SpaceService {
         SpaceBlueprintFile spaceBlueprintFile = SpaceDtoMapper.toSpaceBlueprintFileInfoEntity(uploadedFile, spaceEntity.getId());
 
         spaceBlueprintFileInfoRepository.save(spaceBlueprintFile);
+        spaceBlueprintFile.setCreator("admin"); // CREATOR 값 하드코딩
+
 
         List<SpaceAmenity> spaceAmenities = request.amenityList().stream()
                 .map( amenity -> SpaceDtoMapper.toSpaceAmenityEntity(spaceEntity.getId(), amenity))
@@ -239,12 +256,35 @@ public class SpaceService {
 
         spaceAvailableUseRepository.saveAll(spaceAvailableUses);
 
-        return new SpaceCommonResponse(true, "공간 생성이 완료되었습니다.");
+
+        String resultSpaceId = null;
+        try {
+            resultSpaceId = AES256Util.encrypt(spaceEntity.getId());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        return SpaceResultResponse
+                .builder()
+                .success(true)
+                .message("저장되었습니다.")
+                .spaceId(resultSpaceId).build();     // spaceId 포함해 반환
+
     }
 
     public SpaceCommonResponse updateSpace(SpaceUpdateRequest request, List<MultipartFile> spaceImages, List<MultipartFile> useCaseImages, MultipartFile blueprint, Long userId ) throws Exception {
-        Long spaceId = AES256Util.decrypt(request.id());
+
+        String encSpaceId = request.spaceId();
+        if (encSpaceId == null || encSpaceId.isBlank()) {
+            throw new IllegalArgumentException("spaceId 가 전달되지 않았습니다.");
+        }
+
+        // 2) 복호화
+        Long spaceId = AES256Util.decrypt(encSpaceId);
+
+        // 3) 후속 로직
         Space spaceEntity = findById(spaceId);
+
 
         spaceEntity.updateSpace(
                 request.displayStatus(),
@@ -256,7 +296,7 @@ public class SpaceService {
                 request.price(),
                 request.areaM2(),
                 request.districtInfo(),
-                request.name(),
+                request.spaceName(),
                 request.info(),
                 request.features(),
                 request.usageTime(),
@@ -337,14 +377,19 @@ public class SpaceService {
                 .map(file -> SpaceDtoMapper.toSpaceFileInfoResponse(file,filePath))
                 .toList();
 
-        List<SpaceUseFileResponse> useFileResponseList = spaceUseFileInfoRepository.findBySpaceIdAndUsedOrderByFileOrderAsc(decSpaceId, true).stream()
-                .map(file -> SpaceDtoMapper.toSpaceUseFileResponse(file, filePath))
-                .toList();
+        List<SpaceUseFileResponse> useFileResponseList =
+                spaceUseFileInfoRepository
+                        .findAllBySpaceIdAndUsedOrderByFileOrderAsc(decSpaceId, true)  // ← 수정된 메서드
+                        .stream()
+                        .map(file -> SpaceDtoMapper.toSpaceUseFileResponse(file, filePath))
+                        .toList();
+
 
         Optional<SpaceBlueprintFile> optionalFile = spaceBlueprintFileInfoRepository.findBySpaceIdAndUsed(decSpaceId, true);
 
         SpaceBlueprintFileInfo spaceBlueprintFileInfo = optionalFile
-                .map(SpaceDtoMapper::toSpaceBlueprintFileInfo)
+                //.map(SpaceDtoMapper::toSpaceBlueprintFileInfo)
+                .map(file -> SpaceDtoMapper.toSpaceBlueprintFileInfo(file, filePath))
                 .orElse(null);
 
 

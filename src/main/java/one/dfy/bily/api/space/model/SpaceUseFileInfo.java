@@ -4,10 +4,12 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import one.dfy.bily.api.common.model.BaseEntity;
 
 import java.time.LocalDateTime;
 
+@Setter
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
@@ -63,6 +65,8 @@ public class SpaceUseFileInfo extends BaseEntity {
         this.fileType = fileType;
         this.fileOrder = fileOrder;
         this.fileTitle = fileTitle;
+        this.creator = creator; // 생성자에서 CREATOR 값을 설정
+
     }
 
     public void updateFileOrder(int fileOrder) {
