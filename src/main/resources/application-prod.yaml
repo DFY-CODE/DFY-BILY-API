@@ -2,14 +2,14 @@ server:
   port: 443
   ssl:
     enabled: true
-    key-store: classpath:keystore.p12
+    key-store: /home/ubuntu/bily/keystore.p12
     key-store-password: dfydfy
     key-store-type: PKCS12
     key-alias: tomcat
 
 jwt:
   secret: DjktOBVHAu0VxgLpj5HQFprityt4WamJQBeh21lA+N8=
-  expiration: 86400 # 1일 (초 단위)
+  expiration: 345600000  # 4일 (초 단위)
 
 jasypt:
   encryptor:
@@ -61,37 +61,55 @@ spring:
           connectiontimeout: 5000
           writetimeout: 5000
   datasource:
-    url: jdbc:mysql://15.165.245.177:3306/bliydatabase
+    url: jdbc:mysql://15.164.18.21:3306/bilydatabase
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
-mybatis:
-  configuration:
-    map-underscore-to-camel-case: true
+  jpa:
+    hibernate:
+      ddl-auto: none
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    show-sql: true                       # 콘솔에 SQL 출력
+    properties:
+      hibernate:
+        format_sql: true                 # 가독성 좋은 줄바꿈
+        highlight_sql: true              # ANSI 컬러 하이라이트
+        # --------------------------------------------
+        #  ↓ 바인딩 파라미터 로그를 위해 TRACE 레벨 필요
+        # --------------------------------------------
+        type:
+          descriptor: TRACE
 
-  mvc:
-    pathmatch:
-      matching-strategy: ant_path_matcher
+    mvc:
+      pathmatch:
+        matching-strategy: ant_path_matcher
 
-# 로그 레벨 설정
-logging:
-  pattern:
-    console: "%clr(%d{yyyy-MM-dd HH:mm:ss}){green} [%thread] %clr(%-5level){cyan} %clr([%logger{36}]){blue} - %msg%n"
-  level:
-    root: INFO                                    # 기본 로그 레벨을 INFO로 설정
-    org:
-      apache:
-        ibatis: WARN                              # MyBatis 관련 로그를 INFO -> WARN으로 변경
-      hibernate: WARN                             # Hibernate 주요 로그들 WARN으로 설정
+  mybatis:
+    configuration:
+      map-underscore-to-camel-case: true
+
+  logging:
+    pattern:
+      console: "%clr(%d{yyyy-MM-dd HH:mm:ss}){green} [%thread] %clr(%-5level){cyan} %clr([%logger{36}]){blue} - %msg%n"
+    level:
+      root: INFO
+      org:
+        springframework:
+          web: DEBUG          # DispatcherServlet 등
+          orm: DEBUG          # Transaction, EntityManager 등
+        hibernate:
+          SQL: DEBUG          # 실행 SQL
+          type:
+            descriptor: TRACE # 바인딩 값
+        apache:
+          ibatis: TRACE       # MyBatis 내부
+          mybatis: TRACE
       jdbc:
-        sql: WARN                                 # SQL 쿼리 로그를 WARN으로 축소
-        result: OFF                               # 결과 로그는 비활성화
-        connection: WARN                          # JDBC 연결 이벤트 로그를 WARN으로 축소
-    springframework:
-      web:
-        socket: WARN                              # WebSocket 로그를 WARN으로 축소
-      messaging: WARN                             # 메시징 로그를 WARN으로 축소
+        connection: DEBUG
+        statement: DEBUG
+        result: DEBUG
 
 
 
@@ -118,6 +136,12 @@ springdoc:
 s3:
   path:
     inquiry: images/inquiry/
-
+    space: images/space/space/
+    use_case: images/space/useCase/
+    blueprint: images/space/blueprint/
+    business_card: images/business_card/
 cors:
-  allowed-origins: "http://localhost:3000,https://bily.pages.dev,http://localhost:8081"
+  allowed-origins: "http://localhost:3001,https://api.bily.at,http://localhost:8081,https://bily.at"
+
+dev:
+  fallback-user-id: 110

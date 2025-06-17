@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:3000") // React 개발 서버의 URL
+@CrossOrigin(origins = "http://localhost:3001") // React 개발 서버의 URL
 public class AppController {
 
     private final ResourceLoader resourceLoader;
