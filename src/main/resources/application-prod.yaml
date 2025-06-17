@@ -136,7 +136,10 @@ springdoc:
 s3:
   path:
     inquiry: images/inquiry/
-
+    space: images/space/space/
+    use_case: images/space/useCase/
+    blueprint: images/space/blueprint/
+    business_card: images/business_card/
 cors:
   allowed-origins: "http://localhost:3001,https://api.bily.at,http://localhost:8081,https://bily.at"
 

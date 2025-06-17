@@ -1,9 +1,7 @@
 package one.dfy.bily.api.util;
 
 import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.amazonaws.services.s3.model.S3Object;
-import com.amazonaws.services.s3.model.S3ObjectInputStream;
+import com.amazonaws.services.s3.model.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import one.dfy.bily.api.common.dto.FileUploadInfo;
@@ -44,6 +42,12 @@ public class S3Uploader {
     @Value("${s3.path.space}")
     private String spacePath;
 
+    @Value("${s3.path.use_case}")
+    private String useCasePath;
+
+    @Value("${s3.path.blueprint}")
+    private String bluePrintPath;
+
     @Value("${s3.path.business_card}")
     private String businessCardPath;
 
@@ -59,8 +63,16 @@ public class S3Uploader {
         return uploadFileToS3(file, spacePath);
     }
 
+    public FileUploadInfo useCaseFileUpload(MultipartFile file) {
+        return uploadFileToS3(file, useCasePath);
+    }
+
+    public FileUploadInfo bluePrintUpload(MultipartFile file) {
+        return uploadFileToS3(file, bluePrintPath);
+    }
+
     public FileUploadInfo uploadFileToS3(MultipartFile file, String path) {
-        String extension = "." + FilenameUtils.getExtension(file.getOriginalFilename());
+        String extension = FilenameUtils.getExtension(file.getOriginalFilename());
         String newFileName = UUID.randomUUID() + extension;
         String saveLocation = path + newFileName;
 
@@ -81,6 +93,30 @@ public class S3Uploader {
                 file.getSize(),
                 file.getContentType()
         );
+    }
+
+    /**
+     * 버킷 내부 dir/filename 경로의 객체를 삭제한다.
+     */
+    public void deleteFile(String dir, String fileName) {
+        String key = dir.endsWith("/") ? dir + fileName : dir + "/" + fileName;
+        amazonS3Client.deleteObject(bucket, key);   // ← 오버로드 사용
+    }
+
+    /**
+     * 버킷 내부 경로(key)들을 일괄 삭제한다.
+     *
+     * @param keys "dir/fileName" 형태의 S3 객체 Key 목록
+     */
+    public void deleteFiles(List<String> keys) {
+        if (keys == null || keys.isEmpty()) {
+            return;                 // 삭제 대상 없음
+        }
+
+        DeleteObjectsRequest request = new DeleteObjectsRequest(bucket)
+                .withKeys(keys.toArray(new String[0]));
+
+        amazonS3Client.deleteObjects(request);
     }
 
 
@@ -312,6 +348,14 @@ public class S3Uploader {
 
     public String getSpaceS3Url() {
         return "https://" + "s3." + region + ".amazonaws.com/" + bucket + "/" + spacePath;
+    }
+
+    public String getuseCaseS3Url() {
+        return "https://" + "s3." + region + ".amazonaws.com/" + bucket + "/" + useCasePath;
+    }
+
+    public String getBluePrintS3Url() {
+        return "https://" + "s3." + region + ".amazonaws.com/" + bucket + "/" + bluePrintPath;
     }
 
     public String getInquiryPath() {

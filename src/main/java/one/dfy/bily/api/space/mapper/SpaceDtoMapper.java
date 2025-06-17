@@ -138,7 +138,12 @@ public class SpaceDtoMapper {
         );
     }
 
-    public static SpaceFileInfo toSpaceFileInfoEntity(FileUploadInfo file, Long spaceId, int idx, boolean isThumbnail) {
+    /* 공간 대표/추가 이미지 -------------------------------------------- */
+    public static SpaceFileInfo toSpaceFileInfoEntity(FileUploadInfo file,
+                                                      Long spaceId,
+                                                      int fileOrder,
+                                                      boolean isThumbnail) {
+
         return new SpaceFileInfo(
                 spaceId,
                 file.originalFileName(),
@@ -146,12 +151,17 @@ public class SpaceDtoMapper {
                 file.saveLocation(),
                 file.fileSize(),
                 file.fileType(),
-                idx,
+                fileOrder,
                 isThumbnail
         );
     }
 
-    public static SpaceUseFileInfo toSpaceUseFileInfoEntity(FileUploadInfo file, Long spaceId, String fileTitle, int idx) {
+    /* 공간 사용 사례 이미지 -------------------------------------------- */
+    public static SpaceUseFileInfo toSpaceUseFileInfoEntity(FileUploadInfo file,
+                                                            Long spaceId,
+                                                            String fileTitle,
+                                                            int fileOrder) {
+
         return new SpaceUseFileInfo(
                 spaceId,
                 file.originalFileName(),
@@ -159,12 +169,14 @@ public class SpaceDtoMapper {
                 file.saveLocation(),
                 file.fileSize(),
                 file.fileType(),
-                idx,
+                fileOrder,
                 fileTitle
         );
     }
 
-    public static SpaceBlueprintFile toSpaceBlueprintFileInfoEntity(FileUploadInfo file, Long spaceId) {
+    /* 공간 설계도 -------------------------------------------- */
+    public static SpaceBlueprintFile toSpaceBlueprintFileInfoEntity(FileUploadInfo file,
+                                                                    Long spaceId) {
         return new SpaceBlueprintFile(
                 spaceId,
                 file.originalFileName(),
@@ -175,6 +187,7 @@ public class SpaceDtoMapper {
                 "admin"
         );
     }
+
 
     public static SpaceAmenity toSpaceAmenityEntity(Long spaceId, Long amenityId) {
         return new SpaceAmenity(

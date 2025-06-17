@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import one.dfy.bily.api.common.model.BaseEntity;
+import one.dfy.bily.api.space.dto.SpaceBlueprintFileInfo;
 
 @Setter
 @Getter
@@ -55,4 +56,10 @@ public class SpaceBlueprintFile extends BaseEntity {
         this.fileType = fileType;
         this.creator = creator;
     }
+
+    /* Blueprint → DTO */
+    public SpaceBlueprintFileInfo toDto(String fileUrl) {
+        return new SpaceBlueprintFileInfo(this.id, this.fileName, fileUrl);
+    }
+
 }

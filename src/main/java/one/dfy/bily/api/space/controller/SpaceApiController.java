@@ -337,19 +337,31 @@ public class SpaceApiController {
             )
     })
     public ResponseEntity<SpaceCommonResponse> updateSpace(
-            @RequestPart("data") SpaceUpdateRequest spaceUpdateRequest,
-            @RequestPart(value ="spaceFileInfoResponseList", required = false)                    // 선택
+            /*@RequestPart("data") SpaceUpdateRequest spaceUpdateRequest,*/
+            /* 1) 기타 JSON 데이터 -------------------------------- */
+            @RequestPart("data")             String requestJson,          // SpaceUpdateRequest JSON 문자열
+            /* 2) 공간 이미지 ------------------------------------- */
+            @RequestPart(value = "spaceFileInfoResponseList",      required = false)
             List<MultipartFile> spaceImages,
 
-            @RequestPart(value = "spaceUseFileResponseList", required = false)   // 선택
+            /* 3) 사용 사례 이미지 -------------------------------- */
+            @RequestPart(value = "spaceUseFileResponseList",       required = false)
             List<MultipartFile> useCaseImages,
 
-            @RequestPart(value = "spaceBlueprintFileUrl",   required = false)    // 선택
+            /* 4) 설계도 ------------------------------------------ */
+            @RequestPart(value = "spaceBlueprintFileUrl",          required = false)
             MultipartFile blueprint,
+
+            /* 5) 인증 ------------------------------------------- */
+
             @AuthenticationPrincipal CustomUserDetails userDetails,
             HttpServletRequest request
 
     ) throws Exception {
+
+        // JSON 문자열을 SpaceCreateRequest 객체로 변환
+        ObjectMapper objectMapper = new ObjectMapper();
+        SpaceUpdateRequest spaceUpdateRequest = objectMapper.readValue(requestJson, SpaceUpdateRequest.class);
 
         Long userId;
         if (userDetails != null) {
