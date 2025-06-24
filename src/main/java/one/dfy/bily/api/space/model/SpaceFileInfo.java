@@ -94,26 +94,12 @@ public class SpaceFileInfo extends BaseEntity {
         if (updater == null) updater = creator;
     }
 
-    /* ---------- 비즈니스 로직 ---------- */
-    public void updateCreator(String creator) {
-        this.creator = creator;
-    }
-
-    public void updateUpdater(String updater) {
-        this.updater = updater;
-    }
-
-    public void updateFileOrder(int fileOrder) {
+    /** 메타데이터(순서·타입·썸네일)만 갱신 */
+    public void updateMeta(int fileOrder, String fileType, boolean thumbnail) {
         this.fileOrder = fileOrder;
-    }
-
-    /** 썸네일 여부 갱신용 메서드 */
-    public void updateThumbnail(boolean thumbnail) {
+        this.fileType  = fileType;
         this.thumbnail = thumbnail;
     }
 
-    public void updateUsed(boolean used) {
-        this.used = used;
-    }
 
 }

@@ -2,6 +2,7 @@ package one.dfy.bily.api.space.service;
 
 import com.nimbusds.oauth2.sdk.util.CollectionUtils;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import one.dfy.bily.api.common.mapper.PaginationMapper;
 import one.dfy.bily.api.space.mapper.SpaceDtoMapper;
 import one.dfy.bily.api.space.model.*;
@@ -19,6 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -32,6 +34,7 @@ import java.util.stream.IntStream;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class SpaceService {
     private final S3Uploader s3Uploader;
     private final SpaceRepository spaceRepository;
@@ -107,7 +110,10 @@ public class SpaceService {
     @Transactional
     public MapNonUserSpaceInfoList findMapNonUserSpaceInfoList(){
 
-        List<Space> spaces = spaceRepository.findAll();
+       /* // List<Space> spaces = spaceRepository.findAll();*/
+
+        // ① 공개 공간만 조회
+        List<Space> spaces = spaceRepository.findAllByDisplayStatusTrue();
 
         List<Long> spaceIds = spaces.stream()
                 .map(Space::getId)
@@ -123,7 +129,10 @@ public class SpaceService {
     @Transactional
     public MapUserSpaceInfoList findMapUserSpaceInfoList(){
 
-        List<Space> spaces = spaceRepository.findAll();
+        //List<Space> spaces = spaceRepository.findAll();
+
+        // ① 공개 공간만 조회
+        List<Space> spaces = spaceRepository.findAllByDisplayStatusTrue();
 
         List<Long> spaceIds = spaces.stream()
                 .map(Space::getId)
@@ -364,12 +373,19 @@ public class SpaceService {
 
         /* ---------- 공간 이미지 동기화 ---------- */
         if (CollectionUtils.isNotEmpty(spaceFiles)) {
-            syncSpaceImages(spaceId, req.spaceImagesMeta(), spaceFiles);
+            this.syncSpaceImages(spaceId, req, req.spaceImagesMeta(), spaceFiles);
+        } else {
+
+            this.updateSpaceData(spaceId, req.spaceImagesMeta());
         }
 
+        log.info(req.newUseCaseImages().toString());
         /* ---------- 사용 사례 이미지 동기화 ---------- */
         if (CollectionUtils.isNotEmpty(useCaseFiles)) {
-            syncSpaceUseImages(spaceId, req.useCaseImagesMeta(), useCaseFiles);
+            syncSpaceUseImages(spaceId, req, req.useCaseImagesMeta(), useCaseFiles);
+        } else {
+
+            this.updateSpaceUseCaseData(spaceId, req.useCaseImagesMeta());
         }
 
         /* ---------- 도면(블루프린트) 동기화 ---------- */
@@ -406,6 +422,7 @@ public class SpaceService {
      * 아래는 보조 메서드
      * ---------------------------------------------------------------------*/
     private void deleteRemovedImages(SpaceUpdateRequest req) {
+        log.info("deleteRemovedImages:{}",req.deletedSpaceImages());
         // ===== 공간 이미지 =====
         if (CollectionUtils.isNotEmpty(req.deletedSpaceImages())) {
             for (String url : req.deletedSpaceImages()) {
@@ -419,6 +436,7 @@ public class SpaceService {
     }
 
     private void deleteRemovedUseImages(SpaceUpdateRequest req) {
+        log.info("deleteRemovedUseImages:{}",req.deletedSpaceImages());
         // ===== 이용사례 이미지 =====
         if (CollectionUtils.isNotEmpty(req.deletedUseCaseImages())) {
             for (String url : req.deletedUseCaseImages()) {
@@ -432,6 +450,7 @@ public class SpaceService {
     }
 
     private void deleteRemovedBlueImages(SpaceUpdateRequest req) {
+        log.info("deleteRemovedBlueImages:{}",req.deletedSpaceImages());
         // ===== 도면 이미지 =====
         if (CollectionUtils.isNotEmpty(req.deletedBlueprintImages())) {
             for (String url : req.deletedBlueprintImages()) {
@@ -444,27 +463,108 @@ public class SpaceService {
         }
     }
 
+    /**
+     * 공간 이미지 메타데이터만 갱신
+     *  - 파일 업로드, S3 처리는 수행하지 않는다.
+     */
+    @Transactional
+    public void updateSpaceData(Long spaceId, List<SpaceImageMetaRequest> metas) {
+        if (CollectionUtils.isEmpty(metas)) {
+            return;
+        }
+
+        // ① 기존 파일 정보 : fileOrder ASC 로 정렬되어 조회
+        List<SpaceFileInfo> originals = spaceFileInfoRepository.findBySpaceIdAndUsedOrderByFileOrderAsc(spaceId, true);
+
+
+        // ③ 두 리스트 중 더 짧은 쪽까지만 처리 하려 했으나 JPA 쿼리조회에서 spaceId만으로는 사이즈 알수 없음 동일PK (id, spaceId)로 조회 되어야함
+        int size = Math.min(originals.size(), metas.size());
+
+        // 메타데이터 일괄 갱신
+        for (int i = 0; i < size; i++) {
+            Long id = originals.get(i).getId();                // PK
+            SpaceImageMetaRequest meta = metas.get(i);         // 대응되는 메타
+
+            spaceFileInfoRepository.updateMeta(
+                    id,                                        // PK 기준 업데이트
+                    spaceId,
+                    meta.fileOrder(),
+                    Boolean.TRUE.equals(meta.thumbnail())
+            );
+        }
+    }
+
+
+    /**
+     * 이용사례 이미지 메타데이터만 갱신
+     *  - 파일 업로드, S3 처리는 수행하지 않는다.
+     */
+    @Transactional
+    public void updateSpaceUseCaseData(Long spaceId,
+                                       List<SpaceUseCaseImageMetaRequest> metas) {
+
+        if (CollectionUtils.isEmpty(metas)) return;
+
+        // ① 기존 레코드 : fileOrder ASC 로 이미 정렬돼 있음
+        List<Long> originals = spaceUseFileInfoRepository.findIdsBySpaceIdAndUsedOrderByFileOrderAsc(spaceId, true);
+
+        // 둘 중 더 짧은 쪽까지만 처리
+        int size = Math.min(originals.size(), metas.size());
+
+
+        //int size = metas.size();
+
+
+        for (int i = 0; i < size; i++) {
+            Long id = originals.get(i);                       // PK 바로 사용
+            SpaceUseCaseImageMetaRequest meta = metas.get(i); // 매칭 메타
+
+            String title = meta.title();
+
+
+            // title 이 null 이거나 공백( "" / "   " )이면 기존 제목 유지
+            if (!StringUtils.hasText(title)) {
+                spaceUseFileInfoRepository.updateFileOrder(
+                        id,
+                        spaceId,
+                        meta.fileOrder());
+            } else {
+                // 내용이 있을 때만 제목 업데이트
+                spaceUseFileInfoRepository.updateMeta(
+                        id,
+                        spaceId,
+                        meta.fileOrder(),
+                        title.trim());                        // 필요 시 trim
+            }
+
+        }
+
+
+        // 길이가 다를 경우(예: 메타가 더 많음 / 적음) 어떻게 처리할지 필요에 따라 추가
+    }
+
+
 
     @Transactional
     public void syncSpaceImages(
             Long spaceId,
+            SpaceUpdateRequest req,
             List<SpaceImageMetaRequest> metas,
             List<MultipartFile> spaceFiles
     ) {
         /* 0. 기존 이미지 조회 */
-        List<SpaceFileInfo> existing = spaceFileInfoRepository.findBySpaceId(spaceId);
+        List<SpaceFileInfo> existing = spaceFileInfoRepository.findBySpaceIdAndUsedOrderByFileOrderAsc(spaceId, true);
 
         /* 0-1. S3 객체 Key 수집 후 일괄 삭제 */
         List<String> keys = existing.stream()
                 .map(e -> e.getSaveLocation() + "/" + e.getSaveFileName()) // 엔티티 필드명에 맞게 수정
                 .toList();
 
-        if (!keys.isEmpty()) {
+        if (!keys.isEmpty() && CollectionUtils.isEmpty(req.newSpaceImages())) {
             s3Uploader.deleteFiles(keys);   // ← S3 일괄 삭제 메서드(예: AWS SDK deleteObjects)
+            /* 0-2. DB 레코드 삭제 */
+            spaceFileInfoRepository.deleteAllInBatch(existing);
         }
-
-        /* 0-2. DB 레코드 삭제 */
-        spaceFileInfoRepository.deleteAllInBatch(existing);
 
         /* 1. 새 파일 iterator */
         Iterator<MultipartFile> iter = spaceFiles.iterator();
@@ -498,9 +598,11 @@ public class SpaceService {
     @Transactional
     public void syncSpaceUseImages(
             Long spaceId,
+            SpaceUpdateRequest req,
             List<SpaceUseCaseImageMetaRequest> metas,
             List<MultipartFile> useCaseFiles
     ) {
+
         /* 0. 기존 이미지 조회 */
         List<SpaceUseFileInfo> existing = spaceUseFileInfoRepository.findBySpaceId(spaceId);
 
@@ -509,12 +611,11 @@ public class SpaceService {
                 .map(e -> e.getSaveLocation() + "/" + e.getSaveFileName()) // 엔티티 필드명에 맞게 수정
                 .toList();
 
-        if (!keys.isEmpty()) {
+        if (!keys.isEmpty() && CollectionUtils.isEmpty(req.newUseCaseImages())) {
             s3Uploader.deleteFiles(keys);   // ← S3 일괄 삭제 메서드(예: AWS SDK deleteObjects)
+            /* 0-2. DB 레코드 삭제 */
+            spaceUseFileInfoRepository.deleteAllInBatch(existing);
         }
-
-        /* 0-2. DB 레코드 삭제 */
-        spaceUseFileInfoRepository.deleteAllInBatch(existing);
 
         /* 1. 새 파일 iterator */
         Iterator<MultipartFile> iter = useCaseFiles.iterator();

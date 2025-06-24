@@ -73,7 +73,11 @@ public class S3Uploader {
 
     public FileUploadInfo uploadFileToS3(MultipartFile file, String path) {
         String extension = FilenameUtils.getExtension(file.getOriginalFilename());
-        String newFileName = UUID.randomUUID() + extension;
+        String uuid         = UUID.randomUUID().toString();             // 28f9...
+        String newFileName  = extension.isEmpty()                       // 확장자 없을 때 대비
+                ? uuid
+                : uuid + "." + extension;                               // 28f9....png
+
         String saveLocation = path + newFileName;
 
         try {

@@ -105,20 +105,4 @@ public class SpaceUseFileInfo extends BaseEntity {
         if (updater == null) updater = creator;
     }
 
-    /* ---------- 비즈니스 로직 ---------- */
-    public void updateCreator(String creator) {
-        this.creator = creator;
-    }
-
-    public void updateUpdater(String updater) {
-        this.updater = updater;
-    }
-
-    public void updateFileOrder(int fileOrder) {
-        this.fileOrder = fileOrder;
-    }
-
-    public void updateUsed(boolean used) {
-        this.used = used;
-    }
 }

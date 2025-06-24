@@ -68,6 +68,18 @@ public record SpaceCreateRequest(
         List<SpaceImageMetaRequest> spaceImagesMeta,
 
         @Schema(description = "사용 사례 이미지 메타데이터")
-        List<SpaceImageMetaRequest> useCaseImagesMeta
+        List<SpaceImageMetaRequest> useCaseImagesMeta,
+
+        List<String> newSpaceImages,
+
+        List<String> newUseCaseImages,
+
+        List<String> newBlueprintImages,
+
+        List<String> deletedSpaceImages,
+
+        List<String> deletedUseCaseImages,
+
+        List<String> deletedBlueprintImages
 
 ) {}
