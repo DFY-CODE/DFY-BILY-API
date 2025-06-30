@@ -17,35 +17,40 @@ import java.util.Date;
 public class JwtProvider {
 
     private final SecretKey secretKey;
-    private final long expirationTime;
 
-    public JwtProvider(@Value("${jwt.secret}") String secret,
-                       @Value("${jwt.expiration}") long expirationTime) {
+    /* --------------------- 만료 시간 상수 --------------------- */
+    // 1시간 = 3 600 000 ms
+    private static final long ACCESS_TOKEN_EXP   = 60 * 60 * 1000L;
+    // 3시간 = 10 800 000 ms
+    private static final long REFRESH_TOKEN_EXP  = 3 * 60 * 60 * 1000L;
+    /* -------------------------------------------------------- */
+
+    public JwtProvider(@Value("${jwt.secret}") String secret) {
         this.secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
-        this.expirationTime = expirationTime;
     }
 
-    // Access Token 생성
+    /** Access Token 생성 : 1시간 유효 */
     public String createAccessToken(Long userId, Role role) {
         return Jwts.builder()
                 .setSubject(userId.toString())
                 .claim("roles", role)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
-                .signWith(secretKey, SignatureAlgorithm.HS256) //
+                .setExpiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_EXP))
+                .signWith(secretKey, SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    // Refresh Token 생성
-    public String createRefreshToken(Long userId, Date expiresAt) {
+    /** Refresh Token 생성 : 3시간 유효 */
+    public String createRefreshToken(Long userId) {
         return Jwts.builder()
                 .setSubject(userId.toString())
                 .claim("type", "refresh")
                 .setIssuedAt(new Date())
-                .setExpiration(expiresAt) // 7일 유효
-                .signWith(secretKey, SignatureAlgorithm.HS256) //
+                .setExpiration(new Date(System.currentTimeMillis() + REFRESH_TOKEN_EXP))
+                .signWith(secretKey, SignatureAlgorithm.HS256)
                 .compact();
     }
+
 
     // 토큰 검증
     public boolean validateToken(String token) {

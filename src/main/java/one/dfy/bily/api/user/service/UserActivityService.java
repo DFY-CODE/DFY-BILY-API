@@ -13,6 +13,7 @@ import one.dfy.bily.api.user.dto.SavedSpaceInfo;
 import one.dfy.bily.api.user.dto.UserActivity;
 import one.dfy.bily.api.user.facade.UserActivityFacade;
 import one.dfy.bily.api.user.mapper.UserActivityMapper;
+import one.dfy.bily.api.user.mapper.UserActivityV2Mapper;
 import one.dfy.bily.api.util.AES256Util;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,15 +31,16 @@ public class UserActivityService {
 
     @Transactional(readOnly = true)
     public List<UserActivity> mappingToReservationAndInquiryInfo(
-            List<Object[]> rawResults,
+            List<UserActivity> userActivityList,
             Map<Long, String> fileNameListMap,
             Map<Long, List<InquiryPreferredDateInfo>> preferredDateMap
-    ){
-
-        return rawResults.stream()
-                .map(row -> UserActivityMapper.toReservationAndInquiryInfo(row, preferredDateMap, fileNameListMap))
+    ) {
+        // UserActivityList에서 모든 항목을 매퍼를 사용해 변환
+        return userActivityList.stream()
+                .map(activity -> UserActivityV2Mapper.toReservationAndInquiryInfo(activity, preferredDateMap, fileNameListMap))
                 .toList();
     }
+
 
     public List<UserActivity> reservationActivityToUserActivityList(
             List<ReservationActivity> reservations,

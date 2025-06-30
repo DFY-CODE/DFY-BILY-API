@@ -61,5 +61,25 @@ public record SpaceCreateRequest(
         List<String> useCaseImageTitles,
 
         @Schema(description = "대표 이미지 인덱스")
-        int thumbnailIndex
+        int thumbnailIndex,
+
+        /* ---------- 추가된 필드 ---------- */
+        @Schema(description = "공간 이미지 메타데이터")
+        List<SpaceImageMetaRequest> spaceImagesMeta,
+
+        @Schema(description = "사용 사례 이미지 메타데이터")
+        List<SpaceImageMetaRequest> useCaseImagesMeta,
+
+        List<String> newSpaceImages,
+
+        List<String> newUseCaseImages,
+
+        List<String> newBlueprintImages,
+
+        List<String> deletedSpaceImages,
+
+        List<String> deletedUseCaseImages,
+
+        List<String> deletedBlueprintImages
+
 ) {}

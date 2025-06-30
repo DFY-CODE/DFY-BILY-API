@@ -155,8 +155,8 @@ public class AuthController {
 
     @GetMapping(value = "/admin")
     @Operation(summary = "운영자 여부 확인", description = "운영자 여부를 확인합니다.")
-    @ApiResponse(responseCode = "200", description = "비밀번호 초기화 성공")
-    @ApiResponse(responseCode = "500", description = "비밀번호 초기화 실패")
+    @ApiResponse(responseCode = "200", description = "운영자 여부 조회 성공")
+    @ApiResponse(responseCode = "500", description = "운영자 여부 조회 실패")
     public ResponseEntity<AuthCommonResponse> checkAdmin(@AuthenticationPrincipal CustomUserDetails userDetails) {
         Long userId = userDetails.getUserId();
         boolean isAdmin = userDetails.getAuthorities().stream()

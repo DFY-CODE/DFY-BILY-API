@@ -150,14 +150,14 @@ public class AuthService {
         jwtCookieUtil.setAccessTokenCookie(response, accessToken);
 
         Date date = new Date(System.currentTimeMillis() + 1000L * 60 * 60 * 24 * 7);
-        String refreshToken = jwtProvider.createRefreshToken(user.getId(), date);
+        String refreshToken = jwtProvider.createRefreshToken(user.getId());
         LocalDateTime expiresAt = LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
 
         AuthToken authToken = AuthMapper.toAuthToken(user, refreshToken, expiresAt);
 
         authTokenRepository.save(authToken);
 
-        return new JwtResponse(user.getName(), accessToken, refreshToken);
+        return new JwtResponse(user.getId(), user.getName(), accessToken, refreshToken, user.getRole());
     }
 
     @Transactional
