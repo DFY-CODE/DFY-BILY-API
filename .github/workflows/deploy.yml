@@ -1,0 +1,45 @@
+name: Deploy Spring Boot App to Lightsail
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up JDK 11
+      uses: actions/setup-java@v2
+      with:
+        java-version: '11'
+        distribution: 'adopt'
+
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+
+    - name: Build with Gradle
+      run: ./gradlew build
+
+    - name: Deploy to Lightsail via SSH
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.LIGHTSAIL_HOST }}
+        username: ubuntu
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        script: |
+      # Kill existing process
+      sudo pkill -f 'java -jar' || true
+      
+      # Remove old jar file
+      rm -f /home/ubuntu/bily/one-dfy-bily-api-0.0.1-SNAPSHOT.jar
+      
+      # Upload new jar file
+      scp ./build/libs/one-dfy-bily-api-0.0.1-SNAPSHOT.jar ubuntu@${{ secrets.LIGHTSAIL_HOST }}:/home/ubuntu/bily/one-dfy-bily-api-0.0.1-SNAPSHOT.jar
+      
+      # Run new jar file
+      nohup java -jar /home/ubuntu/bily/one-dfy-bily-api-0.0.1-SNAPSHOT.jar > /dev/null 2>&1 &
