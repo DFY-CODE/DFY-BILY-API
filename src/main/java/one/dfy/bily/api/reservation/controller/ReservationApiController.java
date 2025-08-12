@@ -8,6 +8,8 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import one.dfy.bily.api.inquiry.constant.InquirySearchType;
@@ -16,6 +18,8 @@ import one.dfy.bily.api.reservation.dto.*;
 import one.dfy.bily.api.reservation.facade.ReservationFacade;
 import one.dfy.bily.api.reservation.service.ReservationService;
 import one.dfy.bily.api.security.CustomUserDetails;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -49,33 +53,57 @@ public class ReservationApiController {
     public ResponseEntity<ReservationListResponse> findInquiryListByKeywordAndDate(
             @Parameter(
                     description = "문의 검색 타입 (공간명, 회사명, 이름)",
-                    required = false,
-                    schema = @Schema(
-                            type = "string",
-                            allowableValues = {"공간명", "회사명", "이름"}
-                    )
+                    schema = @Schema(type = "string",
+                            allowableValues = {"SPACE_NAME", "COMPANY_NAME", "CONTACT_PERSON"})
             )
             @RequestParam(value = "type", required = false) InquirySearchType type,
-            @Parameter(description = "예약 검색 단어", required = false) @RequestParam(value = "keyword", required = false) String keyword,
+
+            @Parameter(description = "검색 키워드", required = false)
+            @RequestParam(value = "keyword", required = false) String keyword,
+
             @Parameter(
-                    description = "예약 검색 시작일 (예: 2025-04-06T00:00:00)",
+                    description = "검색 시작일 (예: 2025-04-06T00:00:00)",
                     required = false,
                     schema = @Schema(type = "string", format = "date-time", example = "2025-04-06T00:00:00")
             )
-            @RequestParam(value = "start_date", required = false) LocalDateTime startAt,
+            @RequestParam(value = "start_date", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+            LocalDateTime startAt,
+
             @Parameter(
-                    description = "예약 검색 종료일 (예: 2025-04-06T23:59:59)",
+                    description = "검색 종료일 (예: 2025-04-06T23:59:59)",
                     required = false,
                     schema = @Schema(type = "string", format = "date-time", example = "2025-04-06T23:59:59")
             )
-            @RequestParam(value = "end_date", required = false) LocalDateTime endAt,
-            @Parameter(description = "예약 검색 페이지", required = false) @RequestParam(defaultValue = "1") int page,
-            @Parameter(description = "예약 검색 페이지 사이즈", required = false)
-            @RequestParam(value = "pageSize", defaultValue = "20") int pageSize,
-            @RequestParam(value = "status", required = false) List<ReservationStatus> reservationStatusList
+            @RequestParam(value = "end_date", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+            LocalDateTime endAt,
+
+            @Parameter(description = "페이지 번호(1부터)", required = false)
+            @RequestParam(defaultValue = "1") @Min(1) int page,
+
+            @Parameter(description = "페이지 사이즈", required = false)
+            @RequestParam(value = "pageSize", defaultValue = "20") @Min(1) int pageSize,
+
+            @Parameter(description = "예약 상태 목록", required = false)
+            @RequestParam(value = "status", required = false)
+            List<ReservationStatus> reservationStatusList
     ) {
-        return ResponseEntity.ok(reservationService.findReservationListByKeywordAndDate(type, keyword, startAt, endAt, page, pageSize, reservationStatusList));
+
+        ReservationListResponse body =
+                reservationService.findReservationListByKeywordAndDate(
+                        type,
+                        keyword,
+                        startAt,
+                        endAt,
+                        page,
+                        pageSize,
+                        reservationStatusList
+                );
+
+        return ResponseEntity.ok(body);
     }
+
 
     @GetMapping("/{reservation-id}")
     @Operation(summary = "예약 상세 조회", description = "예약 상세정보를 반환합니다.")
@@ -128,11 +156,23 @@ public class ReservationApiController {
             )
     )
     public ResponseEntity<ReservationPaymentInfo> createReservationPayment(
-            @RequestBody CreateReservation createReservation
-//            @AuthenticationPrincipal CustomUserDetails userDetails
+            @RequestBody CreateReservation createReservation,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            HttpServletRequest request
+
     ) {
-//        Long adminId = userDetails.getUserId();
-        Long adminId = 110L;
+        Long adminId;
+        if (userDetails != null) {
+            adminId = userDetails.getUserId();
+        } else {
+            // local 환경 + Origin 이 localhost:3001 일 때만 세팅된 값
+            adminId = (Long) request.getAttribute("FALLBACK_USER_ID");
+            if (adminId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+        }
+
+//        Long adminId = 110L;
         return ResponseEntity.ok(reservationFacade.createReservationPayment(createReservation, adminId));
     }
 
@@ -152,11 +192,23 @@ public class ReservationApiController {
     )
     public ResponseEntity<ReservationPaymentInfo> updateReservation(
             @PathVariable(name = "reservation-id") Long reservationId,
-            @RequestBody ReservationPaymentInfo reservationPaymentInfo
-//            @AuthenticationPrincipal CustomUserDetails userDetails
+            @RequestBody ReservationPaymentInfo reservationPaymentInfo,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            HttpServletRequest request
+
     ) {
-//        Long adminId = userDetails.getUserId();
-        Long adminId = 110L;
+        Long adminId;
+        if (userDetails != null) {
+            adminId = userDetails.getUserId();
+        } else {
+            // local 환경 + Origin 이 localhost:3001 일 때만 세팅된 값
+            adminId = (Long) request.getAttribute("FALLBACK_USER_ID");
+            if (adminId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+        }
+
+//        Long adminId = 110L;
         return ResponseEntity.ok(reservationService.updateReservation(reservationId,reservationPaymentInfo, adminId));
     }
 }

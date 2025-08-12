@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import one.dfy.bily.api.inquiry.constant.InquirySearchType;
@@ -19,10 +20,14 @@ import one.dfy.bily.api.inquiry.constant.InquiryStatus;
 import one.dfy.bily.api.inquiry.dto.*;
 import one.dfy.bily.api.inquiry.facade.InquiryFacade;
 import one.dfy.bily.api.inquiry.service.InquiryService;
+import one.dfy.bily.api.security.CustomUserDetails;
 import one.dfy.bily.api.space.dto.SpaceDetailInfo;
 import one.dfy.bily.api.space.dto.SpaceFileInfoResponse;
 import one.dfy.bily.api.space.service.SpaceService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -42,7 +47,7 @@ public class InquiryApiController {
 
 
     @GetMapping()
-//    @PreAuthorize("hasRole('ADMIN')")
+    //@PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "문의 리스트 조회", description = "검색 타입과 키워드를 통해 문의 리스트를 반환합니다.")
     @ApiResponse(
             responseCode = "200",
@@ -89,7 +94,7 @@ public class InquiryApiController {
     }
 
     @GetMapping("/{inquiry-id}")
-//    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    //@PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @Operation(summary = "문의 상세 조회", description = "문의 아이디로 상세 데이터를 반환합니다.")
     @ApiResponse(
             responseCode = "200",
@@ -104,15 +109,29 @@ public class InquiryApiController {
             )
     )
     public ResponseEntity<InquiryResponse> findInquiryByInquiryId(
-            @PathVariable(name = "inquiry-id") Long inquiryId
-//            @AuthenticationPrincipal CustomUserDetails userDetails
-    ) {
-//        Long userId = userDetails.getUserId();
+            @PathVariable(name = "inquiry-id") Long inquiryId,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            HttpServletRequest request
 
-        Long userId = 110L;
-//        boolean isAdmin = userDetails.getAuthorities().stream()
-//                .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
-        boolean isAdmin = true;
+    ) {
+        Long userId;
+        boolean isAdmin = false;   // 기본값
+
+        if (userDetails != null) {
+            userId = userDetails.getUserId();
+
+            // ROLE_ADMIN 권한 여부 판별
+            isAdmin = userDetails.getAuthorities().stream()
+                    .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
+
+        } else {
+            // local 환경 + Origin 이 localhost:3001 일 때만 세팅된 값
+            userId = (Long) request.getAttribute("FALLBACK_USER_ID");
+            isAdmin = true;
+            if (userId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+        }
 
         // 1. 기본 InquiryResponse 가져오기
         InquiryResponse inquiryResponse = inquiryService.findInquiryByInquiryIdAndUserId(inquiryId, userId, isAdmin);
@@ -172,7 +191,7 @@ public class InquiryApiController {
 
 
     @PostMapping(consumes = "multipart/form-data")
-//    @PreAuthorize("hasRole('USER')")
+    //@PreAuthorize("hasRole('USER')")
     @Operation(summary = "문의 생성", description = "문의 생성 후 데이터를 반환합니다.")
     @ApiResponse(
             responseCode = "200",
@@ -188,8 +207,10 @@ public class InquiryApiController {
     )
     public ResponseEntity<InquiryResponse> createInquiry(
             @RequestPart("data") String jsonData,
-            @RequestPart("attachFileList") List<MultipartFile> fileAttachments
-//            @AuthenticationPrincipal CustomUserDetails userDetails
+            @RequestPart("attachFileList") List<MultipartFile> fileAttachments,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            HttpServletRequest request
+
     ) {
         try {
 
@@ -199,10 +220,20 @@ public class InquiryApiController {
             objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false); // 알 수 없는 필드 무시
             objectMapper.findAndRegisterModules();
 
-            InquiryCreateRequest request = objectMapper.readValue(jsonData, InquiryCreateRequest.class);
+            InquiryCreateRequest inquiryCreateRequest = objectMapper.readValue(jsonData, InquiryCreateRequest.class);
 
-            Long userId = 110L;
-            return ResponseEntity.ok(inquiryFacade.createInquiry(request, fileAttachments, userId));
+            Long userId;
+            if (userDetails != null) {
+                userId = userDetails.getUserId();
+            } else {
+                // local 환경 + Origin 이 localhost:3001 일 때만 세팅된 값
+                userId = (Long) request.getAttribute("FALLBACK_USER_ID");
+                if (userId == null) {
+                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+                }
+            }
+
+            return ResponseEntity.ok(inquiryFacade.createInquiry(inquiryCreateRequest, fileAttachments, userId));
         } catch (Exception e) {
             // JSON 파싱 오류 처리
             return ResponseEntity.badRequest().build();
@@ -211,7 +242,7 @@ public class InquiryApiController {
     }
 
     @PatchMapping("/{inquiry-id}")
-//    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    //@PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @Operation(summary = "문의 수정", description = "문의 내용을 수정합니다.")
     @ApiResponse(
             responseCode = "200",

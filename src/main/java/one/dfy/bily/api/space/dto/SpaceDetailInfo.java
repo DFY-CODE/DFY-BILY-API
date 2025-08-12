@@ -10,6 +10,8 @@ public record SpaceDetailInfo(
         String location,
         Long price,
         BigDecimal areaM2,
+        BigDecimal latitude,
+        BigDecimal longitude,
         String districtInfo,
         String spaceName,
         String info,

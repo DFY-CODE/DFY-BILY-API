@@ -26,19 +26,37 @@ public class UserActivityFacade {
     private final UserActivityService userActivityService;
 
     public UserActivityList findReservationAndInquiryListByUserId(Long userId, int page, int pageSize) {
-        List<Object[]> reservationAndInquiryRow = reservationService.findReservationAndInquiryRow(userId, page, pageSize);
-        List<Long> contentIds = reservationService.getInquiryIds(reservationAndInquiryRow);
-        long totalCount = reservationService.countReservationAndInquiryRow(userId);
+        // 1. reservationService 호출
+        List<UserActivity> userActivityList = reservationService.findReservationAndInquiryRow(userId, page, pageSize);
 
+        // 2. contentIds 추출
+        List<Long> contentIds = userActivityList.stream()
+                .map(UserActivity::id)
+                .toList();
+
+        // 3. Space 파일 정보 매핑
         Map<Long, String> fileNameListMap = spaceService.findSpaceFileBySpaceIds(contentIds);
 
-        Map<Long, List<InquiryPreferredDateInfo>> preferredDateMap = inquiryService.findInquiryPreferredDateByObject(reservationAndInquiryRow);
-        List<UserActivity> userActivityList = userActivityService.mappingToReservationAndInquiryInfo(reservationAndInquiryRow, fileNameListMap, preferredDateMap);
+        // 4. InquiryPreferredDateInfo 매핑
+        Map<Long, List<InquiryPreferredDateInfo>> preferredDateMap =
+                inquiryService.findInquiryPreferredDateByObject(userActivityList);
 
+        // 5. 매핑 로직
+        List<UserActivity> finalUserActivityList = userActivityService.mappingToReservationAndInquiryInfo(
+                userActivityList,
+                fileNameListMap,
+                preferredDateMap
+        );
+
+        // 6. Pagination 생성
+        long totalCount = reservationService.countReservationAndInquiryRow(userId);
         Pagination pagination = new Pagination(page, pageSize, totalCount, (int) Math.ceil((double) totalCount / pageSize));
 
-        return new UserActivityList(userActivityList, pagination);
+        // 7. 결과 반환
+        return new UserActivityList(finalUserActivityList, pagination);
     }
+
+
 
     public UserActivityList findReservationListByUserId(Long userId, int page, int pageSize) {
         Page<ReservationActivity> reservationActivityPage = reservationService.findReservationListByUserId(userId, page, pageSize);
