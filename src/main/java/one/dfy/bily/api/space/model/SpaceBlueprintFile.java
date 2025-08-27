@@ -4,8 +4,11 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import one.dfy.bily.api.common.model.BaseEntity;
+import one.dfy.bily.api.space.dto.SpaceBlueprintFileInfo;
 
+@Setter
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
@@ -44,12 +47,19 @@ public class SpaceBlueprintFile extends BaseEntity {
     @Column(name = "FILE_TYPE", nullable = false, length = 50)
     private String fileType;
 
-    public SpaceBlueprintFile(Long spaceId, String fileName, String saveFileName, String saveLocation, Long saveSize, String fileType) {
+    public SpaceBlueprintFile(Long spaceId, String fileName, String saveFileName, String saveLocation, Long saveSize, String fileType, String creator) {
         this.spaceId = spaceId;
         this.fileName = fileName;
         this.saveFileName = saveFileName;
         this.saveLocation = saveLocation;
         this.saveSize = saveSize;
         this.fileType = fileType;
+        this.creator = creator;
     }
+
+    /* Blueprint → DTO */
+    public SpaceBlueprintFileInfo toDto(String fileUrl) {
+        return new SpaceBlueprintFileInfo(this.id, this.fileName, fileUrl);
+    }
+
 }

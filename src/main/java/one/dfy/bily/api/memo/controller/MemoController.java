@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import one.dfy.bily.api.inquiry.dto.InquiryResponse;
@@ -15,7 +16,10 @@ import one.dfy.bily.api.memo.dto.MemoCommonResponse;
 import one.dfy.bily.api.memo.dto.MemoResponse;
 import one.dfy.bily.api.memo.facade.MemoFacade;
 import one.dfy.bily.api.memo.service.MemoService;
+import one.dfy.bily.api.security.CustomUserDetails;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
@@ -42,12 +46,22 @@ public class MemoController {
                     )
             )
     )
-    public ResponseEntity<MemoCommonResponse> createMemo(@RequestBody CreateMemoInfo createMemoInfo
-//                                                         @AuthenticationPrincipal CustomUserDetails userDetails
-    ) {
-//        Long userId = userDetails.getUserId();
+    public ResponseEntity<MemoCommonResponse> createMemo(@RequestBody CreateMemoInfo createMemoInfo,
+                                                         @AuthenticationPrincipal CustomUserDetails userDetails,
+                                                         HttpServletRequest request
 
-        Long userId = 110L;
+    ) {
+        Long userId;
+        if (userDetails != null) {
+            userId = userDetails.getUserId();
+        } else {
+            // local 환경 + Origin 이 localhost:3001 일 때만 세팅된 값
+            userId = (Long) request.getAttribute("FALLBACK_USER_ID");
+            if (userId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+        }
+
         return ResponseEntity.ok(memoFacade.createMemo(createMemoInfo, userId));
     }
 
@@ -65,12 +79,24 @@ public class MemoController {
                     )
             )
     )
-    public ResponseEntity<MemoResponse> findMemoByUserIdAndInquiryId(@RequestParam Long inquiryId
-//                                                                     @AuthenticationPrincipal CustomUserDetails userDetails
-    ){
-//        Long userId = userDetails.getUserId();
+    public ResponseEntity<MemoResponse> findMemoByUserIdAndInquiryId(@RequestParam Long inquiryId,
+                                                                     @AuthenticationPrincipal CustomUserDetails userDetails,
+                                                                     HttpServletRequest request
 
-        Long userId = 110L;
+    ){
+        Long userId;
+        if (userDetails != null) {
+            userId = userDetails.getUserId();
+        } else {
+            // local 환경 + Origin 이 localhost:3001 일 때만 세팅된 값
+            userId = (Long) request.getAttribute("FALLBACK_USER_ID");
+            if (userId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+        }
+
+
+        // Long userId = 110L;
         return ResponseEntity.ok(memoFacade.findMemoByUserIdAndInquiryId(userId, inquiryId));
     }
 

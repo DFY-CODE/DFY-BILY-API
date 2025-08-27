@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 public record InquiryActivity(
         Long id,
-       /* String spaceId,*/
+        Long spaceId,
         String spaceName,
         String location,
         BigDecimal areaM2,

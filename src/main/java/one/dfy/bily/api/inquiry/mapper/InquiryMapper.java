@@ -66,6 +66,11 @@ public class InquiryMapper {
         return inquiryToResponse(inquiry, fileNames, preferredDateInfos);
     }
 
+    public static InquiryResponse toInquiryResponseV2(Inquiry inquiry, List<InquiryFile> files, List<PreferredDate> preferredDates,String s3Url) {
+
+        return inquiryToResponseV2(inquiry, files, preferredDates, s3Url);
+    }
+
     public static InquiryResponse toInquiryResponse(Inquiry inquiry, List<InquiryFile> files, List<PreferredDate> preferredDates) {
 
         return inquiryToResponse(inquiry, files, preferredDates);
@@ -111,6 +116,47 @@ public class InquiryMapper {
         );
     }
 
+    private static InquiryResponse inquiryToResponseV2(Inquiry inquiry, List<InquiryFile> inquiryFile, List<PreferredDate> preferredDates, String s3UrlPrefix) {
+        List<InquiryFileName> inquiryFileNames = inquiryFile.stream()
+                .map(file -> InquiryMapper.inquiryFileV2ToResponse(file, s3UrlPrefix)) // ✅ 두 번째 인자 전달
+                .toList();
+
+
+        List<InquiryPreferredDateInfo> preferredDateInfos = preferredDates.stream()
+                .map(InquiryMapper::inquiryPreferredDateInfoToResponse)
+                .toList();
+        String encryptedSpaceId;
+        try {
+            encryptedSpaceId = AES256Util.encrypt(inquiry.getSpace().getId());
+        } catch (GeneralSecurityException e) {
+            throw new RuntimeException("Failed to encrypt space ID", e); // 또는 커스텀 예외로 래핑
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        return new InquiryResponse(
+                inquiry.getId(),
+                encryptedSpaceId, // 🔐 암호화된 spaceId
+                inquiry.getContactPerson(),
+                inquiry.getPhoneNumber(),
+                inquiry.getEmail(),
+                inquiry.getCompanyName(),
+                inquiry.getPosition(),
+                inquiry.getCompanyWebsite(),
+                inquiry.getEventCategory(),
+                preferredDateInfos,
+                inquiry.getContent(),
+                inquiryFileNames,
+                inquiry.getCreatedAt(),
+                inquiry.getStatus(),
+                inquiry.getHostCompany(),
+                inquiry.getSpace().getAlias(),
+                null,
+                null,
+                null
+        );
+    }
+
     public class EncryptionUtils {
         public static String encryptId(Long id) {
             // 암호화 로직 예시 (Base64나 AES 등 실제 사용 중인 로직에 맞게 구현)
@@ -118,10 +164,21 @@ public class InquiryMapper {
         }
     }
 
-    public static InquiryFileName inquiryFileToResponse(InquiryFile file) {
+    public static InquiryFileName inquiryFileV2ToResponse(InquiryFile file, String s3UrlPrefix) {
         return new InquiryFileName(
                 file.getId(),
-                file.getFileName()
+                file.getFileName(),
+                s3UrlPrefix + file.getSaveFileName()   // ✅ URL 생성
+        );
+    }
+
+
+    public static InquiryFileName inquiryFileToResponse(InquiryFile file) {
+
+        return new InquiryFileName(
+                file.getId(),
+                file.getFileName(),
+                null
         );
     }
 

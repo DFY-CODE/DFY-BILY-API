@@ -18,93 +18,25 @@ import java.util.Map;
 
 public class UserActivityMapper {
 
-    public static UserActivity toReservationAndInquiryInfo(
-            Object[] row,
-            Map<Long, List<InquiryPreferredDateInfo>> preferredDatesMap,
-            Map<Long, String> fileNameListMap
-    ) {
-        Long id = toLong(row[0]);
-        Long spaceIdLong = toLong(row[1]); // 기존 spaceId (Long)
-        String spaceId;
-
-        try {
-            // AES256Util을 이용해 spaceId 암호화
-            spaceId = AES256Util.encrypt(spaceIdLong);
-        } catch (Exception e) {
-            throw new RuntimeException("SpaceId 암호화 실패", e);
-        }
-
-        String type = toStr(row[2]);
-        String spaceName = toStr(row[3]);
-        String location = toStr(row[4]);
-        BigDecimal areaM2 = toBigDecimal(row[5]);
-        int areaPy = toPrimitiveInt(row[6]);
-        LocalDateTime from = toDateTime(row[8]);
-        LocalDateTime to = toDateTime(row[9]);
-        Long price = toLong(row[10]);
-        String status = toStr(row[11]);
-        LocalDateTime createdAt = toDateTime(row[12]);
-
-        return new UserActivity(
-                id,
-                spaceId, // AES256으로 암호화된 spaceId 전달
-                type,
-                spaceName,
-                location,
-                areaM2,
-                areaPy,
-                "INQUIRY".equals(type) ? preferredDatesMap.getOrDefault(id, null) : null,
-                "RESERVATION".equals(type) ? new ReservationPreferredDateInfo(from, to) : null,
-                price,
-                status,
-                createdAt,
-                fileNameListMap.getOrDefault(spaceIdLong, null) // 파일 맵은 기존 Long spaceId로 처리
-        );
-    }
-
-
-
-
-    private static String toStr(Object obj) {
-        return obj != null ? obj.toString() : null;
-    }
-
-    private static Long toLong(Object obj) {
-        return obj instanceof Number num ? num.longValue() : null;
-    }
-
-    private static Integer toInt(Object obj) {
-        return obj instanceof Number num ? num.intValue() : null;
-    }
-
-    private static int toPrimitiveInt(Object obj) {
-        return obj instanceof Number num ? num.intValue() : 0;
-    }
-
-    private static LocalDateTime toDateTime(Object obj) {
-        return obj instanceof Timestamp ts ? ts.toLocalDateTime() : null;
-    }
-
-    private static BigDecimal toBigDecimal(Object obj) {
-        return obj instanceof BigDecimal bd ? bd : null;
-    }
-
     public static UserActivity fromInquiryActivity(
             InquiryActivity inquiryActivity,
             Map<Long, String> fileNameListMap,
             Map<Long, List<InquiryPreferredDateInfo>> preferredDatesMap
     ) {
-        String spaceId;
+        // 공간 ID 가져오기
+        Long spaceIdRaw = inquiryActivity.spaceId();   // ← spaceId 를 제공하는 getter 사용
+
+        // spaceId 암호화
+        String encryptedSpaceId;
         try {
-            // 암호화된 spaceId 생성 (id 값을 암호화)
-            spaceId = AES256Util.encrypt(inquiryActivity.id());
+            encryptedSpaceId = AES256Util.encrypt(spaceIdRaw);
         } catch (Exception e) {
             throw new RuntimeException("SpaceId 암호화 실패", e);
         }
 
         return new UserActivity(
                 inquiryActivity.id(),
-                spaceId, // 암호화된 spaceId 사용
+                encryptedSpaceId,
                 "INQUIRY",
                 inquiryActivity.spaceName(),
                 inquiryActivity.location(),
@@ -112,12 +44,14 @@ public class UserActivityMapper {
                 inquiryActivity.areaPy(),
                 preferredDatesMap.getOrDefault(inquiryActivity.id(), null),
                 null,
+                null,
                 inquiryActivity.price(),
                 inquiryActivity.status().getDescription(),
                 inquiryActivity.createdAt(),
-                fileNameListMap.getOrDefault(inquiryActivity.id(), null) // fileName 맵은 id로 처리
+                fileNameListMap.getOrDefault(spaceIdRaw, null) // ★ spaceId 로 조회
         );
     }
+
 
 
 
@@ -127,19 +61,22 @@ public class UserActivityMapper {
             ReservationActivity reservation,
             Map<Long, String> fileNameListMap
     ) {
+        ReservationPreferredDateInfo reservationDateInfo = new ReservationPreferredDateInfo(
+                reservation.startDate(),
+                reservation.endDate()
+        );
+
         return new UserActivity(
                 reservation.id(),
-                reservation.spaceId(), // spaceId 추가
+                reservation.spaceId(),
                 "RESERVATION",
                 reservation.spaceName(),
                 reservation.location(),
                 reservation.areaM2(),
                 reservation.areaPy(),
-                null, // inquiryPreferredDateList는 예약에서는 없음
-                new ReservationPreferredDateInfo(
-                        reservation.startDate(),
-                        reservation.endDate()
-                ),
+                null,
+                reservationDateInfo,        // 예약 실제 사용 날짜
+                reservationDateInfo,        // ✅ preferred 예약 날짜도 동일하게 설정
                 reservation.price(),
                 reservation.status().getDescription(),
                 reservation.createdAt(),

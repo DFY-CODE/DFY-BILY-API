@@ -119,6 +119,7 @@ public class InquiryRepositoryCustomImpl implements InquiryRepositoryCustom {
         List<InquiryActivity> contents = queryFactory
                 .select(Projections.constructor(InquiryActivity.class,
                         inquiry.id,
+                        space.id,
                         space.title,
                         space.location,
                         space.areaM2,
@@ -136,6 +137,7 @@ public class InquiryRepositoryCustomImpl implements InquiryRepositoryCustom {
                 .stream()
                 .map(activity -> new InquiryActivity(
                         activity.id(),
+                        activity.spaceId(),
                         activity.spaceName(),
                         activity.location(),
                         activity.areaM2(),

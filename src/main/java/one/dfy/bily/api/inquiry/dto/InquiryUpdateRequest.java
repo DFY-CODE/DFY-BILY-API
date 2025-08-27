@@ -4,6 +4,9 @@ package one.dfy.bily.api.inquiry.dto;
 import java.util.List;
 
 public record InquiryUpdateRequest(
+
+        Long inquiryId,
+        String spaceIdName,
         String companyName,
         String companyWebsite,
         String contactPerson,
@@ -13,6 +16,6 @@ public record InquiryUpdateRequest(
         String hostCompany,
         String eventCategory,
         String content,
-        Long spaceId,
+        String spaceId,
         List<InquiryPreferredDateInfo> preferredDates
 ) { }
