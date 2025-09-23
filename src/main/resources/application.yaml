@@ -60,45 +60,69 @@ spring:
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
-
   jpa:
     hibernate:
       ddl-auto: none
       naming:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
-    show-sql: true                       # 콘솔에 SQL 출력
+    show-sql: false # 상용에서는 false로 유지하시는 것이 좋습니다.
     properties:
       hibernate:
-        format_sql: true                 # 가독성 좋은 줄바꿈
-        highlight_sql: true              # ANSI 컬러 하이라이트
+        # 상용에서는 SQL 포맷팅 및 하이라이트 기능도 비활성화하여 오버헤드를 줄입니다.
+        format_sql: false
+        highlight_sql: false
         # --------------------------------------------
-        #  ↓ 바인딩 파라미터 로그를 위해 TRACE 레벨 필요
+        # 바인딩 파라미터 로깅은 상용 환경에서 심각한 성능 저하의 원인입니다.
+        # 운영 중에는 이 설정을 아예 없애거나, DEBUG/INFO/WARN 등으로 절대 설정하지 마시고,
+        # 문제 발생 시에만 DEBUG 레벨로 잠깐 활성화 후 다시 비활성화하는 것을 강력히 권장합니다.
+        # 기본적으로 TRACE는 개발/디버깅용입니다.
+        # 해당 로거에 대한 설정을 삭제합니다.
+        # type:
+        #   descriptor: TRACE
         # --------------------------------------------
-        type:
-          descriptor: TRACE
 
-    mvc:
-      pathmatch:
-        matching-strategy: ant_path_matcher
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
 
   mybatis:
     configuration:
       map-underscore-to-camel-case: true
 
   logging:
+    file:
+      name: /var/log/one-dfy-bily-api/application.log
+    logback: # Logback을 사용하는 경우의 롤링 정책 (가장 중요합니다!)
+      rollingpolicy:
+        # 로그 파일을 날짜별로 롤링하고 압축하여 디스크 공간을 효율적으로 관리합니다.
+        file-name-pattern: /var/log/one-dfy-bily-api/application-%d{yyyy-MM-dd}.%i.log.gz
+        clean-history-on-start: true # 애플리케이션 시작 시 오래된 로그 파일 정리 (추가)
+        max-file-size: 50MB # 각 로그 파일의 최대 크기 (필요에 따라 조정)
+        total-size-cap: 2GB # 전체 로그 파일이 차지할 수 있는 최대 용량 (필요에 따라 조정)
+        max-history: 30 # 최대 30일치 로그 보관 (보관 정책에 따라 조정)
+
+    # 상용에서는 컬러 코드를 제거하고, 간결한 로깅 패턴을 사용합니다.
     pattern:
-      console: "%clr(%d{yyyy-MM-dd HH:mm:ss}){green} [%thread] %clr(%-5level){cyan} %clr([%logger{36}]){blue} - %msg%n"
+      console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+      file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n" # 파일 전용 패턴
+
     level:
-      root: INFO
+      root: INFO # 기본 로깅 레벨은 INFO로 유지
 
       # --- Hibernate 실행 SQL ---
-      "org.hibernate.SQL": DEBUG
+      # 상용 환경에서는 SQL 실행 로그를 INFO 레벨로도 남기지 않는 것을 권장합니다.
+      # 중요한 문제 발생 시에만 DEBUG로 임시 변경하여 확인합니다.
+      "org.hibernate.SQL": WARN
 
-      # --- Hibernate 6.x 바인딩 값 ---
-      "org.hibernate.orm.jdbc.bind": TRACE
+      # --- Hibernate 바인딩 값 로거 (6.x 및 5.x) ---
+      # 상용 환경에서는 바인딩 값 로거를 완전히 끄거나 (OFF) 매우 높은 레벨 (ERROR)로 설정하여
+      # 불필요한 파라미터 로깅이 발생하지 않도록 합니다.
+      # 이는 CPU와 디스크 I/O를 크게 절감할 수 있는 핵심 부분입니다.
+      "org.hibernate.orm.jdbc.bind": OFF # Hibernate 6.x 바인딩 값
+      "org.hibernate.type.descriptor.sql": OFF # Hibernate 5.x 바인딩 값 (매우 중요!)
 
-      # --- Hibernate 5.x 바인딩 값 ---
-      "org.hibernate.type.descriptor.sql": TRACE
+      # Spring Framework 내부 로깅은 필요에 따라 INFO 유지
+      "org.springframework": INFO
 
 
 

@@ -47,7 +47,7 @@ public class SpaceUseFileInfo extends BaseEntity {
     private Long saveSize;
 
     @Column(name = "IS_USED")
-    private boolean used = true;
+    private Boolean used = true;
 
     @Column(name = "CREATOR", nullable = false, length = 50)
     private String creator = SYSTEM_USER;   // 기본값
@@ -67,17 +67,24 @@ public class SpaceUseFileInfo extends BaseEntity {
     @Column(name = "IS_THUMBNAIL")
     private Boolean thumbnail;
 
-    /** 새로 업로드된 파일 정보로 파일 관련 속성을 한 번에 교체 */
-    public void replaceWith(FileUploadInfo info) {
-        this.fileName     = info.originalFileName();
-        this.saveFileName = info.newFileName();
-        this.saveLocation = info.saveLocation();
-        this.saveSize     = info.fileSize();
-        this.fileType     = info.fileType();
-        // fileOrder · thumbnail · creator · updater 등은 유지
+    /* ---------- JPA 라이프사이클 ---------- */
+    @jakarta.persistence.PrePersist
+    private void onPersist() {
+        if (isBlank(this.creator)) this.creator = SYSTEM_USER;
+        if (isBlank(this.updater)) this.updater = SYSTEM_USER;
+    }
+
+    @jakarta.persistence.PreUpdate
+    private void onUpdate() {
+        if (isBlank(this.updater)) this.updater = SYSTEM_USER;
+    }
+
+    private static boolean isBlank(String s) {
+        return s == null || s.trim().isEmpty();
     }
 
     /* ---------- 생성자 ---------- */
+    // 기존 생성자가 있을 수 있으므로 유지. 필요 시 다음과 같은 명시적 생성자도 사용 가능합니다.
     public SpaceUseFileInfo(Long spaceId,
                             String fileName,
                             String saveFileName,
@@ -85,24 +92,19 @@ public class SpaceUseFileInfo extends BaseEntity {
                             Long saveSize,
                             String fileType,
                             Integer fileOrder,
-                            String fileTitle) {
-
-        this.spaceId      = spaceId;
-        this.fileName     = fileName;
+                            Boolean used,
+                            String fileTitle,
+                            Boolean thumbnail) {
+        this.spaceId = spaceId;
+        this.fileName = fileName;
         this.saveFileName = saveFileName;
         this.saveLocation = saveLocation;
-        this.saveSize     = saveSize;
-        this.fileType     = fileType;
-        this.fileOrder    = fileOrder;
-        this.fileTitle    = fileTitle;
-        // creator / updater 는 기본값(SYSTEM_USER) 유지
+        this.saveSize = saveSize;
+        this.fileType = fileType;
+        this.fileOrder = fileOrder;
+        this.used = used;
+        this.fileTitle = fileTitle;
+        this.thumbnail = thumbnail != null ? thumbnail : Boolean.FALSE;
     }
-
-    /* ---------- JPA life-cycle ---------- */
-    @PrePersist
-    private void prePersist() {
-        if (creator == null) creator = SYSTEM_USER;
-        if (updater == null) updater = creator;
-    }
-
 }
+

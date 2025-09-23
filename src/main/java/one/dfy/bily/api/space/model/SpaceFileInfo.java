@@ -4,9 +4,11 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import one.dfy.bily.api.common.dto.FileUploadInfo;
 import one.dfy.bily.api.common.model.BaseEntity;
 
+@Setter
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
@@ -88,18 +90,20 @@ public class SpaceFileInfo extends BaseEntity {
 
 
     /* ---------- JPA Life-cycle ---------- */
-    @PrePersist
+    @jakarta.persistence.PrePersist
     private void prePersist() {
-        if (creator == null) creator = SYSTEM_USER;
-        if (updater == null) updater = creator;
+        if (isBlank(this.creator)) this.creator = SYSTEM_USER;
+        if (isBlank(this.updater)) this.updater = SYSTEM_USER;
     }
 
+    private static boolean isBlank(String s) {
+        return s == null || s.trim().isEmpty();
+    }
     /** 메타데이터(순서·타입·썸네일)만 갱신 */
     public void updateMeta(int fileOrder, String fileType, boolean thumbnail) {
         this.fileOrder = fileOrder;
         this.fileType  = fileType;
         this.thumbnail = thumbnail;
     }
-
 
 }

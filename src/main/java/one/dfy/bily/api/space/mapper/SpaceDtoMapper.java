@@ -170,7 +170,9 @@ public class SpaceDtoMapper {
                 file.fileSize(),
                 file.fileType(),
                 fileOrder,
-                fileTitle
+                true,
+                fileTitle,
+                false
         );
     }
 

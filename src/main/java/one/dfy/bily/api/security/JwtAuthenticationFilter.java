@@ -45,7 +45,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         }
 
-        log.info("Access Token from Cookie: {}", token);
+        // log.info("Access Token from Cookie: {}", token);
 
         if (token != null) {
             try {
@@ -73,7 +73,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 }
 
             } catch (Exception e) {
-                log.warn("❌ JWT Token validation failed: {}", e.getMessage());
+                // log.warn("❌ JWT Token validation failed: {}", e.getMessage());
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 return;
             }

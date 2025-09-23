@@ -317,7 +317,6 @@ public class SpaceService {
         }
 
         return SpaceResultResponse.builder()
-                .success(true)
                 .message("저장되었습니다.")
                 .spaceId(resultSpaceId)
                 .build();
@@ -372,27 +371,15 @@ public class SpaceService {
         this.deleteRemovedBlueImages(req);
 
         /* ---------- 공간 이미지 동기화 ---------- */
-        if (CollectionUtils.isNotEmpty(spaceFiles)) {
-            this.syncSpaceImages(spaceId, req, req.spaceImagesMeta(), spaceFiles);
-        } else {
+        this.syncSpaceImages(spaceId, req, req.spaceImagesMeta(), spaceFiles);
 
-            this.updateSpaceData(spaceId, req.spaceImagesMeta());
-        }
-
-        log.info(req.newUseCaseImages().toString());
         /* ---------- 사용 사례 이미지 동기화 ---------- */
-        if (CollectionUtils.isNotEmpty(useCaseFiles)) {
-            syncSpaceUseImages(spaceId, req, req.useCaseImagesMeta(), useCaseFiles);
-        } else {
-
-            this.updateSpaceUseCaseData(spaceId, req.useCaseImagesMeta());
-        }
+            this.syncSpaceUseImages(spaceId, req, req.useCaseImagesMeta(), useCaseFiles);
 
         /* ---------- 도면(블루프린트) 동기화 ---------- */
         if (blueprint != null && !blueprint.isEmpty()) {
             syncSpaceBlueprintImage(spaceId, blueprint, "ADMIN");
         }
-
 
         // 5-1. 기존 행 제거
         spaceAmenityRepository.deleteBySpaceId(spaceId);
@@ -465,86 +452,8 @@ public class SpaceService {
 
     /**
      * 공간 이미지 메타데이터만 갱신
-     *  - 파일 업로드, S3 처리는 수행하지 않는다.
+     *  - 파일 업로드, S3 FileUpload
      */
-    @Transactional
-    public void updateSpaceData(Long spaceId, List<SpaceImageMetaRequest> metas) {
-        if (CollectionUtils.isEmpty(metas)) {
-            return;
-        }
-
-        // ① 기존 파일 정보 : fileOrder ASC 로 정렬되어 조회
-        List<SpaceFileInfo> originals = spaceFileInfoRepository.findBySpaceIdAndUsedOrderByFileOrderAsc(spaceId, true);
-
-
-        // ③ 두 리스트 중 더 짧은 쪽까지만 처리 하려 했으나 JPA 쿼리조회에서 spaceId만으로는 사이즈 알수 없음 동일PK (id, spaceId)로 조회 되어야함
-        int size = Math.min(originals.size(), metas.size());
-
-        // 메타데이터 일괄 갱신
-        for (int i = 0; i < size; i++) {
-            Long id = originals.get(i).getId();                // PK
-            SpaceImageMetaRequest meta = metas.get(i);         // 대응되는 메타
-
-            spaceFileInfoRepository.updateMeta(
-                    id,                                        // PK 기준 업데이트
-                    spaceId,
-                    meta.fileOrder(),
-                    Boolean.TRUE.equals(meta.thumbnail())
-            );
-        }
-    }
-
-
-    /**
-     * 이용사례 이미지 메타데이터만 갱신
-     *  - 파일 업로드, S3 처리는 수행하지 않는다.
-     */
-    @Transactional
-    public void updateSpaceUseCaseData(Long spaceId,
-                                       List<SpaceUseCaseImageMetaRequest> metas) {
-
-        if (CollectionUtils.isEmpty(metas)) return;
-
-        // ① 기존 레코드 : fileOrder ASC 로 이미 정렬돼 있음
-        List<Long> originals = spaceUseFileInfoRepository.findIdsBySpaceIdAndUsedOrderByFileOrderAsc(spaceId, true);
-
-        // 둘 중 더 짧은 쪽까지만 처리
-        int size = Math.min(originals.size(), metas.size());
-
-
-        //int size = metas.size();
-
-
-        for (int i = 0; i < size; i++) {
-            Long id = originals.get(i);                       // PK 바로 사용
-            SpaceUseCaseImageMetaRequest meta = metas.get(i); // 매칭 메타
-
-            String title = meta.title();
-
-
-            // title 이 null 이거나 공백( "" / "   " )이면 기존 제목 유지
-            if (!StringUtils.hasText(title)) {
-                spaceUseFileInfoRepository.updateFileOrder(
-                        id,
-                        spaceId,
-                        meta.fileOrder());
-            } else {
-                // 내용이 있을 때만 제목 업데이트
-                spaceUseFileInfoRepository.updateMeta(
-                        id,
-                        spaceId,
-                        meta.fileOrder(),
-                        title.trim());                        // 필요 시 trim
-            }
-
-        }
-
-
-        // 길이가 다를 경우(예: 메타가 더 많음 / 적음) 어떻게 처리할지 필요에 따라 추가
-    }
-
-
-
     @Transactional
     public void syncSpaceImages(
             Long spaceId,
@@ -552,99 +461,198 @@ public class SpaceService {
             List<SpaceImageMetaRequest> metas,
             List<MultipartFile> spaceFiles
     ) {
-        /* 0. 기존 이미지 조회 */
-        List<SpaceFileInfo> existing = spaceFileInfoRepository.findBySpaceIdAndUsedOrderByFileOrderAsc(spaceId, true);
+        // 0) NPE 방지
+        final List<SpaceImageMetaRequest> safeMetas = (metas == null) ? List.of() : metas;
+        final List<MultipartFile> newFiles = (spaceFiles == null) ? List.of() : spaceFiles;
 
-        /* 0-1. S3 객체 Key 수집 후 일괄 삭제 */
-        List<String> keys = existing.stream()
-                .map(e -> e.getSaveLocation() + "/" + e.getSaveFileName()) // 엔티티 필드명에 맞게 수정
+        // 0-1) 메타를 fileOrder 기준으로 정렬해서 처리 안정성 확보
+        final List<SpaceImageMetaRequest> orderedMetas = safeMetas.stream()
+                .sorted(Comparator.comparingInt(m -> {
+                    Integer fo = m.fileOrder();
+                    return (fo == null) ? Integer.MAX_VALUE : fo;
+                }))
                 .toList();
 
-        if (!keys.isEmpty() && CollectionUtils.isEmpty(req.newSpaceImages())) {
-            s3Uploader.deleteFiles(keys);   // ← S3 일괄 삭제 메서드(예: AWS SDK deleteObjects)
-            /* 0-2. DB 레코드 삭제 */
-            spaceFileInfoRepository.deleteAllInBatch(existing);
+        // 1) 기존 이미지 로드
+        List<SpaceFileInfo> existing = spaceFileInfoRepository
+                .findBySpaceIdAndUsedOrderByFileOrderAsc(spaceId, true);
+
+        Map<Long, SpaceFileInfo> existingById = existing.stream()
+                .collect(Collectors.toMap(SpaceFileInfo::getId, Function.identity()));
+
+        // 2) 메타에 포함되지 않은 기존 파일 찾기(삭제 대상)
+        Set<Long> keepIds = orderedMetas.stream()
+                .map(SpaceImageMetaRequest::fileId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+
+        List<SpaceFileInfo> toDelete = existing.stream()
+                .filter(e -> !keepIds.contains(e.getId()))
+                .toList();
+
+        if (!toDelete.isEmpty()) {
+            List<String> keys = toDelete.stream()
+                    .map(e -> e.getSaveLocation() + "/" + e.getSaveFileName())
+                    .toList();
+            s3Uploader.deleteFiles(keys);
+            spaceFileInfoRepository.deleteAllInBatch(toDelete);
         }
 
-        /* 1. 새 파일 iterator */
-        Iterator<MultipartFile> iter = spaceFiles.iterator();
+        // 3) 신규 파일 매칭 커서
+        int newFileCursor = 0;
 
-        /* 2. 메타 순서대로 업로드 & INSERT */
-        for (SpaceImageMetaRequest meta : metas) {
-            if (!iter.hasNext()) break;            // 파일 부족 시 탈출 (예외 처리 선택)
+        // 4) 메타 처리
+        List<SpaceFileInfo> toUpdate = new ArrayList<>();
 
-            MultipartFile file = iter.next();
+        for (SpaceImageMetaRequest meta : orderedMetas) {
+            Long fileId = meta.fileId();
 
-            // ① 업로드
-            FileUploadInfo uploaded = s3Uploader.spaceFileUpload(file);
+            // fileId가 null이거나 0(또는 음수)면 기존파일 갱신 로직을 타지 않도록 안전 처리
+            if (fileId != null && fileId > 0) {
+                SpaceFileInfo entity = existingById.get(fileId);
+                if (entity == null) {
+                    continue;
+                }
+                entity.setFileType(meta.fileType());
+                entity.setFileOrder(meta.fileOrder());
+                entity.setThumbnail(Boolean.TRUE.equals(meta.thumbnail()));
+                entity.setUsed(true);
+                toUpdate.add(entity);
+            } else {
+                // 신규 파일 등록(메타에는 fileId 없음)
+                if (newFileCursor >= newFiles.size()) {
+                    continue;
+                }
+                MultipartFile file = newFiles.get(newFileCursor++);
+                FileUploadInfo uploaded = s3Uploader.spaceFileUpload(file);
 
-            // ② 엔티티 생성
-            SpaceFileInfo entity = new SpaceFileInfo(
-                    spaceId,
-                    uploaded.originalFileName(),
-                    uploaded.newFileName(),        // S3 Key
-                    uploaded.saveLocation(),
-                    uploaded.fileSize(),
-                    meta.fileType(),
-                    meta.fileOrder(),
-                    Boolean.TRUE.equals(meta.thumbnail())
-            );
-
-            // ③ 저장
-            spaceFileInfoRepository.save(entity);
+                SpaceFileInfo entity = new SpaceFileInfo(
+                        spaceId,
+                        uploaded.originalFileName(),
+                        uploaded.newFileName(),
+                        uploaded.saveLocation(),
+                        uploaded.fileSize(),
+                        meta.fileType() != null ? meta.fileType() : file.getContentType(),
+                        meta.fileOrder(),
+                        Boolean.TRUE.equals(meta.thumbnail())
+                );
+                spaceFileInfoRepository.save(entity);
+            }
         }
+
+
+        // 5) 기존 엔티티의 Dirty Checking 반영을 보장하고 싶다면 saveAll/flush
+        if (!toUpdate.isEmpty()) {
+            spaceFileInfoRepository.saveAll(toUpdate);
+        }
+        spaceFileInfoRepository.flush();
     }
 
+    /**
+     * 이용사례 이미지 동기화
+     * - 신규 파일이 있을 때만 S3 업로드 수행
+     * - 기존 파일은 메타데이터만 갱신
+     * - 메타에 포함되지 않은 기존 파일은 S3 및 DB에서 삭제
+     */
     @Transactional
     public void syncSpaceUseImages(
             Long spaceId,
             SpaceUpdateRequest req,
             List<SpaceUseCaseImageMetaRequest> metas,
-            List<MultipartFile> useCaseFiles
+            List<MultipartFile> useFiles
     ) {
+        // 0) NPE 방지
+        final List<SpaceUseCaseImageMetaRequest> safeMetas = (metas == null) ? List.of() : metas;
+        final List<MultipartFile> newFiles = (useFiles == null) ? List.of() : useFiles;
 
-        /* 0. 기존 이미지 조회 */
-        List<SpaceUseFileInfo> existing = spaceUseFileInfoRepository.findBySpaceId(spaceId);
-
-        /* 0-1. S3 객체 Key 수집 후 일괄 삭제 */
-        List<String> keys = existing.stream()
-                .map(e -> e.getSaveLocation() + "/" + e.getSaveFileName()) // 엔티티 필드명에 맞게 수정
+        // 0-1) 메타를 fileOrder 기준으로 정렬해서 처리 안정성 확보
+        final List<SpaceUseCaseImageMetaRequest> orderedMetas = safeMetas.stream()
+                .sorted(Comparator.comparingInt(m -> {
+                    Integer fo = m.fileOrder();
+                    return (fo == null) ? Integer.MAX_VALUE : fo;
+                }))
                 .toList();
 
-        if (!keys.isEmpty() && CollectionUtils.isEmpty(req.newUseCaseImages())) {
-            s3Uploader.deleteFiles(keys);   // ← S3 일괄 삭제 메서드(예: AWS SDK deleteObjects)
-            /* 0-2. DB 레코드 삭제 */
-            spaceUseFileInfoRepository.deleteAllInBatch(existing);
+        // 1) 기존 이미지 로드
+        List<SpaceUseFileInfo> existing = spaceUseFileInfoRepository
+                .findAllBySpaceIdAndUsedOrderByFileOrderAsc(spaceId, true);
+
+        Map<Long, SpaceUseFileInfo> existingById = existing.stream()
+                .collect(Collectors.toMap(SpaceUseFileInfo::getId, Function.identity()));
+
+        // 2) 메타에 포함되지 않은 기존 파일 찾기(삭제 대상)
+        Set<Long> keepIds = orderedMetas.stream()
+                .map(SpaceUseCaseImageMetaRequest::fileId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+
+        List<SpaceUseFileInfo> toDelete = existing.stream()
+                .filter(e -> !keepIds.contains(e.getId()))
+                .toList();
+
+        if (!toDelete.isEmpty()) {
+            List<String> keys = toDelete.stream()
+                    .map(e -> e.getSaveLocation() + "/" + e.getSaveFileName())
+                    .toList();
+            s3Uploader.deleteFiles(keys);
+            spaceUseFileInfoRepository.deleteAllInBatch(toDelete);
         }
 
-        /* 1. 새 파일 iterator */
-        Iterator<MultipartFile> iter = useCaseFiles.iterator();
+        // 3) 신규 파일 매칭 커서: "신규 메타"의 상대 인덱스와 MultipartFile 리스트를 매칭
+        int newFileCursor = 0;
 
-        /* 2. 메타 순서대로 업로드 & INSERT */
-        for (SpaceUseCaseImageMetaRequest meta : metas) {
-            if (!iter.hasNext()) break;            // 파일 부족 시 탈출 (예외 처리 선택)
+        // 4) 메타 처리
+        List<SpaceUseFileInfo> toUpdate = new ArrayList<>();
 
-            MultipartFile file = iter.next();
+        for (SpaceUseCaseImageMetaRequest meta : orderedMetas) {
+            Long fileId = meta.fileId();
 
-            // ① 업로드
-            FileUploadInfo uploaded = s3Uploader.useCaseFileUpload(file);
+            // 기존 파일의 경우 fileId가 반드시 존재하고, 0/음수 등의 잘못된 값도 차단
+            if (fileId != null && fileId > 0) {
+                SpaceUseFileInfo entity = existingById.get(fileId);
+                if (entity == null) {
+                    // 방어: 메타에 fileId가 있지만 DB에는 없는 경우 skip
+                    continue;
+                }
+                entity.setFileTitle(meta.title());
+                entity.setFileType(meta.fileType());
+                entity.setFileOrder(meta.fileOrder());
+                entity.setThumbnail(Boolean.TRUE.equals(meta.thumbnail()));
+                entity.setUsed(true);
+                toUpdate.add(entity);
+            } else {
+                // 신규 파일: 신규 메타 등장 순서대로 MultipartFile 매칭
+                if (newFileCursor >= newFiles.size()) {
+                    // 신규 메타 수 > 업로드 파일 수 인 경우 방어적으로 스킵
+                    continue;
+                }
+                MultipartFile file = newFiles.get(newFileCursor++);
+                FileUploadInfo uploaded = s3Uploader.useCaseFileUpload(file);
 
-            // ② 엔티티 생성
-            SpaceUseFileInfo entity = new SpaceUseFileInfo(
-                    spaceId,
-                    uploaded.originalFileName(),
-                    uploaded.newFileName(),        // S3 Key
-                    uploaded.saveLocation(),
-                    uploaded.fileSize(),
-                    meta.fileType(),
-                    meta.fileOrder(),
-                    meta.title()
-            );
-
-            // ③ 저장
-            spaceUseFileInfoRepository.save(entity);
+                SpaceUseFileInfo entity = new SpaceUseFileInfo(
+                        spaceId,
+                        uploaded.originalFileName(),
+                        uploaded.newFileName(),          // S3에 저장된 파일명(Key)
+                        uploaded.saveLocation(),
+                        uploaded.fileSize(),
+                        meta.fileType() != null ? meta.fileType() : file.getContentType(),
+                        meta.fileOrder(),
+                        true,
+                        meta.title(),
+                        Boolean.TRUE.equals(meta.thumbnail())
+                );
+                spaceUseFileInfoRepository.save(entity);
+            }
         }
+
+
+        // 5) 기존 엔티티의 Dirty Checking 반영을 보장하고 싶다면 saveAll/flush
+        if (!toUpdate.isEmpty()) {
+            spaceUseFileInfoRepository.saveAll(toUpdate);
+        }
+        spaceUseFileInfoRepository.flush();
     }
+
 
     /**
      * 도면(블루프린트) 파일 단건 동기화
